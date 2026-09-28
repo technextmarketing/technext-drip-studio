@@ -406,7 +406,7 @@
     var st = 'left:' + (L.x || 0) + 'px;' + (L.b != null ? 'bottom:' + L.b + 'px;' : 'top:' + y + 'px;') + (L.w ? 'width:' + L.w + 'px;' : '') +
       'z-index:' + (L.z == null ? 10 : L.z) + ';' + (L.op != null && L.op !== 1 ? 'opacity:' + L.op + ';' : '') +
       ((L.rot || L.flip || L.s || (L.cam && CAM[ctx.cam])) ? 'transform:' + (L.cam && CAM[ctx.cam] ? CAM[ctx.cam] + ' ' : '') + 'rotate(' + (L.rot || 0) + 'deg)' + (L.flip ? ' scaleX(-1)' : '') + (L.s ? ' scale(' + L.s + ')' : '') + ';' : '');
-    var cls = 'L L-' + L.type + (FX[L.type] ? ' fx fx-' + L.type : '') + (L.variant && FX[L.type] ? ' ' + L.variant : '') + (L.sticker ? ' sticker' : '');
+    var cls = 'L L-' + L.type + (FX[L.type] ? ' fx fx-' + L.type : '') + (L.variant && FX[L.type] ? ' ' + L.variant : '') + (L.sticker ? ' sticker' : '') + (L.stack ? ' stack' + (+L.stack > 1 ? ' stack2' : '') : '');
     return '<div class="' + cls + '" data-i="' + i + '" style="' + st + '"><div class="in">' + inner + '</div></div>';
   }
 
@@ -421,11 +421,12 @@
     var el = document.createElement('div');
     var tall = d.format === '4:5', H = tall ? 1350 : 1080, v3 = d.bg && typeof d.bg === 'object', dark = false, h = '';
     if (v3) { var B = bgx(d.bg, H, false); h += B.html; dark = B.dark; }
-    el.className = 'drip' + (tall ? ' r45' : '') + (v3 ? ' v3' + (dark ? ' dark' : '') : d.bg && d.bg !== 'light' ? ' bg-' + d.bg : '');
+    el.className = 'drip' + (tall ? ' r45' : '') + (v3 ? ' v3' + (dark ? ' dark' : '') : d.bg && d.bg !== 'light' ? ' bg-' + d.bg : '') + (!v3 && d.tint ? ' tint-' + d.tint : '');
     el.setAttribute('data-id', d.id);
     if (!v3) {
       var ground = d.ground == null ? 'blobs' : d.ground;
       if (d.grid) h += '<div class="d-grid"></div>';
+      if (d.pattern) h += '<div class="d-pat pat-' + esc(d.pattern) + '"></div>';
       if (ground) h += '<div class="d-ground">' + (ground === 'wave' ? wave() : ground.indexOf('blobs') === 0 ? blobs(ground) : ground === 'haze' ? '<i class="haze"></i>' : '') + '</div>';
     }
     if (d.brand) h += brandHTML(d.brand, d);

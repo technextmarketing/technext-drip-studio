@@ -113,6 +113,34 @@
     'card-plan': ['appcard', { app: 'planning', view: 'planning', title: 'This week', crumb: 'Planning · Schedule', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], rows: [['Ravi S.', [[0, 2, 'Service'], [3, 1, 'Install']]], ['Mei Ling T.', [[1, 2, 'Repair']]], ['Daniel K.', [[0, 1, 'Survey'], [2, 3, 'Maintenance']]]] }],
     'card-kds': ['appcard', { app: 'pos_restaurant', view: 'kds', title: 'Kitchen display', crumb: 'POS · Main kitchen', tickets: [['Table 12', [['Laksa', '2'], ['Chicken rice', '1']], 'cooking', '2 min'], ['Table 7', [['Satay (10)', '1']], 'ready', '6 min']] }],
     qr: ['qr', { title: 'Table 12', text: 'Scan to order and pay', app: 'pos_restaurant' }],
+    'doc-quote': ['doc', { kind: 'quote', partner: 'Sample Trading Pte Ltd', fields: [['Expiration', '15 Oct 2026']], lines: [['Office chair', '10', 'S$ 1,800.00'], ['Standing desk', '4', 'S$ 2,480.00']], total: 'S$ 4,665.20' }],
+    'doc-order': ['doc', { kind: 'order', partner: 'Sample Trading Pte Ltd', lines: [['Office chair', '10', 'S$ 1,800.00']], total: 'S$ 1,962.00' }],
+    'doc-invoice': ['doc', { kind: 'invoice', partner: 'Sample Foods Pte Ltd', fields: [['Due', '30 Oct 2026']], lines: [['Accounting set-up', '1', 'S$ 3,040.00']], total: 'S$ 3,313.60', ribbon: 'PAID' }],
+    'doc-bill': ['doc', { kind: 'bill', partner: 'Sample Seafood Pte Ltd', lines: [['Prawns 2 kg', '6', 'S$ 192.00']], total: 'S$ 209.28', note: 'Filled by Odoo AI' }],
+    'doc-po': ['doc', { kind: 'po', partner: 'Sample Supplier Pte Ltd', lines: [['Cement, 40 kg bags', '20', 'S$ 180.00']], total: 'S$ 196.20' }],
+    'doc-delivery': ['doc', { kind: 'delivery', partner: 'Sample Cafe, Tampines', lines: [['Chicken rice (kg)', '20 / 20', ''], ['Laksa paste', '6 / 8', '']] }],
+    'doc-compact': ['doc', { kind: 'invoice', compact: true, partner: 'Sample Foods Pte Ltd', total: 'S$ 3,313.60', ribbon: 'PAID' }],
+    product: ['product', { name: 'Linen shirt', ref: '[LN-SHIRT-M] Apparel', icon: 'shirt', price: 'S$ 49.00', stock: [['On hand', '4 units'], ['Forecast', '64 units']], level: 12, tags: ['Reorder at 10'], badge: 'Low stock' }],
+    workorder: ['workorder', { title: 'WO/00042 · Painting', sub: 'Oak dining table x20', status: 'In progress', timer: '00:24:10', steps: [['Cutting', 'done', '12:40'], ['Painting', 'now', 'Work center 2'], ['Packing', 'todo', '']], progress: 60, progressLabel: '12 of 20 done', btn: 'Mark as done' }],
+    ticket: ['ticket', { title: '#1042 · Change address', sub: 'Sample Buyer · WhatsApp', stage: 'In progress', priority: 2, sla: '2h left', text: 'Can you deliver to our Tampines outlet instead?', assignee: 'Mei Ling T.', tags: ['Delivery'] }],
+    calendar: ['calendar', { title: 'This week', sub: 'Appointments', tag: '6 booked', days: ['Mon 5', 'Tue 6', 'Wed 7', 'Thu 8', 'Fri 9'], from: 9, to: 15, events: [[0, 9, 1, 'Check-up'], [1, 10.5, 1.5, 'Dental'], [2, 13, 2, 'Surgery', '', 1], [4, 11, 1, 'Follow-up']] }],
+    employee: ['employee', { name: 'Mei Ling T.', job: 'Sales Manager', dept: 'Sales · Singapore', rows: [['Manager', 'Ravi S.'], ['Leave', '2-4 Oct', 'Approved'], ['Payslip', 'September', 'Sent']] }],
+    email: ['email', { subject: 'New arrivals, 20% off this week', from: 'From: Sample Store', headline: 'The linen *edit* is here', cta: 'Shop now', stats: [['42%', 'opened'], ['12%', 'clicked'], ['38', 'orders']] }],
+    shop: ['shop', { brand: 'Sample Store', product: 'Linen shirt', category: 'Apparel', icon: 'shirt', price: 'S$ 49.00', rating: 4.5, reviews: '128 reviews', stock: 'In stock · ships today', options: ['S', 'M', 'L'], pick: 1, cart: '2' }],
+    reconcile: ['reconcile', { title: 'Bank reconciliation', sub: 'DBS · September 2026', status: 'Reconciled', bank: ['24 Sep · PayNow', 'SAMPLE TRADING PTE LTD', 'S$ 4,665.20'], match: ['INV/2026/0142', 'Sample Trading Pte Ltd', 'S$ 4,665.20'], label: 'Matched by amount and reference', btn: 'Validate' }],
+    approval: ['approval', { title: 'Purchase request', sub: 'Approvals · S$ 2,400', status: 'To approve', fields: [['Requested by', 'Mei Ling T.'], ['Amount', 'S$ 2,400']], approvers: [['Ravi S.', 'Approved'], ['Daniel K.', 'Waiting']] }],
+    sheet: ['sheet', { title: 'Sales by outlet', tag: 'Live', formula: '=ODOO.PIVOT(1,"sales")', cols: ['Outlet', 'Sales', 'Orders'], rows: [['Orchard', 'S$ 42,100', '1,204'], ['Tampines', 'S$ 38,400', '1,118'], ['Total', 'S$ 80,500', '2,322']], totalRow: true }],
+    docs: ['docs', { title: 'Finance · Inbox', sub: 'Documents', tag: '4 new', files: [['Bill Seafood.pdf', 'pdf', 'Bill', 1], ['Payslips Sep.xls', 'xls', 'HR'], ['Receipt 88.jpg', 'img', 'Expense'], ['Contract.doc', 'doc', 'Sign']] }],
+    rating: ['rating', { stars: 5, text: 'Fixed on the first visit, and the invoice came the same day.', who: 'Daniel K.', meta: 'Rated the service' }],
+    kcard: ['kcard', { app: 'crm', title: 'Office fit-out', sub: 'Sample Build Co', tags: ['Fit-out', 'Hot'], priority: 3, amount: 'S$ 18,000', owner: 'Ravi S.', activity: 'Call back today, 3 pm' }],
+    pyramid: ['pyramid', { levels: [['Scale', 'Growth'], ['Marketing', 'Growth'], ['ERP', 'Sales · Ops · Admin']], hot: 2 }],
+    groups: ['groups', { groups: [{ title: 'Sales & growth', apps: [['crm'], ['sale'], ['sign'], ['accountant']] }, { title: 'Operations', apps: [['stock'], ['industry_fsm'], ['hr'], ['project']] }], base: 'One database' }],
+    stamp: ['stamp', { text: 'PAID', rot: -10 }], sticker: ['sticker', { text: 'New in|*Odoo 20*', rot: -8 }], ring: ['ring', { value: 78, label: 'Orders on time' }],
+    avatars: ['avatars', { names: ['Mei Ling T.', 'Ravi S.', 'Daniel K.', 'Aisha R.'], more: '+8', label: 'Team SG' }], sticky: ['sticky', { text: 'Stock count? Odoo did it.', rot: -4 }],
+    toggle: ['toggle', { text: 'Offline mode' }], button: ['button', { text: 'Confirm order' }], search: ['search', { query: 'late deliveries', filters: ['This week', 'Tampines'] }],
+    barcode: ['barcode', { code: '8 88012 34567 1', label: 'Linen shirt · M' }], pin: ['pin', { label: 'Tampines' }], timer: ['timer', { time: '00:24:10', label: 'on this job' }],
+    'scr-circle': ['scribble', { kind: 'circle', color: '#E5534B' }], 'scr-underline': ['scribble', { kind: 'underline' }], 'scr-arrow': ['scribble', { kind: 'arrow', color: '#3167CA' }], 'scr-check': ['scribble', { kind: 'check', color: '#21B799' }],
+    scanner: ['scanner', { title: 'Scanned', text: 'LN-SHIRT-M x1' }],
     'g-bar': ['graph', { kind: 'bar', title: 'Orders by day', data: [['Mon', 32], ['Tue', 41], ['Wed', 38], ['Thu', 52], ['Fri', 61]], highlight: 4 }],
     'g-line': ['graph', { kind: 'line', title: 'Revenue by week', data: [['W36', 18], ['W37', 21], ['W38', 19], ['W39', 26], ['W40', 31]], unit: 'k' }],
     'g-donut': ['graph', { kind: 'donut', title: 'Sales by channel', data: [['Store', 46], ['Online', 34], ['Wholesale', 20]], center: '100%', centerLabel: 'of sales', unit: '%' }],
@@ -129,7 +157,10 @@
     link: ['link', { x1: 300, y1: 600, x2: 700, y2: 760, label: 'Handed over', bend: .25 }]
   };
   var ELEMENTS = [
-    ['Odoo cards', [['card-kanban', 'Board (pipeline)'], ['card-list', 'List (invoices…)'], ['card-plan', 'Planning board'], ['card-kds', 'Kitchen tickets'], ['ph-form', 'Phone screen']]],
+    ['Odoo documents', [['doc-quote', 'Quotation'], ['doc-order', 'Sales order'], ['doc-invoice', 'Invoice (paid)'], ['doc-bill', 'Vendor bill'], ['doc-po', 'Purchase order'], ['doc-delivery', 'Delivery'], ['doc-compact', 'Small document']]],
+    ['Odoo cards', [['card-kanban', 'Board (pipeline)'], ['card-list', 'List (invoices…)'], ['card-plan', 'Planning board'], ['card-kds', 'Kitchen tickets'], ['ph-form', 'Phone screen'], ['product', 'Product'], ['workorder', 'Work order'], ['ticket', 'Helpdesk ticket'], ['calendar', 'Calendar week'], ['employee', 'Employee'], ['email', 'Email campaign'], ['shop', 'Online shop page'], ['reconcile', 'Bank reconciliation'], ['approval', 'Approval'], ['sheet', 'Spreadsheet'], ['docs', 'Documents'], ['rating', 'Rating'], ['kcard', 'Lead card']]],
+    ['Poster elements', [['stamp', 'Stamp'], ['sticker', 'Round sticker'], ['ring', 'Progress ring'], ['avatars', 'Team avatars'], ['sticky', 'Sticky note'], ['toggle', 'Toggle'], ['button', 'Big button'], ['search', 'Search bar'], ['barcode', 'Barcode'], ['pin', 'Map pin'], ['timer', 'Timer'], ['scanner', 'Barcode scanner'], ['pyramid', 'Growth pyramid'], ['groups', 'One-system map'], ['scr-circle', 'Scribble circle'], ['scr-underline', 'Scribble underline'], ['scr-arrow', 'Scribble arrow'], ['scr-check', 'Scribble tick']]],
+    ['Industry props', []],
     ['Odoo windows', [['win-form', 'Form (quotation, bill…)'], ['win-list', 'List (invoices…)'], ['win-kanban', 'Kanban (pipeline)'], ['win-dash', 'Dashboard'], ['win-plan', 'Planning board'], ['win-pos', 'Point of Sale'], ['win-kds', 'Kitchen display'], ['win-apps', 'App home screen'], ['win-discuss', 'Discuss / Odoo AI']]],
     ['Charts & numbers', [['g-bar', 'Bar chart'], ['g-line', 'Line chart'], ['g-donut', 'Donut chart'], ['g-funnel', 'Funnel'], ['g-prog', 'Progress bars'], ['kpis', 'KPI tiles'], ['stat', 'Big number']]],
     ['Workflow', [['steps', 'Steps across apps'], ['timeline', 'Timeline'], ['link', 'Arrow with label'], ['appflow', 'How a record moves'], ['flow', 'Industry workflow (site)'], ['ba', 'Before / after (site)'], ['phases', 'Rollout phases (site)'], ['chart', 'Industry dashboard (site)']]],
@@ -152,11 +183,11 @@
     pill: { x: 80, y: 600, text: 'Quote it', rot: -4 }, chip: { x: 640, y: 820, icon: 'check', tone: 'ok', text: 'Done in one click' },
     note: { x: 120, y: 900, text: 'handwritten note', rot: -3 }, bubble: { x: 80, y: 460, text: 'Hello!' }, text: { x: 80, y: 900, w: 600, text: 'Your text', size: 40 },
     icon: { x: 880, y: 500, w: 110, name: 'sparkle' }, odoo: { x: 880, y: 500, w: 110, app: 'accountant' },
-    burst: { x: 240, y: 420, w: 600, z: 2 }, glow: { x: 240, y: 440, w: 600, z: 1 }, sphere: { x: 940, y: 640, w: 60, z: 6 }, halftone: { x: 600, y: 420, w: 500, z: 2 },
+    prop: { x: 800, y: 700, w: 180, name: 'rocket' }, burst: { x: 240, y: 420, w: 600, z: 2 }, glow: { x: 240, y: 440, w: 600, z: 1 }, sphere: { x: 940, y: 640, w: 60, z: 6 }, halftone: { x: 600, y: 420, w: 500, z: 2 },
     scan: { x: 480, y: 560, w: 540 }, sparkles: { x: 880, y: 420, w: 110 }, storm: { x: 700, y: 430, w: 290 }, speed: { x: 60, y: 520, w: 260, z: 8 },
     confetti: { x: 140, y: 380, w: 800 }, arrow: { x: 480, y: 700, w: 130, kind: 'right' }, nosignal: { x: 680, y: 620, w: 120 }
   };
-  var PRESET_W = { appcard: 820, qr: 260, window: 700, ophone: 320, graph: 460, kpis: 640, timeline: 480, steps: 800, chat: 420, receipt: 340, notif: 440, stat: 320, route: 440 };
+  var PRESET_W = { appcard: 820, qr: 260, doc: 520, product: 400, workorder: 520, ticket: 520, calendar: 660, employee: 420, email: 480, shop: 620, reconcile: 580, approval: 520, sheet: 580, docs: 580, rating: 420, kcard: 420, pyramid: 600, groups: 900, ring: 220, sticky: 280, search: 560, barcode: 320, scribble: 220, scanner: 240, sticker: 190, window: 700, ophone: 320, graph: 460, kpis: 640, timeline: 480, steps: 800, chat: 420, receipt: 340, notif: 440, stat: 320, route: 440 };
 
   /* ---------- rail ---------- */
   function renderRail() {
@@ -164,6 +195,7 @@
       var h = '<h2>Add to the drip</h2><p class="rail-help">Click to drop it on the canvas, then drag it into place.</p>';
       ELEMENTS.forEach(function (g) {
         h += '<h2>' + esc(g[0]) + '</h2>';
+        if (g[0] === 'Industry props') { var PR = window.TNProps; if (PR) { var ord = Object.keys(PR.BY_IND).concat(['any']); ord.forEach(function (k) { var list = k === 'any' ? PR.ANY : PR.BY_IND[k]; h += '<p class="rail-help" style="margin:6px 0 4px">' + esc(k === 'any' ? 'Any industry' : indName(k)) + '</p><div class="el-grid props">' + list.map(function (n) { return '<button class="el nexi prop" data-add="prop" data-name="' + n + '" title="' + n + '">' + PR.svg(n) + '<span>' + n + '</span></button>'; }).join('') + '</div>'; }); } return; }
         if (g[0] === 'Nexi') h += '<div class="el-grid">' + g[1].map(function (e) { return '<button class="el nexi" data-add="nexi" data-pose="' + e[1] + '" title="Nexi · ' + e[1] + '"><img src="assets/nexi/nexi-' + e[1] + '.png" alt=""><span>' + e[1] + '</span></button>'; }).join('') + '</div>';
         else h += g[1].map(function (e) { return '<button class="el" data-add="' + e[0] + '">' + esc(e[1]) + '</button>'; }).join('');
       });
@@ -272,7 +304,7 @@
     placeTools();
   }
   var TEXTY = { pill: 1, chip: 1, note: 1, bubble: 1, text: 1, record: 1, phone: 1, checklist: 1, code: 1, site: 1, serp: 1, gauge: 1, ba: 1, orbit: 1, apps: 1, palette: 1, devices: 1, appflow: 1,
-    appcard: 1, qr: 1, window: 1, ophone: 1, graph: 1, kpis: 1, timeline: 1, steps: 1, chat: 1, receipt: 1, notif: 1, stat: 1, route: 1, link: 1 };
+    appcard: 1, qr: 1, doc: 1, product: 1, workorder: 1, ticket: 1, calendar: 1, employee: 1, email: 1, shop: 1, reconcile: 1, approval: 1, sheet: 1, docs: 1, rating: 1, kcard: 1, pyramid: 1, groups: 1, stamp: 1, sticker: 1, ring: 1, avatars: 1, sticky: 1, toggle: 1, button: 1, search: 1, barcode: 1, pin: 1, timer: 1, scanner: 1, prop: 1, window: 1, ophone: 1, graph: 1, kpis: 1, timeline: 1, steps: 1, chat: 1, receipt: 1, notif: 1, stat: 1, route: 1, link: 1 };
   var IMAGEY = { person: 1, shot: 1, img: 1, phone: 1, nexi: 1 };
   var ALIGN_SVG = { l: 'M4 3v18M8 7h12M8 13h8', c: 'M12 3v18M6 7h12M8 13h8', r: 'M20 3v18M4 7h12M8 13h8', t: 'M3 4h18M7 8v12M13 8v8', m: 'M3 12h18M7 6v12M13 8v8', b: 'M3 20h18M7 4v12M13 8v8' };
   function ico(p) { return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">' + '<path d="' + p + '"/></svg>'; }
@@ -501,7 +533,26 @@
     chat: [['title', 'Title', 'text'], ['status', 'Status line', 'text'], ['msgs', 'Messages: in, out or bot | text', 'rows']],
     receipt: [['vendor', 'Vendor', 'text'], ['doc', 'Document', 'text'], ['lines', 'Lines: item | amount', 'rows'], ['total', 'Total', 'text'], ['stamp', 'Stamp', 'text']],
     notif: [['title', 'Title', 'text'], ['text', 'Text', 'text'], ['time', 'Time', 'text']], stat: [['value', 'Value', 'text'], ['label', 'Label', 'text']],
-    route: [['stops', 'Stops: place | time', 'rows'], ['hot', 'Current stop (0 = first)', 'num']], link: [['label', 'Label', 'text']], qr: [['title', 'Title', 'text'], ['text', 'Caption', 'text']]
+    route: [['stops', 'Stops: place | time', 'rows'], ['hot', 'Current stop (0 = first)', 'num']], link: [['label', 'Label', 'text']], qr: [['title', 'Title', 'text'], ['text', 'Caption', 'text']],
+    doc: [['label', 'Document label', 'text'], ['number', 'Number', 'text'], ['partner', 'Customer or vendor', 'text'], ['fields', 'Fields: label | value', 'rows'], ['lines', 'Lines: product | qty | amount', 'rows'], ['total', 'Total', 'text'], ['ribbon', 'Ribbon (PAID…)', 'text'], ['note', 'Note', 'text'], ['btns', 'Buttons, one per line', 'lines'], ['status', 'Status steps, one per line', 'lines']],
+    product: [['name', 'Name', 'text'], ['ref', 'Reference', 'text'], ['price', 'Price', 'text'], ['stock', 'Stock: label | value', 'rows'], ['tags', 'Tags, one per line', 'lines'], ['badge', 'Badge', 'text']],
+    workorder: [['title', 'Title', 'text'], ['sub', 'Product line', 'text'], ['status', 'Status', 'text'], ['timer', 'Timer', 'text'], ['timerLabel', 'Timer label', 'text'], ['steps', 'Steps: name | done, now or todo | detail', 'rows'], ['progressLabel', 'Progress label', 'text'], ['btn', 'Button', 'text']],
+    ticket: [['title', 'Title', 'text'], ['sub', 'Customer · channel', 'text'], ['stage', 'Stage', 'text'], ['sla', 'SLA', 'text'], ['channel', 'Channel', 'text'], ['text', 'Message', 'area'], ['assignee', 'Assignee', 'text'], ['tags', 'Tags', 'lines']],
+    calendar: [['title', 'Title', 'text'], ['sub', 'Subtitle', 'text'], ['tag', 'Tag', 'text'], ['days', 'Days, one per line', 'lines'], ['events', 'Events (JSON): [day, start hour, hours, label, colour, highlight]', 'json']],
+    employee: [['name', 'Name', 'text'], ['job', 'Job', 'text'], ['dept', 'Department', 'text'], ['rows', 'Rows: label | value | status', 'rows']],
+    email: [['from', 'From', 'text'], ['subject', 'Subject', 'text'], ['headline', 'Headline (*word*)', 'text'], ['cta', 'Button', 'text'], ['stats', 'Stats: value | label', 'rows']],
+    shop: [['brand', 'Brand', 'text'], ['url', 'Address bar', 'text'], ['product', 'Product', 'text'], ['category', 'Category', 'text'], ['price', 'Price', 'text'], ['reviews', 'Reviews', 'text'], ['stock', 'Stock line', 'text'], ['options', 'Options, one per line', 'lines'], ['btn', 'Button', 'text'], ['cart', 'Cart count', 'text']],
+    reconcile: [['title', 'Title', 'text'], ['sub', 'Subtitle', 'text'], ['status', 'Status', 'text'], ['bank', 'Bank line: date, payer, amount (3 lines)', 'lines'], ['match', 'Invoice: number, customer, amount (3 lines)', 'lines'], ['label', 'Match label', 'text'], ['btn', 'Button', 'text'], ['note', 'Note', 'text']],
+    approval: [['title', 'Title', 'text'], ['sub', 'Subtitle', 'text'], ['status', 'Status', 'text'], ['fields', 'Fields: label | value', 'rows'], ['approvers', 'Approvers: name | state', 'rows'], ['btns', 'Buttons, one per line', 'lines']],
+    sheet: [['title', 'Title', 'text'], ['tag', 'Tag', 'text'], ['formula', 'Formula', 'text'], ['cols', 'Columns, one per line', 'lines'], ['rows', 'Rows: a | b | c | d', 'rows']],
+    docs: [['title', 'Title', 'text'], ['sub', 'Subtitle', 'text'], ['tag', 'Tag', 'text'], ['files', 'Files: name | pdf, xls, doc or img | tag', 'rows']],
+    rating: [['text', 'Review', 'area'], ['who', 'Name', 'text'], ['meta', 'Detail', 'text']],
+    kcard: [['title', 'Title', 'text'], ['sub', 'Customer', 'text'], ['amount', 'Amount', 'text'], ['owner', 'Owner', 'text'], ['tags', 'Tags, one per line', 'lines'], ['activity', 'Next activity', 'text']],
+    pyramid: [['levels', 'Levels, top to bottom: title | sub', 'rows'], ['note', 'Note', 'text']], groups: [['groups', 'Groups (JSON)', 'json'], ['base', 'Base bar', 'text']],
+    stamp: [['text', 'Text', 'text'], ['small', 'Second line', 'text']], sticker: [['text', 'Text (*blue*, | = new line)', 'text'], ['small', 'Small line', 'text']],
+    ring: [['text', 'Centre text (blank = the value)', 'text'], ['label', 'Label', 'text']], avatars: [['names', 'Names, one per line', 'lines'], ['more', 'More (+8)', 'text'], ['label', 'Label', 'text']],
+    sticky: [['text', 'Text', 'area']], toggle: [['text', 'Text', 'text']], button: [['text', 'Text', 'text']], search: [['query', 'Search', 'text'], ['filters', 'Filters, one per line', 'lines']],
+    barcode: [['code', 'Code', 'text'], ['label', 'Label', 'text']], pin: [['label', 'Label', 'text']], timer: [['time', 'Time', 'text'], ['label', 'Label', 'text']], scanner: [['title', 'Title', 'text'], ['text', 'Text', 'text']], prop: [['label', 'Label', 'text']]
   };
   function popSpec(L) { if (!L) return POP.copy; if (L.type === 'appcard') return [['title', 'Title', 'text'], ['crumb', 'Breadcrumb', 'text'], ['tag', 'Tag', 'text']].concat((POPW[L.view || 'kanban'] || []).filter(function (f) { return f[0] !== 'crumbs'; })); if (L.type === 'window' || L.type === 'ophone') return [['appLabel', 'App name in the bar', 'text']].concat(POPW[L.view || 'form'] || []); return POP[L.type]; }
   function openPop() {
@@ -635,7 +686,16 @@
     flow: [['from', 'industry'], ['hot', 'number', 'Highlight step (0 = first)'], ['cols', 'number'], ['nodeW', 'number'], ['nodeH', 'number']],
     ba: [['from', 'industry'], ['n', 'number', 'Rows from the website']], phases: [['from', 'industry']], chart: [['from', 'industry'], ['view', 'number', 'Chart view (0 or 1)']],
     appflow: [['app', 'flowapp'], ['hot', 'number', 'Highlight state'], ['max', 'number', 'States shown'], ['handoffs', 'number', 'Hand-offs shown']],
-    checklist: [['app', 'odoo'], ['variant', 'select', ['', 'old']], ['big', 'check', 'Large text'], ['from', 'industry'], ['max', 'number', 'Items shown']], appcard: [['app', 'odoo'], ['view', 'select', CARD_VIEWS], ['k', 'number', 'Text size (1.2 to 2.2)']], qr: [['app', 'odoo']], orbit: [['core', 'select', ['', 'odoo']]], apps: [['cols', 'number'], ['labels', 'check', 'Show labels']],
+    checklist: [['app', 'odoo'], ['variant', 'select', ['', 'old']], ['big', 'check', 'Large text'], ['from', 'industry'], ['max', 'number', 'Items shown']], appcard: [['app', 'odoo'], ['view', 'select', CARD_VIEWS], ['k', 'number', 'Text size (1.2 to 2.2)'], ['stack', 'number', 'Paper sheets behind (0-2)']], qr: [['app', 'odoo']],
+    doc: [['kind', 'select', ['quote', 'order', 'invoice', 'bill', 'po', 'delivery', 'receipt']], ['app', 'odoo'], ['statusAt', 'number', 'Current status (0 = first)'], ['compact', 'check', 'Small version'], ['stack', 'number', 'Paper sheets behind (0-2)']],
+    product: [['icon', 'select', (window.TNCards || {}).PICO || []], ['level', 'number', 'Stock level %'], ['stack', 'number', 'Paper sheets behind (0-2)']], workorder: [['app', 'odoo'], ['progress', 'number', 'Progress %'], ['stack', 'number', 'Paper sheets behind (0-2)']],
+    ticket: [['app', 'odoo'], ['priority', 'number', 'Stars (0-3)']], calendar: [['app', 'odoo'], ['from', 'number', 'First hour'], ['to', 'number', 'Last hour'], ['today', 'number', 'Today (0 = first day)']],
+    employee: [['app', 'odoo'], ['stack', 'number', 'Paper sheets behind (0-2)']], email: [['app', 'odoo'], ['color', 'text'], ['stack', 'number', 'Paper sheets behind (0-2)']], shop: [['icon', 'select', (window.TNCards || {}).PICO || []], ['rating', 'number', 'Stars']],
+    reconcile: [['app', 'odoo']], approval: [['app', 'odoo']], sheet: [['app', 'odoo'], ['totalRow', 'check', 'Last row is a total']], docs: [['app', 'odoo']], rating: [['stars', 'number', 'Stars (1-5)']], kcard: [['app', 'odoo'], ['priority', 'number', 'Stars (0-3)']],
+    pyramid: [['hot', 'number', 'Highlighted level (0 = top)']], stamp: [['tone', 'select', ['', 'b', 'r', 'o']]], sticker: [['tone', 'select', ['', 'blue', 'white', 'mint', 'pink']]],
+    ring: [['value', 'number', 'Value %'], ['color', 'text'], ['plain', 'check', 'Without the card']], sticky: [['tone', 'select', ['', 'blue', 'mint', 'pink']]], toggle: [['on', 'check', 'Switched on', true]],
+    button: [['tone', 'select', ['', 'blue', 'white', 'green']]], timer: [['tone', 'select', ['', 'light']]], scribble: [['kind', 'select', (window.TNCards || {}).SCRIB || []], ['color', 'text'], ['weight', 'number']],
+    prop: [['name', 'select', (window.TNProps || {}).names || []], ['tile', 'check', 'White tile']], orbit: [['core', 'select', ['', 'odoo']]], apps: [['cols', 'number'], ['labels', 'check', 'Show labels']],
     devices: [['site', 'site'], ['phone', 'check', 'Show the phone', true]], site: [['src', 'image']],
     pill: [['variant', 'select', ['', 'white', 'ok', 'sans', 'white sans']], ['icon', 'icon']], chip: [['icon', 'icon'], ['tone', 'select', ['', 'ok']]],
     note: [['variant', 'select', ['', 'red', 'red strike']], ['size', 'number'], ['color', 'text']],
@@ -663,11 +723,12 @@
     checklist: 'Checklist', ba: 'Before / after', phases: 'Phases', chart: 'Dashboard', devices: 'Laptop + phone', site: 'Website mockup', code: 'Code window', palette: 'Palette', wireframe: 'Wireframe',
     serp: 'Google result', gauge: 'Gauge', cursor: 'Cursor', pill: 'Pill', chip: 'Chip', note: 'Note', bubble: 'Bubble', text: 'Text', icon: 'Icon', odoo: 'Odoo icon', arrow: 'Arrow',
     burst: 'Burst', glow: 'Glow', sphere: 'Sphere', halftone: 'Halftone', scan: 'Scan beam', sparkles: 'Sparkles', storm: 'Storm', speed: 'Speed lines', confetti: 'Confetti', nosignal: 'No signal',
-    appcard: 'Odoo card', qr: 'QR code', window: 'Odoo screen', ophone: 'Odoo on a phone', graph: 'Chart', kpis: 'KPI tiles', timeline: 'Timeline', steps: 'Steps', chat: 'Chat', receipt: 'Paper invoice', notif: 'Notification', stat: 'Big number', route: 'Route', link: 'Arrow link' };
+    appcard: 'Odoo card', qr: 'QR code', doc: 'Odoo document', product: 'Product', workorder: 'Work order', ticket: 'Ticket', calendar: 'Calendar', employee: 'Employee', email: 'Email campaign', shop: 'Shop page', reconcile: 'Reconciliation', approval: 'Approval', sheet: 'Spreadsheet', docs: 'Documents', rating: 'Rating', kcard: 'Lead card', pyramid: 'Pyramid', groups: 'One-system map', stamp: 'Stamp', sticker: 'Sticker', ring: 'Progress ring', avatars: 'Avatars', sticky: 'Sticky note', toggle: 'Toggle', button: 'Button', search: 'Search bar', barcode: 'Barcode', pin: 'Map pin', timer: 'Timer', scribble: 'Scribble', scanner: 'Scanner', prop: 'Prop', window: 'Odoo screen', ophone: 'Odoo on a phone', graph: 'Chart', kpis: 'KPI tiles', timeline: 'Timeline', steps: 'Steps', chat: 'Chat', receipt: 'Paper invoice', notif: 'Notification', stat: 'Big number', route: 'Route', link: 'Arrow link' };
   function layerLabel(L) {
     var t = L.text || L.title || L.label || L.record || (L.view && R.appName(L.app) + ' · ' + L.view) || L.head || L.pose || L.value || L.vendor || (L.from && indName(L.from.replace('industry:', ''))) || (L.app && R.appName(L.app)) || (L.site && C.sites[L.site] && C.sites[L.site].name) || L.kind || (L.src ? (L.src.indexOf('data:') === 0 ? 'embedded image' : L.src.split('/').pop()) : '');
     return String(t || '').replace(/[*~|=]/g, '');
   }
+  var PATLAB = { dots: 'Dots', grid: 'Grid lines', fine: 'Fine grid', diagonal: 'Diagonal', rings: 'Rings', plus: 'Plus', hex: 'Hexagons', waves: 'Waves', spots: 'Light spots', floor: 'Floor grid' };
   function designPanel(d) {
     var b = d.brand || {}, V = d.post && SP.VIS[d.visual], g = d.bg && typeof d.bg === 'object' ? 'v3' : d.ground == null ? 'blobs' : String(d.ground);
     var badgeSel = '<label class="f"><span>Odoo badge (top right)</span><select id="d-badge2">' + opts(['ready', 'o20', ''], d.brand ? (b.badge === 'none' ? '' : b.badge || 'ready') : d.badge == null ? 'ready' : d.badge, ['Odoo Ready Partner', 'Meet Odoo 20', 'None']) + '</select></label>';
@@ -675,6 +736,8 @@
     if (g === 'v3') return '<section class="sec design"><h3>Design<small>older v3 look</small></h3><div class="confirm" style="background:var(--blue-050);color:var(--blue-700)">This drip uses the v3 look (background shapes and a camera angle). <button class="btn sm primary" data-simplify="1">Switch to the clean style</button></div>' + frame + badgeSel + '</section>';
     return '<section class="sec design"><h3>Design<small>the frame stays; only the visual changes</small></h3>' +
       '<div class="f"><span>Background</span><div class="chips">' + [['', 'Clean'], ['haze', 'Soft blue floor'], ['blobs', 'Blue shapes']].map(function (o) { return '<button data-ground="' + o[0] + '"' + (g === o[0] || (o[0] === 'blobs' && g.indexOf('blobs') === 0) ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join('') + '</div></div>' +
+      '<div class="f"><span>Pattern</span><div class="chips">' + [['', 'None']].concat(SP.PATTERNS.map(function (x) { return [x, PATLAB[x] || x]; })).map(function (o) { return '<button data-pattern="' + o[0] + '"' + ((d.pattern || '') === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join('') + '</div></div>' +
+      '<div class="f"><span>Tint</span><div class="chips">' + [['', 'White']].concat(SP.TINTS.map(function (x) { return [x, x.charAt(0).toUpperCase() + x.slice(1)]; })).map(function (o) { return '<button data-tint="' + o[0] + '"' + ((d.tint || '') === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join('') + '</div></div>' +
       (V ? '<div class="f"><span>Layout · ' + esc(V.label) + '</span><div class="chips">' + (SP.canMirror(d.visual) ? '<button data-mirror="1"' + (d.mirror ? ' class="on"' : '') + '>Mirror</button>' : '') + (SP.hasVariants(d.visual) ? '<button data-variant="1">Other arrangement</button>' : '') +
         '<button data-relayout="1">Reset layout</button></div><p class="help" style="margin:6px 0 0">Rebuilds the visual from its content; moved or added elements go back to the standard layout.</p></div>' : '') +
       frame + badgeSel + '</section>';
@@ -756,7 +819,7 @@
   function simpleRelayout(ch) {
     var d = cur(); if (!d || !d.post) return;
     snapshot();
-    var n = SP.relayout(d, ch, { cat: d.cat, industry: (catObj(d.cat) || {}).industry });
+    var n = SP.relayout(d, ch, { cat: d.cat, industry: d.industry || (catObj(d.cat) || {}).industry });
     ['layers', 'mirror', 'variant', 'visual', 'post'].forEach(function (k) { if (n[k] === undefined) delete d[k]; else d[k] = n[k]; });
     st.sel = -1; st.multi = []; queueSave(d); drawCanvas(); renderInspector();
   }
@@ -799,7 +862,7 @@
     if (ds.keep) { var k = lib.filter(function (x) { return x.id === ds.keep; })[0]; if (k) { delete k.draft; saveNow(k); toast('Kept in ' + catName(k.cat)); if (st.id) { drawCanvas(); renderInspector(); } else showGallery(); } return; }
     if (ds.keepall) { lib.forEach(function (x) { if (x.draft && (st.cat === 'all' || st.cat === 'drafts' || x.cat === st.cat)) { delete x.draft; saveNow(x); } }); toast('All drafts kept'); showGallery(); return; }
     if (ds.discard) { var g = lib.filter(function (x) { return x.id === ds.discard; })[0]; if (g) { removeDrip(g); toast('Discarded'); showGallery(); } return; }
-    if (ds.add) { addLayer(ds.add, ds.pose ? { pose: ds.pose } : null); return; }
+    if (ds.add) { addLayer(ds.add, ds.pose ? { pose: ds.pose } : ds.name ? { name: ds.name } : null); return; }
     if (ds.fmt) { change(function (d) { if (ds.fmt === '1:1') delete d.format; else d.format = ds.fmt; }, { now: true, insp: true }); return; }
     if (ds.clear) { change(function (d) { delete d.layers[st.sel][ds.clear]; }, { insp: true, now: true }); return; }
     if (ds.pick) { pickImage(); return; }
@@ -809,6 +872,8 @@
     if (ds.color) { change(function (d) { d.copy.color = ds.color === '#1F1F3D' ? undefined : ds.color; }, { now: true }); return; }
     if (ds.calign) { change(function (d) { var c = d.copy, cn = $('#box .d-copy'); if (c.x == null) { c.x = cn.offsetLeft; c.y = cn.offsetTop - (d.format === '4:5' ? 40 : 0); c.w = cn.offsetWidth; } c.align = ds.calign; }, { now: true }); return; }
     if (ds.ground !== undefined) { change(function (d) { d.ground = ds.ground; }, { now: true, insp: true }); return; }
+    if (ds.pattern !== undefined) { change(function (d) { if (ds.pattern) d.pattern = ds.pattern; else delete d.pattern; }, { now: true, insp: true }); return; }
+    if (ds.tint !== undefined) { change(function (d) { if (ds.tint) d.tint = ds.tint; else delete d.tint; }, { now: true, insp: true }); return; }
     if (ds.mirror) { simpleRelayout({ mirror: !cur().mirror }); return; }
     if (ds.variant) { simpleRelayout({ variant: (cur().variant || 0) + 1 }); return; }
     if (ds.relayout) { simpleRelayout({}); toast('Layout reset'); return; }
@@ -926,7 +991,7 @@
     $('#g-go').addEventListener('click', runGenerate);
   }
   function genOpts() {
-    var cat = $('#g-cat').value, ind = $('#g-ind').value || (catObj(cat) || {}).industry || '';
+    var cat = $('#g-cat').value, ind = $('#g-ind').value || (catObj(cat) || {}).industry || AI.detectIndustry($('#g-brief').value) || '';
     return { cat: cat, catName: catName(cat), industry: ind || null, count: +$('#g-n').value, tier: $('#g-tier').value, brief: $('#g-brief').value.trim(),
       angles: $$('[data-angle]').filter(function (b) { return b.checked; }).map(function (b) { return b.dataset.angle; }),
       existing: lib.filter(function (d) { return d.cat === cat; }).map(function (d) { return String(d.copy && d.copy.head || '').replace(/[*~|=]/g, ' ').replace(/\s+/g, ' ').trim(); }) };
@@ -942,7 +1007,7 @@
     AI.generate(o, function (n) { $('#g-stage').textContent = 'Designing post ' + Math.min(n, o.count) + ' of ' + o.count + '…'; $('#g-bar').style.width = Math.max(8, Math.min(96, n / o.count * 96)) + '%'; }, genCtl.signal)
       .then(function (r) {
         genCtl = null;
-        var gid = 'g' + Date.now().toString(36), made = [], posts = SP.diversify(r.concepts.slice(0, o.count));
+        var gid = 'g' + Date.now().toString(36), made = [], posts = SP.diversify(r.concepts.slice(0, o.count), Date.now() % 1e6);
         posts.forEach(function (sc, i) {
           var d = SP.compose(sc, { cat: o.cat, industry: o.industry, index: i, source: 'Claude · ' + o.catName + (o.industry ? ' · ' + indName(o.industry) : '') + ' · ' + new Date().toISOString().slice(0, 10) });
           d.id = uid(d.name); d.draft = true; d.gen = gid; d.createdAt = new Date().toISOString(); d.order = lib.length + i;
@@ -1043,6 +1108,13 @@
   $('#main').innerHTML = '<div class="gallery"><p class="empty">Loading the library…</p></div>';
   S.init(fileLib, clone(window.CATEGORIES || [])).then(function (r) {
     lib = r.lib; cats = r.cats; usage = r.usage;
+    var addedCat = false;
+    (window.CATEGORIES || []).forEach(function (c, i) {
+      var have = cats.filter(function (x) { return x.id === c.id; })[0];
+      if (!have) { cats.splice(Math.min(i, cats.length), 0, clone(c)); addedCat = true; }
+      else if (c.industry && !have.industry) { have.industry = c.industry; addedCat = true; }
+    });
+    if (addedCat && S.canWrite) S.saveCats(cats);
     topbar(); S.on('caps', topbar);
     if (location.protocol !== 'file:' && S.mode !== 'hub') fetch('api/ping', { cache: 'no-store' }).then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; }).then(function (j) { SERVER = !!(j && j.ok); if (SERVER) topbar(); });
     var hash = location.hash.slice(1);

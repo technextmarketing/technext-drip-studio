@@ -181,8 +181,8 @@
     return '<div class="ntf">' + oi(L.app || 'mail') + '<div><b data-e="title">' + esc(L.title || 'Notification') + '</b><span data-e="text">' + esc(L.text || '') + '</span></div><em>' + esc(L.time || 'now') + '</em></div>';
   };
   LAYERS.stat = function (L) {
-    var n = String(L.value || '').length;
-    return '<div class="stt' + (L.glass ? ' glass' : '') + (L.variant === 'big' ? ' big' : '') + '"><b data-e="value"' + (n > 6 ? ' style="font-size:' + (132 / n).toFixed(1) + 'cqw"' : '') + '>' + esc(L.value || '') + '</b><span data-e="label">' + esc(L.label || '') + '</span></div>';
+    var n = String(L.value || '').length, fs = L.variant === 'big' ? Math.min(34, 150 / Math.max(1, n)) : n > 6 ? 132 / n : 0;
+    return '<div class="stt' + (L.glass ? ' glass' : '') + (L.variant === 'big' ? ' big' : '') + '"><b data-e="value"' + (fs ? ' style="font-size:' + fs.toFixed(1) + 'cqw"' : '') + '>' + esc(L.value || '') + '</b><span data-e="label">' + esc(L.label || '') + '</span></div>';
   };
   LAYERS.route = function (L) {
     var st = arr(L.stops).slice(0, 5), n = st.length || 1;

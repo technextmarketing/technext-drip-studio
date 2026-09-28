@@ -281,3 +281,6 @@ textarea.bad{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(179,39,
 .stc-t .drip{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none}
 .stc b{font:700 13px/1.25 var(--font-display);color:var(--ink)}
 .stc small{font-size:11.5px;line-height:1.35;color:var(--label)}
+.el-grid.props{grid-template-columns:repeat(4,1fr)}
+.el.prop svg{width:44px;height:44px;display:block}
+.el.prop span{font-size:10px}

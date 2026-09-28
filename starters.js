@@ -78,6 +78,50 @@
       return { visual: 'reaction', name: 'Stock count hook', head: 'Still counting stock|*on a Sunday?*', sub: 'Odoo counts as you sell, receive and move stock, so the numbers are right every morning.', nexi: 'surprise', pills: ['Counts as you sell', 'Right every morning', 'Sundays off'] }; } },
     website: { label: 'Website we built', about: 'A TechNext-built site on a laptop and phone', make: function () {
       return { visual: 'website', site: 'movewithease', name: 'Website salesperson', head: 'Your website,|*your best salesperson.*', sub: 'TechNext builds fast, mobile-first sites where every inquiry reaches the right person.', chips: ['Fast on every phone', 'Every inquiry routed', 'Built to be found'] }; } },
+    spotlight: { label: 'Industry poster', about: "A big prop from the industry with three callouts", make: function (k) {
+      var I = ind(k), P = window.TNProps, prop = P && P.BY_IND[k] ? P.BY_IND[k][0] : 'rocket', f = I.flow || [];
+      return { visual: 'spotlight', prop: prop, kicker: 'Reasons your customer', name: I.name + ' · poster', head: 'One system|*for ' + I.noun + '.*', sub: I.flow_title || 'Every step in its own Odoo app, on one database.',
+        pills: f.slice(0, 3).map(function (x) { return x.t + ' in Odoo'; }), chip: { text: 'Book a call', small: 'technext.asia', icon: 'check' } }; } },
+    groups: { label: 'One operating system', about: "The industry's apps in two groups on one database", make: function (k) {
+      var I = ind(k), f = (I.flow || []).filter(function (x) { return x.app; }), half = Math.ceil(f.length / 2);
+      return { visual: 'groups', name: I.name + ' · one system', head: 'One operating|*system.*', sub: 'Sales and operations on one database, so nobody asks what a job actually cost.',
+        groups: [{ title: 'Sales & growth', apps: f.slice(0, half).map(function (x) { return [x.app, x.t]; }) }, { title: 'Operations', apps: f.slice(half).map(function (x) { return [x.app, x.t]; }) }], base: 'One database for ' + I.noun, pills: ['One system, not five'] }; } },
+    pyramid: { label: 'Growth pyramid', about: 'Stages that build on each other, ERP at the base', make: function () {
+      return { visual: 'pyramid', name: 'Growth pyramid', head: 'The business growth|*pyramid.*', sub: 'Each stage builds on the one below it: operations first, then growth, then scale.',
+        levels: [['Scale', 'New outlets, new markets'], ['Automation', 'AI inside Odoo'], ['Marketing', 'Growth'], ['ERP', 'Sales · Ops · Admin']], hot: 3, pills: ['Start here', 'Then scale'] }; } },
+    document: { label: 'Quotation signed', about: 'An Odoo quotation with its status bar and Nexi', make: function () {
+      return { visual: 'document', kind: 'quote', name: 'Quotation signed', head: 'The quote,|*signed the same day.*', sub: 'Odoo quotations carry every line and option, and the customer signs online.',
+        number: 'S00118', partner: 'Sample Trading Pte Ltd', fields: [['Expiration', '15 Oct 2026']], lines: [['Office chair', '10', 'S$ 1,800.00'], ['Standing desk', '4', 'S$ 2,480.00']], total: 'S$ 4,665.20', note: 'Signed online by A. Tan',
+        steps: ['Sent from a template', 'Signed online'], bubble: 'Signed!', nexi: 'point', accents: [{ type: 'stamp', text: 'SIGNED', tone: 'blue' }] }; } },
+    fan: { label: 'Quote, order, invoice', about: 'Three documents: one record handed on', make: function () {
+      return { visual: 'fan', name: 'Quote to invoice', head: 'Quote, order, invoice:|*one record, handed on.*', sub: 'The sales order carries the customer and the lines from the quote to the invoice, so nothing is typed twice.',
+        docs: [{ kind: 'quote', number: 'S00118', partner: 'Sample Trading Pte Ltd', total: 'S$ 4,665.20' }, { kind: 'order', number: 'S00118', partner: 'Sample Trading Pte Ltd', total: 'S$ 4,665.20' }, { kind: 'invoice', number: 'INV/2026/0142', partner: 'Sample Trading Pte Ltd', total: 'S$ 4,665.20', ribbon: 'PAID' }], pills: ['Nothing retyped', 'Paid online'] }; } },
+    product: { label: 'Product and stock', about: 'A product card with stock, a barcode and the reorder', make: function () {
+      return { visual: 'product', name: 'Stock per product', head: 'Know what is on the shelf|*before you promise it.*', sub: 'On-hand and forecast stock per product, and a reorder rule that raises the purchase order.',
+        item: 'Sample product', icon: 'box', price: 'S$ 38.00', stock: [['On hand', '6 units'], ['Forecast', '46 units']], level: 14, tags: ['Reorder at 10'], badge: 'Low stock', barcode: { code: '8 88012 34567 1', label: 'Sample product' }, chip: { text: 'PO P00231 drafted', small: '40 units · due Fri' }, pills: ['Reorder rule on'] }; } },
+    workorder: { label: 'Work order', about: 'A manufacturing work order with its steps and timer', make: function () {
+      return { visual: 'workorder', name: 'Work order', head: 'The shop floor,|*live in Odoo.*', sub: 'Each work order shows its steps, the time on the current one and how many are done.',
+        title: 'WO/00042 · Painting', crumb: 'Oak dining table x20', status: 'In progress', timer: '00:24:10', timerLabel: 'on painting', steps: [['Cutting', 'done', '12:40'], ['Painting', 'now', 'Work center 2'], ['Packing', 'todo', '']], progress: 60, progressLabel: '12 of 20 done', btn: 'Mark as done', chip: { text: 'Next: packing', small: 'Work center 3' } }; } },
+    ticket: { label: 'Helpdesk ticket', about: 'A ticket, the customer message and the rating', make: function () {
+      return { visual: 'ticket', name: 'Support ticket', head: 'Every request,|*tracked to solved.*', sub: 'Requests from email or WhatsApp become tickets with an SLA, and the customer rates the fix.',
+        title: '#1042 · Change delivery address', crumb: 'Sample Buyer · WhatsApp', stage: 'In progress', priority: 2, sla: '2h left', channel: 'WhatsApp', text: 'Can you deliver to our Tampines outlet instead?', assignee: 'Mei Ling T.', tags: ['Delivery'],
+        chat: { channel: 'whatsapp', title: 'Sample Store', msgs: [['in', 'Can you deliver to Tampines instead?'], ['out', 'Ticket #1042 opened, done by 3 pm.']] }, rating: { stars: 5, text: 'Sorted in an hour. Thank you!', who: 'Daniel K.', meta: 'Rated ticket #1042' } }; } },
+    calendar: { label: 'Bookings calendar', about: 'A week of appointments with the confirmation', make: function () {
+      return { visual: 'calendar', name: 'Bookings', head: 'Every booking,|*on one calendar.*', sub: 'Customers book online, the team sees the week, and the confirmation goes out on its own.',
+        app: 'appointment', title: 'Appointments', crumb: 'This week', tag: '12 booked', days: ['Mon 5', 'Tue 6', 'Wed 7', 'Thu 8', 'Fri 9'], from: 9, to: 16, today: 1, events: [[0, 9, 1, 'Check-up'], [1, 10.5, 1.5, 'Consultation', 1], [2, 13, 2, 'Treatment'], [3, 11, 1, 'Check-up'], [4, 14, 1.5, 'Follow-up']],
+        notif: { app: 'appointment', title: 'Booking confirmed', text: 'Consultation · Tue 10:30', time: 'now' }, pills: ['Booked online'] }; } },
+    store: { label: 'Online shop', about: 'A product page in the Odoo shop and the order it brings', make: function () {
+      return { visual: 'store', name: 'Online shop', head: 'Your shop|*open all night.*', sub: 'The Odoo online shop shares stock and prices with your stores, and orders arrive paid.',
+        brand: 'Sample Store', url: 'samplestore.sg/shop', product: 'Linen shirt', category: 'Apparel', icon: 'shirt', price: 'S$ 49.00', rating: 4.5, reviews: '128 reviews', stock: 'In stock · ships today', options: ['S', 'M', 'L', 'XL'], cart: '2',
+        notif: { app: 'website_sale', title: 'New order S00412', text: 'Paid online · 2 items', time: '02:14' }, pills: ['Same stock as the store'] }; } },
+    reconcile: { label: 'Bank match', about: 'A bank line matched to its invoice, with Nexi', make: function () {
+      return { visual: 'reconcile', name: 'Bank reconciliation', head: 'The bank line finds|*its invoice.*', sub: 'Odoo matches each payment to its invoice by amount and reference, so month-end is shorter.',
+        title: 'Bank reconciliation', crumb: 'DBS · September 2026', status: 'Reconciled', bank: ['24 Sep · PayNow', 'SAMPLE TRADING PTE LTD', 'S$ 4,665.20'], match: ['INV/2026/0142', 'Sample Trading Pte Ltd', 'S$ 4,665.20'], label: 'Matched by amount and reference', btn: 'Validate',
+        steps: ['Bank feed imported', 'Invoice marked paid'], nexi: 'think', bubble: 'Matched!', accents: [{ type: 'stamp', text: 'MATCHED' }] }; } },
+    bignumber: { label: 'Big number', about: 'One big number with its chart', make: function (k) {
+      var I = ind(k), ch = I.chart || { kpis: [['Orders today', '312']], views: [{ bars: [['Mon', 12], ['Tue', 18], ['Wed', 15]] }] }, kp = (ch.kpis || [])[0] || ['Today', '—'];
+      return { visual: 'bignumber', name: I.name + ' · big number', head: 'One number|*worth watching.*', sub: ch.title ? ch.title + ', live from the records your team already keeps.' : 'Live from the records your team already keeps.',
+        stat: { value: kp[1], label: kp[0] + ' · demo data' }, chart: { kind: 'bar', title: ch.title || 'This week', data: (ch.views[0].bars || []).slice(0, 6) }, chip: { text: 'Updated as you work', small: 'No month-end export', icon: 'chart' } }; } },
     proof: { label: 'TechNext in numbers', about: 'The three approved company figures', make: function () {
       return { visual: 'proof', name: 'TechNext in numbers', head: 'Trusted across|*the region.*', sub: 'TechNext implements Odoo and builds AI for companies across Singapore and Southeast Asia.', pills: ['Odoo Partner', 'Singapore HQ'], nexi: 'celebrate' }; } }
   };

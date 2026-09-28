@@ -67,9 +67,22 @@ window.CATEGORIES = [
     "industry": "health-wellness"
   },
   {
+    "id": "kitchen",
+    "group": "Industries",
+    "name": "Kitchen",
+    "industry": "kitchen"
+  },
+  {
     "id": "field-service",
     "group": "Industries",
-    "name": "Field Service"
+    "name": "Field Service",
+    "industry": "field-service"
+  },
+  {
+    "id": "it",
+    "group": "Industries",
+    "name": "IT & Tech",
+    "industry": "it"
   },
   {
     "id": "services",
@@ -88,6 +101,7 @@ window.DRIPS = [
   "variant": 0,
   "mirror": false,
   "ground": "haze",
+  "pattern": "dots",
   "badge": "o20",
   "copy": {
    "head": "No signal? *Keep working.*",
@@ -265,7 +279,8 @@ window.DRIPS = [
     "#Singapore"
    ],
    "mirror": false,
-   "variant": 0
+   "variant": 0,
+   "background": "dots"
   }
  },
  {
@@ -273,10 +288,12 @@ window.DRIPS = [
   "cat": "fnb",
   "name": "F&B · Supplier to the books",
   "v": 4,
+  "industry": "fnb",
   "visual": "flow",
   "variant": 0,
   "mirror": false,
   "ground": "haze",
+  "pattern": "hex",
   "badge": "ready",
   "copy": {
    "head": "From supplier to table|to the books, *in one Odoo.*",
@@ -326,7 +343,7 @@ window.DRIPS = [
     "layout": "snake",
     "hot": 4,
     "x": 70,
-    "y": 454
+    "y": 442
    },
    {
     "type": "note",
@@ -336,7 +353,7 @@ window.DRIPS = [
     "rot": -4,
     "z": 20,
     "x": 267,
-    "y": 950
+    "y": 938
    },
    {
     "type": "arrow",
@@ -345,7 +362,7 @@ window.DRIPS = [
     "z": 20,
     "kind": "right",
     "x": 486,
-    "y": 936
+    "y": 924
    },
    {
     "type": "note",
@@ -354,14 +371,23 @@ window.DRIPS = [
     "rot": -3,
     "z": 20,
     "x": 606,
-    "y": 946
+    "y": 934
    },
    {
     "type": "sparkles",
     "w": 100,
     "z": 21,
     "x": 946,
-    "y": 402
+    "y": 390
+   },
+   {
+    "type": "prop",
+    "name": "bowl",
+    "w": 150,
+    "rot": -6,
+    "z": 17,
+    "x": 106,
+    "y": 898
    }
   ],
   "caption": "Buy, prep, deliver, serve, cook and close: six steps every restaurant group runs. In Odoo each one has its app, on one database, so food cost and takings per outlet are ready without retyping. Which step still runs on paper in your kitchen?",
@@ -420,7 +446,8 @@ window.DRIPS = [
     "#Singapore"
    ],
    "mirror": false,
-   "variant": 0
+   "variant": 0,
+   "background": "hex"
   }
  },
  {
@@ -432,6 +459,7 @@ window.DRIPS = [
   "variant": 0,
   "mirror": false,
   "ground": "haze",
+  "pattern": "rings",
   "badge": "ready",
   "copy": {
    "head": "AI prepares the bill.|*You approve it.*",
@@ -597,7 +625,8 @@ window.DRIPS = [
     "#Automation"
    ],
    "mirror": false,
-   "variant": 0
+   "variant": 0,
+   "background": "rings"
   }
  },
  {
@@ -605,10 +634,12 @@ window.DRIPS = [
   "cat": "fnb",
   "name": "F&B · Food cost per outlet",
   "v": 4,
+  "industry": "fnb",
   "visual": "chart",
   "variant": 0,
   "mirror": true,
   "ground": "haze",
+  "pattern": "diagonal",
   "badge": "ready",
   "copy": {
    "head": "Food cost per outlet,|*every single day.*",
@@ -647,7 +678,7 @@ window.DRIPS = [
     "highlight": 2,
     "unit": "%",
     "x": 408,
-    "y": 487
+    "y": 462
    },
    {
     "type": "stat",
@@ -657,7 +688,7 @@ window.DRIPS = [
     "value": "30.8%",
     "label": "Food cost today · -1.2%",
     "x": 64,
-    "y": 501
+    "y": 476
    },
    {
     "type": "chip",
@@ -667,7 +698,7 @@ window.DRIPS = [
     "z": 18,
     "rot": 2,
     "x": 76,
-    "y": 646
+    "y": 621
    },
    {
     "type": "nexi",
@@ -675,14 +706,23 @@ window.DRIPS = [
     "w": 217,
     "z": 16,
     "x": 46,
-    "y": 777
+    "y": 752
    },
    {
     "type": "sparkles",
     "w": 92,
     "z": 21,
     "x": 372,
-    "y": 447
+    "y": 422
+   },
+   {
+    "type": "prop",
+    "name": "bell",
+    "w": 150,
+    "rot": 6,
+    "z": 17,
+    "x": 648,
+    "y": 852
    }
   ],
   "caption": "Most restaurant groups see food cost once a month, after the stock count. In Odoo every dish sold deducts its recipe, so each outlet's food cost is there every day, while there is still time to act. How often do you see yours?",
@@ -748,7 +788,8 @@ window.DRIPS = [
     "#Singapore"
    ],
    "mirror": true,
-   "variant": 0
+   "variant": 0,
+   "background": "diagonal"
   }
  },
  {
@@ -760,6 +801,7 @@ window.DRIPS = [
   "variant": 0,
   "mirror": false,
   "ground": "haze",
+  "pattern": "waves",
   "badge": "ready",
   "copy": {
    "head": "Every lead,|*one pipeline.*",
@@ -960,7 +1002,8 @@ window.DRIPS = [
     "#Singapore"
    ],
    "mirror": false,
-   "variant": 0
+   "variant": 0,
+   "background": "waves"
   }
  },
  {
@@ -968,10 +1011,12 @@ window.DRIPS = [
   "cat": "retail",
   "name": "WhatsApp orders",
   "v": 4,
+  "industry": "retail",
   "visual": "chat",
   "variant": 0,
   "mirror": true,
   "ground": "haze",
+  "pattern": "spots",
   "badge": "ready",
   "copy": {
    "head": "WhatsApp orders|*land in Odoo.*",
@@ -1060,6 +1105,15 @@ window.DRIPS = [
     "z": 21,
     "x": 520,
     "y": 631
+   },
+   {
+    "type": "prop",
+    "name": "cart",
+    "w": 150,
+    "rot": 6,
+    "z": 17,
+    "x": 736,
+    "y": 785
    }
   ],
   "caption": "Customers order on WhatsApp; your team re-types it into the system later. Connected to Odoo, the chat becomes a quotation with the stock reserved, ready to confirm. How many WhatsApp orders does your team re-type every day?",
@@ -1130,7 +1184,8 @@ window.DRIPS = [
     "#Singapore"
    ],
    "mirror": true,
-   "variant": 0
+   "variant": 0,
+   "background": "spots"
   }
  },
  {
@@ -1142,6 +1197,7 @@ window.DRIPS = [
   "variant": 0,
   "mirror": false,
   "ground": "haze",
+  "pattern": "fine",
   "badge": "",
   "copy": {
    "head": "Your website,|*your best salesperson.*",
@@ -1234,6 +1290,863 @@ window.DRIPS = [
     "#Website",
     "#Singapore",
     "#SmallBusiness"
+   ],
+   "mirror": false,
+   "variant": 0,
+   "background": "fine"
+  }
+ },
+ {
+  "id": "kitchen-quote-signed",
+  "cat": "kitchen",
+  "name": "Kitchen · quote signed",
+  "v": 4,
+  "industry": "kitchen",
+  "visual": "document",
+  "variant": 0,
+  "mirror": true,
+  "ground": "haze",
+  "pattern": "plus",
+  "badge": "ready",
+  "copy": {
+   "head": "The kitchen quote,|*signed the same day.*",
+   "sub": "Equipment, fabrication and installation on one Odoo quotation that the owner signs online."
+  },
+  "layers": [
+   {
+    "type": "nexi",
+    "pose": "point",
+    "w": 418,
+    "z": 16,
+    "x": 611,
+    "y": 505,
+    "s": 0.917
+   },
+   {
+    "type": "doc",
+    "kind": "quote",
+    "app": "sale",
+    "number": "S00118",
+    "partner": "Sample Dining Pte Ltd",
+    "fields": [
+     [
+      "Site",
+      "Tampines outlet"
+     ]
+    ],
+    "lines": [
+     [
+      "Combi oven, 10 trays",
+      "1",
+      "S$ 18,400.00"
+     ],
+     [
+      "Stainless prep table",
+      "3",
+      "S$ 4,650.00"
+     ],
+     [
+      "Installation",
+      "1",
+      "S$ 1,200.00"
+     ]
+    ],
+    "total": "S$ 24,250.00",
+    "note": "Signed online by the owner",
+    "btns": [],
+    "w": 560,
+    "rot": -2,
+    "z": 12,
+    "x": 45,
+    "y": 421,
+    "s": 0.917
+   },
+   {
+    "type": "bubble",
+    "text": "Signed!",
+    "rot": 3,
+    "z": 20,
+    "x": 831,
+    "y": 438,
+    "s": 0.917
+   },
+   {
+    "type": "chip",
+    "text": "Layout approved",
+    "icon": "spark",
+    "rot": 1.5,
+    "z": 18,
+    "x": 261,
+    "y": 911,
+    "s": 0.917
+   },
+   {
+    "type": "chip",
+    "text": "Signed online",
+    "icon": "check",
+    "tone": "ok",
+    "rot": -1.5,
+    "z": 19,
+    "x": 246,
+    "y": 983,
+    "s": 0.917
+   },
+   {
+    "type": "sparkles",
+    "w": 96,
+    "z": 21,
+    "x": 558,
+    "y": 479,
+    "s": 0.917
+   },
+   {
+    "type": "stamp",
+    "text": "SIGNED",
+    "tone": "b",
+    "rot": 9,
+    "z": 24,
+    "x": 53,
+    "y": 837,
+    "s": 0.917
+   }
+  ],
+  "caption": "Commercial kitchen quotes still built in spreadsheets? In Odoo the equipment, the fabrication and the installation sit on one quotation, and the owner signs it online the same day. Book a call at technext.asia.",
+  "hashtags": [
+   "#Odoo",
+   "#CommercialKitchen",
+   "#Singapore"
+  ],
+  "source": "Studio kitchen profile: quotation templates with e-signature",
+  "post": {
+   "visual": "document",
+   "kind": "quote",
+   "head": "The kitchen quote,|*signed the same day.*",
+   "sub": "Equipment, fabrication and installation on one Odoo quotation that the owner signs online.",
+   "number": "S00118",
+   "partner": "Sample Dining Pte Ltd",
+   "fields": [
+    [
+     "Site",
+     "Tampines outlet"
+    ]
+   ],
+   "lines": [
+    [
+     "Combi oven, 10 trays",
+     "1",
+     "S$ 18,400.00"
+    ],
+    [
+     "Stainless prep table",
+     "3",
+     "S$ 4,650.00"
+    ],
+    [
+     "Installation",
+     "1",
+     "S$ 1,200.00"
+    ]
+   ],
+   "total": "S$ 24,250.00",
+   "note": "Signed online by the owner",
+   "steps": [
+    "Layout approved",
+    "Signed online"
+   ],
+   "bubble": "Signed!",
+   "nexi": "point",
+   "props": [
+    "oven"
+   ],
+   "accents": [
+    {
+     "type": "stamp",
+     "text": "SIGNED",
+     "tone": "blue"
+    }
+   ],
+   "name": "Kitchen · quote signed",
+   "caption": "Commercial kitchen quotes still built in spreadsheets? In Odoo the equipment, the fabrication and the installation sit on one quotation, and the owner signs it online the same day. Book a call at technext.asia.",
+   "hashtags": [
+    "#Odoo",
+    "#CommercialKitchen",
+    "#Singapore"
+   ],
+   "mirror": true,
+   "variant": 0,
+   "background": "plus"
+  }
+ },
+ {
+  "id": "kitchen-growth-pyramid",
+  "cat": "kitchen",
+  "name": "Kitchen · growth pyramid",
+  "v": 4,
+  "industry": "kitchen",
+  "visual": "pyramid",
+  "variant": 0,
+  "mirror": false,
+  "ground": "haze",
+  "pattern": "grid",
+  "badge": "ready",
+  "copy": {
+   "head": "The business growth|*pyramid.*",
+   "sub": "Each stage builds on the one below it: operations first, then growth, then scale."
+  },
+  "layers": [
+   {
+    "type": "pyramid",
+    "w": 640,
+    "z": 12,
+    "levels": [
+     [
+      "Exit",
+      "IPO or merger"
+     ],
+     [
+      "IoT",
+      "Connected equipment"
+     ],
+     [
+      "ID | IT",
+      "Design and technology"
+     ],
+     [
+      "Marketing",
+      "Growth"
+     ],
+     [
+      "ERP",
+      "Sales · Ops · Admin"
+     ]
+    ],
+    "hot": 4,
+    "x": 220,
+    "y": 464
+   },
+   {
+    "type": "pill",
+    "text": "Start here",
+    "rot": -4,
+    "z": 19,
+    "x": 30,
+    "y": 806
+   },
+   {
+    "type": "pill",
+    "text": "Then scale",
+    "rot": 4,
+    "z": 19,
+    "x": 821,
+    "y": 553
+   },
+   {
+    "type": "sparkles",
+    "w": 96,
+    "z": 21,
+    "x": 490,
+    "y": 414
+   },
+   {
+    "type": "prop",
+    "name": "chefhat",
+    "w": 150,
+    "rot": -6,
+    "z": 17,
+    "x": 62,
+    "y": 634
+   }
+  ],
+  "caption": "Growth starts at the bottom: one system for sales, operations and admin. Marketing, design and technology, and connected equipment come after. Which stage is your kitchen business at?",
+  "hashtags": [
+   "#Odoo",
+   "#BusinessGrowth",
+   "#CommercialKitchen"
+  ],
+  "source": "Drive drip \"The Business Growth Pyramid\", rebuilt in the clean style",
+  "post": {
+   "visual": "pyramid",
+   "head": "The business growth|*pyramid.*",
+   "sub": "Each stage builds on the one below it: operations first, then growth, then scale.",
+   "levels": [
+    [
+     "Exit",
+     "IPO or merger"
+    ],
+    [
+     "IoT",
+     "Connected equipment"
+    ],
+    [
+     "ID | IT",
+     "Design and technology"
+    ],
+    [
+     "Marketing",
+     "Growth"
+    ],
+    [
+     "ERP",
+     "Sales · Ops · Admin"
+    ]
+   ],
+   "hot": 4,
+   "pills": [
+    "Start here",
+    "Then scale"
+   ],
+   "background": "grid",
+   "name": "Kitchen · growth pyramid",
+   "caption": "Growth starts at the bottom: one system for sales, operations and admin. Marketing, design and technology, and connected equipment come after. Which stage is your kitchen business at?",
+   "hashtags": [
+    "#Odoo",
+    "#BusinessGrowth",
+    "#CommercialKitchen"
+   ],
+   "mirror": false,
+   "variant": 0
+  }
+ },
+ {
+  "id": "kitchen-happy-head-chef",
+  "cat": "kitchen",
+  "name": "Kitchen · happy head chef",
+  "v": 4,
+  "industry": "kitchen",
+  "visual": "spotlight",
+  "variant": 0,
+  "mirror": true,
+  "ground": "haze",
+  "pattern": "floor",
+  "badge": "ready",
+  "copy": {
+   "head": "Happy head chef,|*happy kitchen.*",
+   "sub": "Equipment, parts and service visits in one Odoo, so the kitchen team gets what it needs on time.",
+   "kicker": "Reasons your customer"
+  },
+  "layers": [
+   {
+    "type": "glow",
+    "w": 660,
+    "z": 2,
+    "x": 210,
+    "y": 476
+   },
+   {
+    "type": "prop",
+    "name": "chefhat",
+    "w": 400,
+    "rot": 4,
+    "z": 12,
+    "x": 340,
+    "y": 520
+   },
+   {
+    "type": "pill",
+    "text": "Parts in stock",
+    "rot": 5,
+    "z": 19,
+    "x": 753,
+    "y": 566
+   },
+   {
+    "type": "pill",
+    "text": "Service on time",
+    "rot": -4,
+    "z": 19,
+    "x": 40,
+    "y": 726
+   },
+   {
+    "type": "pill",
+    "text": "One call",
+    "rot": 2,
+    "z": 19,
+    "x": 823,
+    "y": 916
+   },
+   {
+    "type": "chip",
+    "text": "Service visit booked",
+    "small": "Combi oven · Tue 10 am",
+    "icon": "check",
+    "tone": "ok",
+    "z": 18,
+    "rot": -3,
+    "x": 130,
+    "y": 936
+   },
+   {
+    "type": "sparkles",
+    "w": 116,
+    "z": 21,
+    "x": 140,
+    "y": 500
+   }
+  ],
+  "caption": "A head chef wants the parts in stock and the service visit on time. With equipment, spare parts and service calls in one Odoo, your team can promise both. Book a call at technext.asia.",
+  "hashtags": [
+   "#Odoo",
+   "#CommercialKitchen",
+   "#FieldService"
+  ],
+  "source": "Drive drip series \"Reasons your customer\", rebuilt with a prop",
+  "post": {
+   "visual": "spotlight",
+   "prop": "chefhat",
+   "head": "Happy head chef,|*happy kitchen.*",
+   "sub": "Equipment, parts and service visits in one Odoo, so the kitchen team gets what it needs on time.",
+   "kicker": "Reasons your customer",
+   "pills": [
+    "Parts in stock",
+    "Service on time",
+    "One call"
+   ],
+   "chip": {
+    "text": "Service visit booked",
+    "small": "Combi oven · Tue 10 am",
+    "icon": "check"
+   },
+   "background": "floor",
+   "name": "Kitchen · happy head chef",
+   "caption": "A head chef wants the parts in stock and the service visit on time. With equipment, spare parts and service calls in one Odoo, your team can promise both. Book a call at technext.asia.",
+   "hashtags": [
+    "#Odoo",
+    "#CommercialKitchen",
+    "#FieldService"
+   ],
+   "mirror": true,
+   "variant": 0
+  }
+ },
+ {
+  "id": "it-ticket-to-solved",
+  "cat": "it",
+  "name": "IT · ticket to solved",
+  "v": 4,
+  "industry": "it",
+  "visual": "ticket",
+  "variant": 0,
+  "mirror": false,
+  "ground": "haze",
+  "pattern": "dots",
+  "badge": "ready",
+  "copy": {
+   "head": "Every IT issue,|*tracked to solved.*",
+   "sub": "Requests from email or WhatsApp become tickets with an SLA, and the customer rates the fix."
+  },
+  "layers": [
+   {
+    "type": "chat",
+    "w": 420,
+    "rot": -3,
+    "z": 12,
+    "channel": "whatsapp",
+    "title": "Sample Logistics",
+    "msgs": [
+     [
+      "in",
+      "Hi, camera 3 at the warehouse is offline"
+     ],
+     [
+      "out",
+      "Ticket #2041 opened. Ravi is on his way."
+     ]
+    ],
+    "x": 44,
+    "y": 446
+   },
+   {
+    "type": "ticket",
+    "w": 540,
+    "rot": 2,
+    "z": 13,
+    "app": "helpdesk",
+    "title": "#2041 · CCTV offline",
+    "stage": "In progress",
+    "priority": 3,
+    "sla": "1h left",
+    "channel": "WhatsApp",
+    "text": "Camera 3 at the warehouse shows no signal since 9am.",
+    "assignee": "Ravi S.",
+    "tags": [
+     "CCTV",
+     "Onsite"
+    ],
+    "x": 496,
+    "y": 556
+   },
+   {
+    "type": "rating",
+    "w": 400,
+    "rot": -2,
+    "z": 14,
+    "stars": 5,
+    "text": "Back online in an hour. Thanks team!",
+    "who": "Daniel K.",
+    "meta": "Rated ticket #2041",
+    "x": 60,
+    "y": 726
+   },
+   {
+    "type": "sparkles",
+    "w": 90,
+    "z": 21,
+    "x": 976,
+    "y": 500
+   },
+   {
+    "type": "prop",
+    "name": "cctv",
+    "w": 170,
+    "rot": -6,
+    "z": 17,
+    "x": 458,
+    "y": 858
+   }
+  ],
+  "caption": "A camera goes offline and the customer messages on WhatsApp. In Odoo it becomes a ticket with an SLA, the engineer is assigned, and the customer rates the fix. How do your support requests arrive today?",
+  "hashtags": [
+   "#Odoo",
+   "#Helpdesk",
+   "#ITServices"
+  ],
+  "source": "Studio IT profile: Helpdesk with SLA timers and ratings",
+  "post": {
+   "visual": "ticket",
+   "head": "Every IT issue,|*tracked to solved.*",
+   "sub": "Requests from email or WhatsApp become tickets with an SLA, and the customer rates the fix.",
+   "title": "#2041 · CCTV offline",
+   "crumb": "",
+   "stage": "In progress",
+   "priority": 3,
+   "sla": "1h left",
+   "channel": "WhatsApp",
+   "text": "Camera 3 at the warehouse shows no signal since 9am.",
+   "assignee": "Ravi S.",
+   "tags": [
+    "CCTV",
+    "Onsite"
+   ],
+   "chat": {
+    "channel": "whatsapp",
+    "title": "Sample Logistics",
+    "msgs": [
+     [
+      "in",
+      "Hi, camera 3 at the warehouse is offline"
+     ],
+     [
+      "out",
+      "Ticket #2041 opened. Ravi is on his way."
+     ]
+    ]
+   },
+   "rating": {
+    "stars": 5,
+    "text": "Back online in an hour. Thanks team!",
+    "who": "Daniel K.",
+    "meta": "Rated ticket #2041"
+   },
+   "props": [
+    "cctv"
+   ],
+   "background": "dots",
+   "name": "IT · ticket to solved",
+   "caption": "A camera goes offline and the customer messages on WhatsApp. In Odoo it becomes a ticket with an SLA, the engineer is assigned, and the customer rates the fix. How do your support requests arrive today?",
+   "hashtags": [
+    "#Odoo",
+    "#Helpdesk",
+    "#ITServices"
+   ],
+   "mirror": false,
+   "variant": 0
+  }
+ },
+ {
+  "id": "retail-shop-open-all-night",
+  "cat": "retail",
+  "name": "Retail · shop open all night",
+  "v": 4,
+  "industry": "retail",
+  "visual": "store",
+  "variant": 0,
+  "mirror": true,
+  "ground": "haze",
+  "pattern": "hex",
+  "badge": "ready",
+  "copy": {
+   "head": "Your shop|*open all night.*",
+   "sub": "The Odoo online shop shares stock and prices with your stores, and orders arrive paid."
+  },
+  "layers": [
+   {
+    "type": "shop",
+    "w": 640,
+    "rot": 1.5,
+    "z": 12,
+    "brand": "Sample Store",
+    "url": "samplestore.sg/shop",
+    "product": "Linen shirt",
+    "category": "Apparel",
+    "icon": "shirt",
+    "price": "S$ 49.00",
+    "rating": 4.5,
+    "reviews": "128 reviews",
+    "stock": "In stock · ships today",
+    "options": [
+     "S",
+     "M",
+     "L",
+     "XL"
+    ],
+    "cart": "2",
+    "btn": "Add to cart",
+    "x": 404,
+    "y": 455
+   },
+   {
+    "type": "notif",
+    "w": 380,
+    "rot": -3,
+    "z": 14,
+    "app": "website_sale",
+    "title": "New order S00412",
+    "text": "Paid online · 2 items",
+    "time": "02:14",
+    "x": 30,
+    "y": 805
+   },
+   {
+    "type": "pill",
+    "text": "Same stock as the store",
+    "rot": 3,
+    "z": 19,
+    "x": 582,
+    "y": 921
+   },
+   {
+    "type": "sparkles",
+    "w": 90,
+    "z": 21,
+    "x": 354,
+    "y": 409
+   },
+   {
+    "type": "prop",
+    "name": "bag",
+    "w": 170,
+    "rot": 6,
+    "z": 17,
+    "x": 232,
+    "y": 597
+   }
+  ],
+  "caption": "Your stores close at 10; your online shop does not. The Odoo shop sells from the same stock and prices as your stores, and every order arrives paid and ready to pick. Book a call at technext.asia.",
+  "hashtags": [
+   "#Odoo",
+   "#Retail",
+   "#eCommerce"
+  ],
+  "source": "technext.asia/industries/retail — the online shop on the same stock",
+  "post": {
+   "visual": "store",
+   "head": "Your shop|*open all night.*",
+   "sub": "The Odoo online shop shares stock and prices with your stores, and orders arrive paid.",
+   "brand": "Sample Store",
+   "url": "samplestore.sg/shop",
+   "product": "Linen shirt",
+   "category": "Apparel",
+   "icon": "shirt",
+   "price": "S$ 49.00",
+   "rating": 4.5,
+   "reviews": "128 reviews",
+   "stock": "In stock · ships today",
+   "options": [
+    "S",
+    "M",
+    "L",
+    "XL"
+   ],
+   "cart": "2",
+   "btn": "Add to cart",
+   "notif": {
+    "app": "website_sale",
+    "title": "New order S00412",
+    "text": "Paid online · 2 items",
+    "time": "02:14"
+   },
+   "pills": [
+    "Same stock as the store"
+   ],
+   "props": [
+    "bag"
+   ],
+   "background": "hex",
+   "name": "Retail · shop open all night",
+   "caption": "Your stores close at 10; your online shop does not. The Odoo shop sells from the same stock and prices as your stores, and every order arrives paid and ready to pick. Book a call at technext.asia.",
+   "hashtags": [
+    "#Odoo",
+    "#Retail",
+    "#eCommerce"
+   ],
+   "mirror": true,
+   "variant": 0
+  }
+ },
+ {
+  "id": "apps-quote-order-invoice",
+  "cat": "apps",
+  "name": "Quote, order, invoice",
+  "v": 4,
+  "visual": "fan",
+  "variant": 0,
+  "mirror": false,
+  "ground": "haze",
+  "pattern": "rings",
+  "badge": "ready",
+  "copy": {
+   "head": "Quote, order, invoice:|*one record, handed on.*",
+   "sub": "The sales order carries the customer and the lines from the quote to the invoice, so nothing is typed twice."
+  },
+  "layers": [
+   {
+    "type": "doc",
+    "kind": "quote",
+    "app": "sale",
+    "number": "S00118",
+    "partner": "Sample Trading Pte Ltd",
+    "fields": [],
+    "lines": [],
+    "total": "S$ 4,665.20",
+    "btns": [],
+    "compact": true,
+    "w": 336,
+    "rot": -6,
+    "z": 11,
+    "x": 34,
+    "y": 529
+   },
+   {
+    "type": "doc",
+    "kind": "order",
+    "app": "sale",
+    "number": "S00118",
+    "partner": "Sample Trading Pte Ltd",
+    "fields": [],
+    "lines": [],
+    "total": "S$ 4,665.20",
+    "btns": [],
+    "compact": true,
+    "w": 336,
+    "rot": 0,
+    "z": 13,
+    "x": 372,
+    "y": 481
+   },
+   {
+    "type": "doc",
+    "kind": "invoice",
+    "app": "accountant",
+    "number": "INV/2026/0142",
+    "partner": "Sample Trading Pte Ltd",
+    "fields": [],
+    "lines": [],
+    "total": "S$ 4,665.20",
+    "ribbon": "PAID",
+    "btns": [],
+    "compact": true,
+    "w": 336,
+    "rot": 6,
+    "z": 12,
+    "x": 710,
+    "y": 529
+   },
+   {
+    "type": "arrow",
+    "w": 92,
+    "rot": -8,
+    "z": 26,
+    "kind": "right",
+    "x": 324,
+    "y": 724
+   },
+   {
+    "type": "arrow",
+    "w": 92,
+    "rot": -8,
+    "z": 26,
+    "kind": "right",
+    "x": 662,
+    "y": 724
+   },
+   {
+    "type": "pill",
+    "text": "Nothing retyped",
+    "rot": -3,
+    "z": 19,
+    "x": 70,
+    "y": 816
+   },
+   {
+    "type": "pill",
+    "text": "Paid online",
+    "rot": 3,
+    "z": 19,
+    "x": 778,
+    "y": 816
+   },
+   {
+    "type": "sparkles",
+    "w": 90,
+    "z": 21,
+    "x": 678,
+    "y": 425
+   }
+  ],
+  "caption": "The quotation becomes the sales order, and the sales order becomes the invoice. In Odoo it is one record handed on, so the customer and the lines are never typed twice. Book a call at technext.asia.",
+  "hashtags": [
+   "#Odoo",
+   "#Sales",
+   "#Accounting"
+  ],
+  "source": "technext.asia — the sales order record flow",
+  "post": {
+   "visual": "fan",
+   "head": "Quote, order, invoice:|*one record, handed on.*",
+   "sub": "The sales order carries the customer and the lines from the quote to the invoice, so nothing is typed twice.",
+   "docs": [
+    {
+     "kind": "quote",
+     "number": "S00118",
+     "partner": "Sample Trading Pte Ltd",
+     "total": "S$ 4,665.20"
+    },
+    {
+     "kind": "order",
+     "number": "S00118",
+     "partner": "Sample Trading Pte Ltd",
+     "total": "S$ 4,665.20"
+    },
+    {
+     "kind": "invoice",
+     "number": "INV/2026/0142",
+     "partner": "Sample Trading Pte Ltd",
+     "total": "S$ 4,665.20",
+     "ribbon": "PAID"
+    }
+   ],
+   "pills": [
+    "Nothing retyped",
+    "Paid online"
+   ],
+   "background": "rings",
+   "name": "Quote, order, invoice",
+   "caption": "The quotation becomes the sales order, and the sales order becomes the invoice. In Odoo it is one record handed on, so the customer and the lines are never typed twice. Book a call at technext.asia.",
+   "hashtags": [
+    "#Odoo",
+    "#Sales",
+    "#Accounting"
    ],
    "mirror": false,
    "variant": 0

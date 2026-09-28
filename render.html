@@ -11,9 +11,12 @@
 <!-- Renders one drip at full size for tools/render.py and tools/serve.py: render.html?id=<drip id>[&format=4:5] or ?src=<json url> -->
 <div id="out"></div>
 <script src="content.js"></script>
+<script src="industries-extra.js"></script>
 <script src="drips.js"></script>
 <script src="drip-render.js"></script>
 <script src="odoo-ui.js"></script>
+<script src="cards.js"></script>
+<script src="props.js"></script>
 <script>
 (function () {
   var q = new URLSearchParams(location.search), id = q.get('id');
