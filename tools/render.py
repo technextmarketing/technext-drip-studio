@@ -18,7 +18,10 @@ def drip_index():
     """Read id + category of every drip straight from drips.js."""
     src = open(os.path.join(ROOT, "drips.js"), encoding="utf-8").read()
     src = src[src.index("window.DRIPS"):]
-    return re.findall(r"id:\s*'([^']+)',\s*cat:\s*'([^']+)'", src)
+    try:
+        return [(d["id"], d.get("cat", "misc")) for d in json.loads(src[src.index("["):src.rindex("]") + 1])]
+    except ValueError:
+        return re.findall(r"id:\s*'([^']+)',\s*cat:\s*'([^']+)'", src)
 
 
 class Chrome:

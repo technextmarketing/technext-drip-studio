@@ -30,7 +30,11 @@
     cloudOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10.5a3.5 3.5 0 0 0 .9-6.9A6 6 0 0 0 7.2 9.1 4.5 4.5 0 0 0 7 18Z"/><path d="m3 3 18 18"/></svg>',
     cloudOk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10.5a3.5 3.5 0 0 0 .9-6.9A6 6 0 0 0 7.2 9.1 4.5 4.5 0 0 0 7 18Z"/><path d="m9.5 13.5 2 2 3.5-4"/></svg>',
     sync: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.3-4.3L4 8.5"/><path d="M4 4v4.5h4.5"/><path d="M4 13a8 8 0 0 0 14.3 4.3l1.7-1.8"/><path d="M20 20v-4.5h-4.5"/></svg>',
-    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>'
+    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>',
+    x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg>',
+    bell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15Z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+    chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 16v-4M12 16V7M17 16v-6"/></svg>'
   };
   function kit(name) { return SVG[name] || icon(name); }
 
@@ -279,10 +283,31 @@
       '<div class="dash-bars">' + view.bars.map(function (b) { return '<span><i style="height:' + (b[1] / max * 100).toFixed(1) + '%"></i><small>' + esc(b[0]) + '</small></span>'; }).join('') + '</div></div>';
   };
   LAYERS.checklist = function (L) {
-    var items = L.items || fromInd(L, 'new20') || [];
-    return '<div class="clist">' + (L.title ? '<div class="cl-top">' + (L.app ? oi(L.app) : '') + '<b data-e="title">' + esc(L.title) + '</b>' + (L.tag ? '<span class="cl-tag">' + esc(L.tag) + '</span>' : '') + '</div>' : '') +
-      '<ul>' + items.slice(0, L.max || 5).map(function (t) { return '<li><span class="ck">' + SVG.check + '</span><span>' + esc(t) + '</span></li>'; }).join('') + '</ul>' +
+    var items = L.items || fromInd(L, 'new20') || [], old = L.variant === 'old';
+    return '<div class="clist' + (old ? ' old' : '') + (L.big ? ' big' : '') + '">' + (L.title ? '<div class="cl-top">' + (L.app ? oi(L.app) : '') + '<b data-e="title">' + esc(L.title) + '</b>' + (L.tag ? '<span class="cl-tag">' + esc(L.tag) + '</span>' : '') + '</div>' : '') +
+      '<ul>' + items.slice(0, L.max || 5).map(function (t) { return '<li><span class="ck' + (old ? ' x' : '') + '">' + (old ? SVG.x : SVG.check) + '</span><span>' + esc(t) + '</span></li>'; }).join('') + '</ul>' +
       (L.apps && L.apps.length ? '<div class="cl-apps">' + L.apps.map(function (a) { return oi(a); }).join('') + '</div>' : '') + '</div>';
+  };
+  /* a QR code card (the pattern is decorative, drawn from the text so it stays the same on every render) */
+  function strHash(s) { var h = 2166136261; s = String(s); for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function qrSVG(seed) {
+    var n = 25, r = rng(seed), s = '';
+    var finder = function (x, y) { return '<rect x="' + x + '" y="' + y + '" width="7" height="7" rx="1.4"/><rect x="' + (x + 1) + '" y="' + (y + 1) + '" width="5" height="5" rx=".9" fill="#fff"/><rect x="' + (x + 2) + '" y="' + (y + 2) + '" width="3" height="3" rx=".7"/>'; };
+    for (var y = 0; y < n; y++) {
+      var run = -1;
+      for (var x = 0; x <= n; x++) {
+        var free = x < n && !((x < 8 && y < 8) || (x > n - 9 && y < 8) || (x < 8 && y > n - 9)) && !(x > 9 && x < 15 && y > 9 && y < 15);
+        var on = free && r() > .5;
+        if (on && run < 0) run = x;
+        if (!on && run >= 0) { s += '<rect x="' + run + '" y="' + y + '" width="' + (x - run) + '" height="1"/>'; run = -1; }
+      }
+    }
+    return '<svg viewBox="-1 -1 ' + (n + 2) + ' ' + (n + 2) + '" aria-hidden="true"><g fill="#1F1F3D">' + s + finder(0, 0) + finder(n - 7, 0) + finder(0, n - 7) + '</g></svg>';
+  }
+  LAYERS.qr = function (L) {
+    return '<div class="qrc">' + (L.title ? '<b class="qr-t" data-e="title">' + esc(L.title) + '</b>' : '') +
+      '<div class="qr-box">' + qrSVG(strHash(L.title || L.text || 'qr')) + '<span class="qr-logo">' + oi(L.app || 'point_of_sale') + '</span></div>' +
+      (L.text ? '<span class="qr-x" data-e="text">' + esc(L.text) + '</span>' : '') + '</div>';
   };
   LAYERS.phases = function (L) {
     var ph = L.data || fromInd(L, 'phases') || [];
@@ -401,7 +426,7 @@
     if (!v3) {
       var ground = d.ground == null ? 'blobs' : d.ground;
       if (d.grid) h += '<div class="d-grid"></div>';
-      if (ground) h += '<div class="d-ground">' + (ground === 'wave' ? wave() : ground.indexOf('blobs') === 0 ? blobs(ground) : '') + '</div>';
+      if (ground) h += '<div class="d-ground">' + (ground === 'wave' ? wave() : ground.indexOf('blobs') === 0 ? blobs(ground) : ground === 'haze' ? '<i class="haze"></i>' : '') + '</div>';
     }
     if (d.brand) h += brandHTML(d.brand, d);
     else h += '<img class="d-logo" src="' + asset('assets/brand/logo-horizontal.png') + '" alt="TechNext">' + badge(d.badge);

@@ -181,7 +181,8 @@
     return '<div class="ntf">' + oi(L.app || 'mail') + '<div><b data-e="title">' + esc(L.title || 'Notification') + '</b><span data-e="text">' + esc(L.text || '') + '</span></div><em>' + esc(L.time || 'now') + '</em></div>';
   };
   LAYERS.stat = function (L) {
-    return '<div class="stt' + (L.glass ? ' glass' : '') + '"><b data-e="value">' + esc(L.value || '') + '</b><span data-e="label">' + esc(L.label || '') + '</span></div>';
+    var n = String(L.value || '').length;
+    return '<div class="stt' + (L.glass ? ' glass' : '') + (L.variant === 'big' ? ' big' : '') + '"><b data-e="value"' + (n > 6 ? ' style="font-size:' + (132 / n).toFixed(1) + 'cqw"' : '') + '>' + esc(L.value || '') + '</b><span data-e="label">' + esc(L.label || '') + '</span></div>';
   };
   LAYERS.route = function (L) {
     var st = arr(L.stops).slice(0, 5), n = st.length || 1;
@@ -191,6 +192,16 @@
       '<path d="' + path + '" fill="none" stroke="#3167CA" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1 16"/>' +
       pts.map(function (p, i) { return '<g transform="translate(' + p[0].toFixed(0) + ' ' + p[1].toFixed(0) + ')"><circle r="20" fill="' + (i === +L.hot ? '#3167CA' : '#fff') + '" stroke="#3167CA" stroke-width="5"/><text y="7" text-anchor="middle" class="rn' + (i === +L.hot ? ' w' : '') + '">' + (i + 1) + '</text></g>'; }).join('') + '</svg>' +
       '<div class="rte-l">' + st.map(function (s, i) { s = arr(s); return '<span' + (i === +L.hot ? ' class="hot"' : '') + '><em>' + (i + 1) + '</em><b>' + esc(s[0]) + '</b><small>' + esc(s[1] || '') + '</small></span>'; }).join('') + '</div></div>';
+  };
+
+  /* ---------- one Odoo view as a clean card (no browser chrome): the simple style ---------- */
+  var APC_K = { kanban: 1.75, list: 1.6, planning: 1.55, kds: 1.8, pos: 1.5, dashboard: 1.45, discuss: 1.6, form: 1.5, apps: 1.35 };
+  LAYERS.appcard = function (L) {
+    var view = V[L.view] ? L.view : 'kanban', app = L.app || 'sale';
+    return '<div class="apc">' +
+      '<div class="apc-top">' + oi(app) + '<div><b data-e="title">' + esc(L.title || appName(app)) + '</b>' + (L.crumb ? '<small data-e="crumb">' + esc(L.crumb) + '</small>' : '') + '</div>' +
+      (L.tag ? '<span class="apc-tag" data-e="tag">' + esc(L.tag) + '</span>' : '') + '</div>' +
+      '<div class="apc-body ow v-' + view + '" style="--k:' + (+L.k || APC_K[view] || 1.6) + '">' + V[view](L) + '</div></div>';
   };
 
   R.chartSVG = chartSVG;

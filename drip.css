@@ -331,11 +331,11 @@
 .clist{border-radius:24px;background:#fff;border:1px solid #E3E7F0;box-shadow:var(--shadow-card);padding:20px 24px 22px}
 .cl-top{display:flex;align-items:center;gap:12px;padding-bottom:14px;margin-bottom:6px;border-bottom:1px solid var(--line)}
 .cl-top .oi{width:40px;height:40px}
-.cl-top b{font:800 23px/1.2 var(--font-display);color:var(--ink);letter-spacing:-.02em}
+.cl-top b{font:800 25px/1.2 var(--font-display);color:var(--ink);letter-spacing:-.02em}
 .cl-tag{margin-left:auto;padding:6px 12px;border-radius:999px;background:var(--blue-050);color:var(--blue-700);font:700 13px/1 var(--font-body);white-space:nowrap}
 .clist ul{margin:0;padding:0;list-style:none;display:grid;gap:4px}
-.clist li{display:flex;align-items:flex-start;gap:12px;padding:10px 0;font:500 19px/1.35 var(--font-body);color:var(--ink)}
-.clist .ck,.bat .ck{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--ok-050);color:var(--ok);margin-top:1px}
+.clist li{display:flex;align-items:flex-start;gap:12px;padding:10px 0;font:500 21px/1.35 var(--font-body);color:var(--ink)}
+.clist .ck,.bat .ck{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--ok-050);color:var(--ok);margin-top:1px}
 .clist .ck svg,.bat .ck svg{width:16px;height:16px}
 .cl-apps{display:flex;gap:12px;padding-top:12px;margin-top:8px;border-top:1px solid var(--line)}
 .cl-apps .oi{width:38px;height:38px}
@@ -582,18 +582,18 @@ svg.chart .tip{font:800 17px var(--font-body);fill:#fff}
 .tl-i small{display:block;margin-top:.6cqw;font:500 3.2cqw/1.3 var(--font-body);color:var(--label)}
 .stp{display:flex;align-items:center;gap:1.4cqw}
 .stp.v{flex-direction:column;align-items:stretch}
-.st{flex:1;display:grid;justify-items:center;gap:1.4cqw;padding:3cqw 2cqw;border-radius:3.4cqw;background:#fff;border:1px solid #E3E7F0;box-shadow:var(--shadow-card);text-align:center;min-width:0}
+.stp .st{flex:1;display:grid;justify-items:center;gap:1.4cqw;padding:3cqw 2cqw;border-radius:3.4cqw;background:#fff;border:1px solid #E3E7F0;box-shadow:var(--shadow-card);text-align:center;min-width:0}
 .stp.v .st{grid-template-columns:auto 1fr;justify-items:start;text-align:left;align-items:center}
 .stp.v .st small{grid-column:2}
 .st-ic{width:10cqw;height:10cqw;border-radius:3cqw;background:var(--blue-050);display:grid;place-items:center}
 .stp.v .st-ic{grid-row:1 / 3;width:8cqw;height:8cqw}
 .st-ic .oi{width:65%;height:65%}
 .st-ic b{font:800 4.6cqw/1 var(--font-display);color:var(--blue)}
-.st > b{font:800 3.6cqw/1.15 var(--font-display);letter-spacing:-.01em}
+.stp .st > b{font:800 3.6cqw/1.15 var(--font-display);letter-spacing:-.01em}
 .stp.v .st > b{font-size:4.4cqw}
-.st small{font:500 2.6cqw/1.3 var(--font-body);color:var(--label)}
+.stp .st small{font:500 2.6cqw/1.3 var(--font-body);color:var(--label)}
 .stp.v .st small{font-size:3.3cqw}
-.st.hot{border-color:var(--blue);box-shadow:0 0 0 1cqw rgba(49,103,202,.16),var(--shadow-card)}
+.stp .st.hot{border-color:var(--blue);box-shadow:0 0 0 1cqw rgba(49,103,202,.16),var(--shadow-card)}
 .st-ar{flex:none;width:3cqw;height:3cqw;border-top:.7cqw solid var(--blue);border-right:.7cqw solid var(--blue);transform:rotate(45deg);margin:0 .6cqw}
 .stp.v .st-ar{align-self:center;transform:rotate(135deg);margin:.2cqw 0}
 .cht{border-radius:5cqw;background:#fff;border:1px solid #E3E7F0;box-shadow:var(--shadow-card);overflow:hidden}
@@ -602,12 +602,12 @@ svg.chart .tip{font:800 17px var(--font-body);fill:#fff}
 .cht-h > i{width:9cqw;height:9cqw;border-radius:50%;display:grid;place-items:center;background:#25D366;color:#fff;font:800 4.4cqw/1 var(--font-display);font-style:normal}
 .cht.web .cht-h > i{background:var(--blue)}.cht.odoo .cht-h > i{background:var(--odoo)}
 .cht-h > i svg{width:55%;height:55%}
-.cht-h b{display:block;font:700 4.2cqw/1.2 var(--font-body)}
+.cht-h b{display:block;font:700 4.6cqw/1.2 var(--font-body)}
 .cht-h small{display:block;font:500 3cqw/1.2 var(--font-body);color:var(--label)}
 .cht-b{display:grid;gap:2.4cqw;padding:4cqw;background:#EEF2F7}
 .cht.whatsapp .cht-b{background:#EFEAE2}
 .cm{position:relative;max-width:82%;padding:2.6cqw 3.4cqw;border-radius:3cqw;background:#fff;box-shadow:0 1px 1px rgba(0,0,0,.06)}
-.cm p{margin:0;font:500 3.6cqw/1.4 var(--font-body);color:#1F1F2E}
+.cm p{margin:0;font:500 4cqw/1.4 var(--font-body);color:#1F1F2E}
 .cm small{display:block;margin-top:.8cqw;font:500 2.6cqw/1 var(--font-body);color:#8A8D9E;text-align:right}
 .cm.out{justify-self:end;background:#D9FDD3}.cht.web .cm.out,.cht.odoo .cm.out{background:#DDE7F8}
 .cm.bot{display:flex;gap:2cqw;align-items:flex-start;background:#fff;border:1px solid #D2DFF6}
@@ -680,3 +680,40 @@ svg.chart .cx.fz{font-size:26px}
 .drip.dark .d-badge.ready{padding:8px 12px;border-radius:14px;background:#fff;box-shadow:0 10px 24px -14px rgba(0,0,0,.6)}
 .drip.dark .d-badge.ready img{height:62px}
 .drip.dark .d-badge.o20{padding:10px 14px 6px;border-radius:14px;background:#fff}
+
+/* ================= simple style (v4): the look of the first drips on a clean background ================= */
+.d-ground .haze{position:absolute;left:0;right:0;bottom:0;height:36%;
+  background:linear-gradient(180deg,rgba(214,227,249,0) 0%,rgba(178,203,245,.42) 52%,rgba(132,168,238,.72) 100%)}
+/* one Odoo view as a card */
+.apc{border-radius:26px;background:#fff;border:1px solid #E3E7F0;box-shadow:var(--shadow-card);overflow:hidden;text-align:left}
+.apc-top{display:flex;align-items:center;gap:14px;padding:18px 24px;border-bottom:1px solid var(--line);background:#FBFCFE}
+.apc-top .oi{width:44px;height:44px;flex:none}
+.apc-top b{display:block;font:800 24px/1.15 var(--font-display);color:var(--ink);letter-spacing:-.02em}
+.apc-top small{display:block;margin-top:2px;font:500 16px/1.2 var(--font-body);color:var(--muted)}
+.apc-tag{margin-left:auto;padding:8px 14px;border-radius:999px;background:var(--blue-050);color:var(--blue-700);font:700 15px/1 var(--font-body);white-space:nowrap}
+.apc-body.ow{border:0;border-radius:0;box-shadow:none;background:#F7F8FB}
+.apc-body .ow-list,.apc-body .ow-pl{background:#fff}
+/* checklist: the old way */
+.clist.old{background:#F3F4F8;border-color:#E1E4EC;box-shadow:0 2px 6px rgba(31,31,61,.05),0 28px 50px -30px rgba(19,47,102,.35)}
+.clist.old .cl-top b{color:#55556D}
+.clist.old .cl-tag{background:#FCE3E1;color:#B3271E}
+.clist.old li{color:#62627A}
+.clist .ck.x{background:#FCE3E1;color:var(--red)}
+/* QR card */
+.qrc{display:grid;justify-items:center;gap:12px;padding:22px 22px 20px;border-radius:26px;background:#fff;border:1px solid #E3E7F0;box-shadow:var(--shadow-float);text-align:center}
+.qr-t{font:800 23px/1.15 var(--font-display);color:var(--ink);letter-spacing:-.02em}
+.qr-box{position:relative;width:100%;aspect-ratio:1}
+.qr-box svg{display:block;width:100%;height:100%;shape-rendering:crispEdges}
+.qr-logo{position:absolute;left:50%;top:50%;width:24%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:14px;background:#fff;display:grid;place-items:center}
+.qr-logo .oi{width:72%;height:72%}
+.qr-x{font:600 17px/1.3 var(--font-body);color:var(--label)}
+/* cards sized in cqw measure their own padding and corners against the layer, so the studio and the export match */
+.L-graph > .in,.L-kpis > .in,.L-timeline > .in,.L-steps > .in,.L-chat > .in,.L-receipt > .in,.L-notif > .in,.L-stat > .in,.L-route > .in,.L-window > .in{container-type:inline-size}
+.clist.big{padding:24px 28px 24px}
+.clist.big .cl-top b{font-size:28px}
+.clist.big li{font-size:24px;padding:13px 0}
+.clist.big .ck{width:34px;height:34px}.clist.big .ck svg{width:19px;height:19px}
+.clist.big .cl-apps .oi{width:44px;height:44px}
+.stt.big{justify-items:center;text-align:center;padding:9cqw 6cqw 8cqw}
+.stt.big b{font-size:36cqw}
+.stt.big span{font-size:8cqw}

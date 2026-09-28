@@ -5,20 +5,20 @@
    right-click for more. The Design panel restyles a whole post (background, camera, layout, logo). */
 (function () {
   'use strict';
-  var C = window.TN_CONTENT || {}, R = window.TNDrip, AI = window.TNAI, S = window.TNStore, K = window.TNCompose, ST = window.TNStarters;
+  var C = window.TN_CONTENT || {}, R = window.TNDrip, AI = window.TNAI, S = window.TNStore, SP = window.TNSimple, ST = window.TNStarters;
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return [].slice.call((r || document).querySelectorAll(s)); };
   var clone = function (o) { return JSON.parse(JSON.stringify(o)); };
   var esc = R.esc;
 
-  var POSES = K.POSES;
+  var POSES = SP.POSES;
   var ODOO = Object.keys(C.apps || {}).concat(['ai_app', 'industry_fsm', 'pos_restaurant', 'appointment', 'whatsapp', 'mail']).filter(function (v, i, a) { return a.indexOf(v) === i; }).sort();
   var KIT = ['check', 'spark', 'search', 'sync', 'wifiOff', 'cloudOff', 'cloudOk'];
   var ICONS = KIT.concat(Object.keys(C.icons || {}).sort());
   var INDUSTRIES = Object.keys(C.industries || {});
   var indName = function (k) { var i = C.industries[k]; return i ? i.name : k; };
   var SITES = Object.keys(C.sites || {});
-  var VIEWS = ['form', 'list', 'kanban', 'dashboard', 'planning', 'pos', 'kds', 'apps', 'discuss'];
+  var VIEWS = ['form', 'list', 'kanban', 'dashboard', 'planning', 'pos', 'kds', 'apps', 'discuss'], CARD_VIEWS = ['kanban', 'list', 'planning', 'kds', 'pos', 'dashboard'];
 
   var lib = [], cats = [], usage = [], fileLib = clone(window.DRIPS || []);
   var st = { cat: 'all', id: null, sel: -1, multi: [], zoom: 1 };
@@ -108,6 +108,11 @@
     'win-apps': ['window', { app: 'sale', view: 'apps', frame: false }],
     'win-discuss': ['window', { app: 'mail', view: 'discuss', appLabel: 'Discuss', crumbs: ['Discuss'], msgs: [['Mei Ling T.', 'Can someone check the P00088 bill?'], ['Odoo AI', 'Done: the bill matches P00088 and is ready to approve.', 'BILL/2026/0311.pdf']] }],
     'ph-form': ['ophone', clone(SAMPLE_FORM)],
+    'card-kanban': ['appcard', { app: 'crm', view: 'kanban', title: 'Pipeline', crumb: 'CRM · Sales team', tag: '4 open deals', stages: [['New', [['Office fit-out', 'Sample Build Co', 'S$ 18,000', 'KL']]], ['Qualified', [['Warehouse barcodes', 'Sample Logistics', 'S$ 12,500', 'RS']]], ['Won', [['Accounting', 'Sample Foods', 'S$ 11,000', 'LT']]]], highlight: ['1.0'] }],
+    'card-list': ['appcard', { app: 'account', view: 'list', title: 'Invoices', crumb: 'Accounting · Customers', cols: ['Number', 'Customer', 'Total', 'Status'], rows: [['INV/2026/0141', 'Sample Trading', 'S$ 3,313.60', 'Paid'], ['INV/2026/0142', 'Sample Foods', 'S$ 860.00', 'Sent'], ['INV/2026/0143', 'Sample Clinic', 'S$ 1,420.00', 'Late']], highlight: 2 }],
+    'card-plan': ['appcard', { app: 'planning', view: 'planning', title: 'This week', crumb: 'Planning · Schedule', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], rows: [['Ravi S.', [[0, 2, 'Service'], [3, 1, 'Install']]], ['Mei Ling T.', [[1, 2, 'Repair']]], ['Daniel K.', [[0, 1, 'Survey'], [2, 3, 'Maintenance']]]] }],
+    'card-kds': ['appcard', { app: 'pos_restaurant', view: 'kds', title: 'Kitchen display', crumb: 'POS · Main kitchen', tickets: [['Table 12', [['Laksa', '2'], ['Chicken rice', '1']], 'cooking', '2 min'], ['Table 7', [['Satay (10)', '1']], 'ready', '6 min']] }],
+    qr: ['qr', { title: 'Table 12', text: 'Scan to order and pay', app: 'pos_restaurant' }],
     'g-bar': ['graph', { kind: 'bar', title: 'Orders by day', data: [['Mon', 32], ['Tue', 41], ['Wed', 38], ['Thu', 52], ['Fri', 61]], highlight: 4 }],
     'g-line': ['graph', { kind: 'line', title: 'Revenue by week', data: [['W36', 18], ['W37', 21], ['W38', 19], ['W39', 26], ['W40', 31]], unit: 'k' }],
     'g-donut': ['graph', { kind: 'donut', title: 'Sales by channel', data: [['Store', 46], ['Online', 34], ['Wholesale', 20]], center: '100%', centerLabel: 'of sales', unit: '%' }],
@@ -124,10 +129,11 @@
     link: ['link', { x1: 300, y1: 600, x2: 700, y2: 760, label: 'Handed over', bend: .25 }]
   };
   var ELEMENTS = [
-    ['Odoo screens', [['win-form', 'Form (quotation, bill…)'], ['win-list', 'List (invoices…)'], ['win-kanban', 'Kanban (pipeline)'], ['win-dash', 'Dashboard'], ['win-plan', 'Planning board'], ['win-pos', 'Point of Sale'], ['win-kds', 'Kitchen display'], ['win-apps', 'App home screen'], ['win-discuss', 'Discuss / Odoo AI'], ['ph-form', 'Phone screen']]],
+    ['Odoo cards', [['card-kanban', 'Board (pipeline)'], ['card-list', 'List (invoices…)'], ['card-plan', 'Planning board'], ['card-kds', 'Kitchen tickets'], ['ph-form', 'Phone screen']]],
+    ['Odoo windows', [['win-form', 'Form (quotation, bill…)'], ['win-list', 'List (invoices…)'], ['win-kanban', 'Kanban (pipeline)'], ['win-dash', 'Dashboard'], ['win-plan', 'Planning board'], ['win-pos', 'Point of Sale'], ['win-kds', 'Kitchen display'], ['win-apps', 'App home screen'], ['win-discuss', 'Discuss / Odoo AI']]],
     ['Charts & numbers', [['g-bar', 'Bar chart'], ['g-line', 'Line chart'], ['g-donut', 'Donut chart'], ['g-funnel', 'Funnel'], ['g-prog', 'Progress bars'], ['kpis', 'KPI tiles'], ['stat', 'Big number']]],
     ['Workflow', [['steps', 'Steps across apps'], ['timeline', 'Timeline'], ['link', 'Arrow with label'], ['appflow', 'How a record moves'], ['flow', 'Industry workflow (site)'], ['ba', 'Before / after (site)'], ['phases', 'Rollout phases (site)'], ['chart', 'Industry dashboard (site)']]],
-    ['Cards', [['record', 'Record card'], ['checklist', 'Checklist'], ['notif', 'Notification'], ['chat', 'Chat (WhatsApp, web)'], ['receipt', 'Paper invoice'], ['route', 'Delivery route'], ['orbit', 'App orbit'], ['apps', 'App cloud']]],
+    ['Cards', [['record', 'Record card'], ['checklist', 'Checklist'], ['notif', 'Notification'], ['chat', 'Chat (WhatsApp, web)'], ['receipt', 'Paper invoice'], ['qr', 'QR code card'], ['route', 'Delivery route'], ['orbit', 'App orbit'], ['apps', 'App cloud']]],
     ['Website design', [['devices', 'Laptop + phone (our sites)'], ['site', 'Website mockup'], ['code', 'Code window'], ['palette', 'Colour palette'], ['wireframe', 'Wireframe'], ['serp', 'Google result'], ['gauge', 'Score gauge'], ['cursor', 'Cursor']]],
     ['Nexi', POSES.map(function (p) { return ['nexi', p]; })],
     ['Photos', [['person', 'Person cut-out'], ['shot', 'Screenshot'], ['img', 'Image']]],
@@ -150,7 +156,7 @@
     scan: { x: 480, y: 560, w: 540 }, sparkles: { x: 880, y: 420, w: 110 }, storm: { x: 700, y: 430, w: 290 }, speed: { x: 60, y: 520, w: 260, z: 8 },
     confetti: { x: 140, y: 380, w: 800 }, arrow: { x: 480, y: 700, w: 130, kind: 'right' }, nosignal: { x: 680, y: 620, w: 120 }
   };
-  var PRESET_W = { window: 700, ophone: 320, graph: 460, kpis: 640, timeline: 480, steps: 800, chat: 420, receipt: 340, notif: 440, stat: 320, route: 440 };
+  var PRESET_W = { appcard: 820, qr: 260, window: 700, ophone: 320, graph: 460, kpis: 640, timeline: 480, steps: 800, chat: 420, receipt: 340, notif: 440, stat: 320, route: 440 };
 
   /* ---------- rail ---------- */
   function renderRail() {
@@ -266,7 +272,7 @@
     placeTools();
   }
   var TEXTY = { pill: 1, chip: 1, note: 1, bubble: 1, text: 1, record: 1, phone: 1, checklist: 1, code: 1, site: 1, serp: 1, gauge: 1, ba: 1, orbit: 1, apps: 1, palette: 1, devices: 1, appflow: 1,
-    window: 1, ophone: 1, graph: 1, kpis: 1, timeline: 1, steps: 1, chat: 1, receipt: 1, notif: 1, stat: 1, route: 1, link: 1 };
+    appcard: 1, qr: 1, window: 1, ophone: 1, graph: 1, kpis: 1, timeline: 1, steps: 1, chat: 1, receipt: 1, notif: 1, stat: 1, route: 1, link: 1 };
   var IMAGEY = { person: 1, shot: 1, img: 1, phone: 1, nexi: 1 };
   var ALIGN_SVG = { l: 'M4 3v18M8 7h12M8 13h8', c: 'M12 3v18M6 7h12M8 13h8', r: 'M20 3v18M4 7h12M8 13h8', t: 'M3 4h18M7 8v12M13 8v8', m: 'M3 12h18M7 6v12M13 8v8', b: 'M3 20h18M7 4v12M13 8v8' };
   function ico(p) { return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">' + '<path d="' + p + '"/></svg>'; }
@@ -286,7 +292,7 @@
       h = (TEXTY[L.type] ? '<button data-tool="edit">Edit text</button>' : '') +
         (IMAGEY[L.type] ? '<button data-tool="image">' + (L.type === 'nexi' ? 'Swap for a photo' : 'Replace image') + '</button>' : '') +
         (L.type === 'nexi' ? '<select data-tool="pose" aria-label="Nexi pose">' + opts(POSES, L.pose) + '</select>' : '') +
-        (L.type === 'window' || L.type === 'ophone' ? '<select data-tool="view" aria-label="Odoo view">' + opts(VIEWS, L.view) + '</select>' : '') +
+        (L.type === 'window' || L.type === 'ophone' ? '<select data-tool="view" aria-label="Odoo view">' + opts(VIEWS, L.view) + '</select>' : L.type === 'appcard' ? '<select data-tool="view" aria-label="Odoo view">' + opts(CARD_VIEWS, L.view || 'kanban') + '</select>' : '') +
         '<button data-tool="lock">' + (L.lock ? 'Unlock' : 'Lock') + '</button><button data-tool="front" title="Bring forward (])">Forward</button><button data-tool="back" title="Send backward ([)">Backward</button><button data-tool="dup" title="Duplicate (Ctrl+D)">Duplicate</button><button data-tool="del" class="danger" title="Delete (Del)">Delete</button>';
     }
     t.innerHTML = h; t.hidden = false;
@@ -495,9 +501,9 @@
     chat: [['title', 'Title', 'text'], ['status', 'Status line', 'text'], ['msgs', 'Messages: in, out or bot | text', 'rows']],
     receipt: [['vendor', 'Vendor', 'text'], ['doc', 'Document', 'text'], ['lines', 'Lines: item | amount', 'rows'], ['total', 'Total', 'text'], ['stamp', 'Stamp', 'text']],
     notif: [['title', 'Title', 'text'], ['text', 'Text', 'text'], ['time', 'Time', 'text']], stat: [['value', 'Value', 'text'], ['label', 'Label', 'text']],
-    route: [['stops', 'Stops: place | time', 'rows'], ['hot', 'Current stop (0 = first)', 'num']], link: [['label', 'Label', 'text']]
+    route: [['stops', 'Stops: place | time', 'rows'], ['hot', 'Current stop (0 = first)', 'num']], link: [['label', 'Label', 'text']], qr: [['title', 'Title', 'text'], ['text', 'Caption', 'text']]
   };
-  function popSpec(L) { if (!L) return POP.copy; if (L.type === 'window' || L.type === 'ophone') return [['appLabel', 'App name in the bar', 'text']].concat(POPW[L.view || 'form'] || []); return POP[L.type]; }
+  function popSpec(L) { if (!L) return POP.copy; if (L.type === 'appcard') return [['title', 'Title', 'text'], ['crumb', 'Breadcrumb', 'text'], ['tag', 'Tag', 'text']].concat((POPW[L.view || 'kanban'] || []).filter(function (f) { return f[0] !== 'crumbs'; })); if (L.type === 'window' || L.type === 'ophone') return [['appLabel', 'App name in the bar', 'text']].concat(POPW[L.view || 'form'] || []); return POP[L.type]; }
   function openPop() {
     closePop();
     var d = cur(), isCopy = st.sel === 'copy', L = isCopy ? d.copy || (d.copy = {}) : d.layers[st.sel], spec = popSpec(isCopy ? null : L);
@@ -535,7 +541,7 @@
     if (i !== -1 && st.multi.indexOf(i) < 0 && st.sel !== i) select(i);
     var L = typeof i === 'number' && i > -1 ? cur().layers[i] : null;
     var items = i === -1 ? [['paste', 'Paste'], ['selall', 'Select all']] : i === 'copy' ? [['edit', 'Edit headline'], ['paste', 'Paste']] :
-      [['edit', 'Edit text'], ['dup', 'Duplicate'], ['copy', 'Copy'], ['paste', 'Paste'], ['top', 'Bring to front'], ['bottom', 'Send to back'], ['lock', L && L.lock ? 'Unlock' : 'Lock'], ['cam', L && L.cam ? 'Stop following the camera' : 'Follow the camera angle'], ['del', 'Delete']];
+      [['edit', 'Edit text'], ['dup', 'Duplicate'], ['copy', 'Copy'], ['paste', 'Paste'], ['top', 'Bring to front'], ['bottom', 'Send to back'], ['lock', L && L.lock ? 'Unlock' : 'Lock']].concat(cur().cam && cur().cam !== 'front' ? [['cam', L && L.cam ? 'Stop following the camera' : 'Follow the camera angle']] : []).concat([['del', 'Delete']]);
     var m = $('#ctx'); m.innerHTML = items.map(function (x) { return '<button data-ctx="' + x[0] + '"' + (x[0] === 'del' ? ' class="danger"' : '') + '>' + esc(x[1]) + '</button>'; }).join('');
     m.hidden = false; m.style.left = Math.min(e.clientX, innerWidth - 220) + 'px'; m.style.top = Math.min(e.clientY, innerHeight - m.offsetHeight - 8) + 'px';
   });
@@ -620,7 +626,7 @@
     ophone: [['app', 'odoo'], ['view', 'select', VIEWS]],
     graph: [['kind', 'select', ['bar', 'line', 'area', 'donut', 'funnel', 'progress']], ['glass', 'check', 'Frosted glass'], ['demo', 'check', 'Show "Demo data"', true]],
     kpis: [['cols', 'number', 'Columns'], ['glass', 'check', 'Frosted glass']], timeline: [['glass', 'check', 'Frosted glass']], steps: [['dir', 'select', ['h', 'v']]],
-    chat: [['channel', 'select', ['whatsapp', 'web', 'odoo']]], notif: [['app', 'odoo']], stat: [['glass', 'check', 'Frosted glass']],
+    chat: [['channel', 'select', ['whatsapp', 'web', 'odoo']]], notif: [['app', 'odoo']], stat: [['variant', 'select', ['', 'big']], ['glass', 'check', 'Frosted glass']],
     link: [['x1', 'number'], ['y1', 'number'], ['x2', 'number'], ['y2', 'number'], ['bend', 'number', 'Bend (-0.6 to 0.6)'], ['tone', 'select', ['', 'blue', 'white']], ['color', 'text'], ['dash', 'check', 'Dashed', true], ['labelOnly', 'check', 'Label only (no arrow)']],
     nexi: [['pose', 'select', POSES], ['glow', 'check', 'Soft glow', true]],
     person: [['src', 'image'], ['sticker', 'check', 'White sticker outline'], ['fade', 'check', 'Fade the bottom edge']],
@@ -629,7 +635,7 @@
     flow: [['from', 'industry'], ['hot', 'number', 'Highlight step (0 = first)'], ['cols', 'number'], ['nodeW', 'number'], ['nodeH', 'number']],
     ba: [['from', 'industry'], ['n', 'number', 'Rows from the website']], phases: [['from', 'industry']], chart: [['from', 'industry'], ['view', 'number', 'Chart view (0 or 1)']],
     appflow: [['app', 'flowapp'], ['hot', 'number', 'Highlight state'], ['max', 'number', 'States shown'], ['handoffs', 'number', 'Hand-offs shown']],
-    checklist: [['app', 'odoo'], ['from', 'industry'], ['max', 'number', 'Items shown']], orbit: [['core', 'select', ['', 'odoo']]], apps: [['cols', 'number'], ['labels', 'check', 'Show labels']],
+    checklist: [['app', 'odoo'], ['variant', 'select', ['', 'old']], ['big', 'check', 'Large text'], ['from', 'industry'], ['max', 'number', 'Items shown']], appcard: [['app', 'odoo'], ['view', 'select', CARD_VIEWS], ['k', 'number', 'Text size (1.2 to 2.2)']], qr: [['app', 'odoo']], orbit: [['core', 'select', ['', 'odoo']]], apps: [['cols', 'number'], ['labels', 'check', 'Show labels']],
     devices: [['site', 'site'], ['phone', 'check', 'Show the phone', true]], site: [['src', 'image']],
     pill: [['variant', 'select', ['', 'white', 'ok', 'sans', 'white sans']], ['icon', 'icon']], chip: [['icon', 'icon'], ['tone', 'select', ['', 'ok']]],
     note: [['variant', 'select', ['', 'red', 'red strike']], ['size', 'number'], ['color', 'text']],
@@ -657,21 +663,21 @@
     checklist: 'Checklist', ba: 'Before / after', phases: 'Phases', chart: 'Dashboard', devices: 'Laptop + phone', site: 'Website mockup', code: 'Code window', palette: 'Palette', wireframe: 'Wireframe',
     serp: 'Google result', gauge: 'Gauge', cursor: 'Cursor', pill: 'Pill', chip: 'Chip', note: 'Note', bubble: 'Bubble', text: 'Text', icon: 'Icon', odoo: 'Odoo icon', arrow: 'Arrow',
     burst: 'Burst', glow: 'Glow', sphere: 'Sphere', halftone: 'Halftone', scan: 'Scan beam', sparkles: 'Sparkles', storm: 'Storm', speed: 'Speed lines', confetti: 'Confetti', nosignal: 'No signal',
-    window: 'Odoo screen', ophone: 'Odoo on a phone', graph: 'Chart', kpis: 'KPI tiles', timeline: 'Timeline', steps: 'Steps', chat: 'Chat', receipt: 'Paper invoice', notif: 'Notification', stat: 'Big number', route: 'Route', link: 'Arrow link' };
+    appcard: 'Odoo card', qr: 'QR code', window: 'Odoo screen', ophone: 'Odoo on a phone', graph: 'Chart', kpis: 'KPI tiles', timeline: 'Timeline', steps: 'Steps', chat: 'Chat', receipt: 'Paper invoice', notif: 'Notification', stat: 'Big number', route: 'Route', link: 'Arrow link' };
   function layerLabel(L) {
     var t = L.text || L.title || L.label || L.record || (L.view && R.appName(L.app) + ' · ' + L.view) || L.head || L.pose || L.value || L.vendor || (L.from && indName(L.from.replace('industry:', ''))) || (L.app && R.appName(L.app)) || (L.site && C.sites[L.site] && C.sites[L.site].name) || L.kind || (L.src ? (L.src.indexOf('data:') === 0 ? 'embedded image' : L.src.split('/').pop()) : '');
     return String(t || '').replace(/[*~|=]/g, '');
   }
   function designPanel(d) {
-    var bg = d.bg && typeof d.bg === 'object' ? d.bg : null, b = d.brand || {}, lk = (d.scene && d.scene.look) || {};
-    var sw = function (p) { var P = R.PAL[p]; return '<button class="pal-sw' + (bg && bg.palette === p ? ' on' : '') + '" data-pal="' + p + '" title="' + p + '" style="--a:' + P.a + ';--b:' + P.b + ';--c:' + P.c + ';--base:' + P.base + '"></button>'; };
-    return '<section class="sec design"><h3>Design<small>restyles the whole post</small></h3>' +
-      '<div class="f"><span>Background</span><div class="chips">' + K.BGS.map(function (s) { return '<button data-bgs="' + s + '"' + (bg && bg.style === s ? ' class="on"' : '') + '>' + s + '</button>'; }).join('') + '</div></div>' +
-      '<div class="f"><span>Palette</span><div class="pals">' + ['blue', 'sky', 'mint', 'violet', 'sunrise', 'slate', 'night'].map(sw).join('') + '<button class="btn sm" data-reseed="1" title="Same style, new shapes">New shapes</button></div></div>' +
-      '<div class="f"><span>Camera angle</span><div class="chips">' + K.CAMS.map(function (c) { return '<button data-cam="' + c + '"' + ((d.cam || 'front') === c ? ' class="on"' : '') + '>' + c + '</button>'; }).join('') + '</div></div>' +
-      (d.brand || (d.copy && d.copy.x != null) ? '<div class="confirm" style="background:#FFF4D6;color:#7A5200">This drip uses a moved logo or headline. <button class="btn sm" data-stdframe="1">Use the standard frame</button></div>' : '') +
-      '<div class="row"><label class="f"><span>Odoo badge (top right)</span><select id="d-badge2">' + opts(['ready', 'o20', ''], d.brand ? (b.badge === 'none' ? '' : b.badge || 'ready') : d.badge == null ? 'ready' : d.badge, ['Odoo Ready Partner', 'Meet Odoo 20', 'None']) + '</select></label>' +
-      (d.scene ? '<div class="f" style="align-self:end"><button class="btn sm primary" data-shuffle="1" style="width:100%">' + sparkIcon() + 'Shuffle look</button></div>' : '') + '</div></section>';
+    var b = d.brand || {}, V = d.post && SP.VIS[d.visual], g = d.bg && typeof d.bg === 'object' ? 'v3' : d.ground == null ? 'blobs' : String(d.ground);
+    var badgeSel = '<label class="f"><span>Odoo badge (top right)</span><select id="d-badge2">' + opts(['ready', 'o20', ''], d.brand ? (b.badge === 'none' ? '' : b.badge || 'ready') : d.badge == null ? 'ready' : d.badge, ['Odoo Ready Partner', 'Meet Odoo 20', 'None']) + '</select></label>';
+    var frame = d.brand || (d.copy && d.copy.x != null) ? '<div class="confirm" style="background:#FFF4D6;color:#7A5200">This drip uses a moved logo or headline. <button class="btn sm" data-stdframe="1">Use the standard frame</button></div>' : '';
+    if (g === 'v3') return '<section class="sec design"><h3>Design<small>older v3 look</small></h3><div class="confirm" style="background:var(--blue-050);color:var(--blue-700)">This drip uses the v3 look (background shapes and a camera angle). <button class="btn sm primary" data-simplify="1">Switch to the clean style</button></div>' + frame + badgeSel + '</section>';
+    return '<section class="sec design"><h3>Design<small>the frame stays; only the visual changes</small></h3>' +
+      '<div class="f"><span>Background</span><div class="chips">' + [['', 'Clean'], ['haze', 'Soft blue floor'], ['blobs', 'Blue shapes']].map(function (o) { return '<button data-ground="' + o[0] + '"' + (g === o[0] || (o[0] === 'blobs' && g.indexOf('blobs') === 0) ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join('') + '</div></div>' +
+      (V ? '<div class="f"><span>Layout · ' + esc(V.label) + '</span><div class="chips">' + (SP.canMirror(d.visual) ? '<button data-mirror="1"' + (d.mirror ? ' class="on"' : '') + '>Mirror</button>' : '') + (SP.hasVariants(d.visual) ? '<button data-variant="1">Other arrangement</button>' : '') +
+        '<button data-relayout="1">Reset layout</button></div><p class="help" style="margin:6px 0 0">Rebuilds the visual from its content; moved or added elements go back to the standard layout.</p></div>' : '') +
+      frame + badgeSel + '</section>';
   }
   function renderInspector() {
     var d = cur(); if (!d) return;
@@ -684,7 +690,7 @@
         (L.type === 'link' ? '' : '<div class="row3">' + field('x', 'number', 'x', L.x || 0) + (L.b != null ? field('b', 'number', 'from bottom', L.b) : field('y', 'number', 'y', L.y || 0)) + field('w', 'number', 'width', L.w) + '</div>' +
         '<div class="row3">' + field('rot', 'number', 'rotate °', L.rot || 0) + field('s', 'number', 'scale', L.s == null ? '' : L.s) + field('op', 'number', 'opacity 0–1', L.op == null ? 1 : L.op) + '</div>') +
         (d.format === '4:5' && L.b == null && L.type !== 'link' ? field('y45', 'number', 'y in 4:5 (blank = y + 150 below the copy)', L.y45) : '') +
-        '<div class="row">' + field('cam', 'check', 'Follow the camera', L.cam) + field('lock', 'check', 'Lock', L.lock) + '</div>' +
+        '<div class="row">' + (d.cam && d.cam !== 'front' ? field('cam', 'check', 'Follow the camera', L.cam) : '') + field('lock', 'check', 'Lock', L.lock) + '</div>' +
         (LF[L.type] || []).map(function (f) { return field(f[0], f[1], f[2], L[f[0]], f[3]); }).join('') +
         '<details style="margin-top:8px"><summary>Every field (JSON)</summary><label class="f" style="margin-top:8px"><textarea class="code" id="ljson">' + esc(JSON.stringify(L, function (k, v) { return typeof v === 'string' && v.indexOf('data:') === 0 ? '(embedded image)' : v; }, 1)) + '</textarea></label>' +
         '<button class="btn sm" id="ljson-apply" type="button">Apply JSON</button></details></section>';
@@ -739,20 +745,19 @@
   }
 
   /* design panel actions */
-  function ensureV3(d) {
-    if (!d.bg || typeof d.bg !== 'object') { d.bg = { style: 'aurora', palette: 'blue', seed: Math.floor(Math.random() * 1e6) }; delete d.ground; delete d.grid; }
-  }
   function stdFrame(d) {
     if (d.brand) { d.badge = d.brand.badge === 'none' ? '' : d.brand.badge || 'ready'; delete d.brand; }
     if (d.copy) ['x', 'y', 'w', 'fs', 'subFs', 'align', 'top', 'color'].forEach(function (k) { delete d.copy[k]; });
   }
-  function recompose(look) {
-    var d = cur(); if (!d.scene) return;
+  function toSimple(d) {
+    delete d.bg; delete d.cam; delete d.scene; d.ground = SP.GROUND; stdFrame(d);
+    (d.layers || []).forEach(function (L) { delete L.cam; });
+  }
+  function simpleRelayout(ch) {
+    var d = cur(); if (!d || !d.post) return;
     snapshot();
-    var sc = clone(d.scene); sc.look = Object.assign({}, sc.look || {}, look || {});
-    sc.head = (d.copy && d.copy.head) || sc.head; sc.sub = (d.copy && d.copy.sub) || sc.sub;
-    var n = K.compose(sc, { cat: d.cat, industry: (catObj(d.cat) || {}).industry });
-    ['bg', 'cam', 'brand', 'badge', 'copy', 'layers', 'scene'].forEach(function (k) { if (n[k] === undefined) delete d[k]; else d[k] = n[k]; });
+    var n = SP.relayout(d, ch, { cat: d.cat, industry: (catObj(d.cat) || {}).industry });
+    ['layers', 'mirror', 'variant', 'visual', 'post'].forEach(function (k) { if (n[k] === undefined) delete d[k]; else d[k] = n[k]; });
     st.sel = -1; st.multi = []; queueSave(d); drawCanvas(); renderInspector();
   }
 
@@ -803,12 +808,12 @@
     if (ds.fs) { change(function (d) { var hd = $('#box .d-head'), base = d.copy.fs || (hd ? parseFloat(getComputedStyle(hd).fontSize) : 80); d.copy.fs = Math.max(32, Math.min(140, Math.round(base + +ds.fs))); d.copy.subFs = Math.max(18, Math.round((d.copy.subFs || 29) + (+ds.fs) / 4)); }, { now: true, insp: true }); return; }
     if (ds.color) { change(function (d) { d.copy.color = ds.color === '#1F1F3D' ? undefined : ds.color; }, { now: true }); return; }
     if (ds.calign) { change(function (d) { var c = d.copy, cn = $('#box .d-copy'); if (c.x == null) { c.x = cn.offsetLeft; c.y = cn.offsetTop - (d.format === '4:5' ? 40 : 0); c.w = cn.offsetWidth; } c.align = ds.calign; }, { now: true }); return; }
-    if (ds.bgs) { change(function (d) { ensureV3(d); d.bg.style = ds.bgs; if (ds.bgs === 'navy') d.bg.palette = 'night'; else if (d.bg.palette === 'night') d.bg.palette = 'blue'; if (d.scene) (d.scene.look = d.scene.look || {}).bg = ds.bgs; }, { now: true, insp: true }); return; }
-    if (ds.pal) { change(function (d) { ensureV3(d); d.bg.palette = ds.pal; if (ds.pal === 'night') d.bg.style = 'navy'; else if (d.bg.style === 'navy') d.bg.style = 'aurora'; if (d.scene) (d.scene.look = d.scene.look || {}).palette = ds.pal; }, { now: true, insp: true }); return; }
-    if (ds.reseed) { change(function (d) { ensureV3(d); d.bg.seed = Math.floor(Math.random() * 1e6); }, { now: true }); return; }
-    if (ds.cam) { change(function (d) { d.cam = ds.cam; if (d.scene) (d.scene.look = d.scene.look || {}).camera = ds.cam; (d.layers || []).forEach(function (L) { if (L.cam == null && /^(window|ophone|graph|kpis|timeline|steps|chat|receipt|notif|stat|route|record|checklist|ba|phases|appflow|orbit|devices|site|code|serp)$/.test(L.type)) L.cam = true; }); }, { now: true, insp: true }); return; }
-    if (ds.stdframe) { if (cur().scene) recompose({}); else change(function (d) { stdFrame(d); }, { now: true, insp: true }); toast('Standard frame: logo top left, badge top right, headline centred'); return; }
-    if (ds.shuffle) { var d0 = cur(); var sc = K.shuffleLook(d0); recompose(sc.look); toast('New look: ' + [sc.look.camera, sc.look.bg, sc.look.palette].join(' · ')); return; }
+    if (ds.ground !== undefined) { change(function (d) { d.ground = ds.ground; }, { now: true, insp: true }); return; }
+    if (ds.mirror) { simpleRelayout({ mirror: !cur().mirror }); return; }
+    if (ds.variant) { simpleRelayout({ variant: (cur().variant || 0) + 1 }); return; }
+    if (ds.relayout) { simpleRelayout({}); toast('Layout reset'); return; }
+    if (ds.simplify) { change(function (d) { toSimple(d); }, { now: true, insp: true }); toast('Clean style: no background shapes, no camera angle'); return; }
+    if (ds.stdframe) { change(function (d) { stdFrame(d); }, { now: true, insp: true }); toast('Standard frame: logo top left, badge top right, headline centred'); return; }
     if (ds.tool) { if (ds.tool === 'edit') openPop(); else if (ds.tool === 'image') pickImage(); else layerAct(ds.tool === 'del' ? 'del' : ds.tool); return; }
     if (ds.lact) { layerAct(ds.lact, +t.closest('[data-li]').dataset.li); return; }
     if (ds.li != null && !e.target.closest('button')) { select(+ds.li, e.shiftKey); return; }
@@ -861,7 +866,7 @@
   /* ---------- new drip from a starter (no Claude) ---------- */
   function openStarters() {
     var c = catObj(st.cat), ind = c && c.industry || 'fnb', keys = Object.keys(ST);
-    openDlg('<h2>New drip</h2><p>Pick a starter. Each one tells one story from technext.asia; restyle it from the Design panel, or edit anything on the canvas.</p>' +
+    openDlg('<h2>New drip</h2><p>Pick a starter. Each one tells one story from technext.asia in the clean style; edit any word on the canvas, or mirror it from the Design panel.</p>' +
       '<div class="row"><label class="f"><span>Category</span><select id="t-cat">' + opts(cats.map(function (x) { return x.id; }), c ? c.id : 'apps', cats.map(function (x) { return x.name; })) + '</select></label>' +
       '<label class="f"><span>Industry content</span><select id="t-ind">' + opts(INDUSTRIES, ind, INDUSTRIES.map(indName)) + '</select></label></div>' +
       '<div class="starters" id="t-grid"></div><div class="dlg-foot"><button class="btn" id="dlg-close" type="button">Cancel</button><button class="btn" id="t-blank" type="button">Blank drip</button></div>', true);
@@ -870,7 +875,7 @@
       keys.forEach(function (k, n) {
         var b = document.createElement('button'); b.type = 'button'; b.className = 'stc'; b.dataset.st = k;
         b.innerHTML = '<span class="stc-t"></span><b>' + esc(ST[k].label) + '</b><small>' + esc(ST[k].about) + '</small>'; g.appendChild(b);
-        setTimeout(function () { var dd = K.compose(ST[k].make(indK), { cat: $('#t-cat').value, industry: indK, index: n }); var el = R.render(dd); var box = b.querySelector('.stc-t'); box.appendChild(el); R.fit(box); el.style.transform = 'scale(' + (box.clientWidth / 1080) + ')'; }, 20 + n * 30);
+        setTimeout(function () { var dd = SP.compose(ST[k].make(indK), { cat: $('#t-cat').value, industry: indK, index: n }); var el = R.render(dd); var box = b.querySelector('.stc-t'); box.appendChild(el); R.fit(box); el.style.transform = 'scale(' + (box.clientWidth / 1080) + ')'; }, 20 + n * 30);
       });
     }
     draw();
@@ -879,11 +884,11 @@
     $('#t-grid').addEventListener('click', function (e) {
       var b = e.target.closest('[data-st]'); if (!b) return;
       var cat = $('#t-cat').value, indK = (catObj(cat) || {}).industry || $('#t-ind').value;
-      var d = K.compose(ST[b.dataset.st].make(indK), { cat: cat, industry: indK, source: 'Starter: ' + ST[b.dataset.st].label });
+      var d = SP.compose(ST[b.dataset.st].make(indK), { cat: cat, industry: indK, source: 'Starter: ' + ST[b.dataset.st].label });
       d.id = uid(d.name); d.createdAt = new Date().toISOString(); lib.push(d); saveNow(d); closeDlg(); openDrip(d.id); toast('Created "' + d.name + '"');
     });
     $('#t-blank').addEventListener('click', function () {
-      var cat = $('#t-cat').value, d = { id: uid('new-drip'), cat: cat, name: 'New drip', v: 3, bg: { style: 'aurora', palette: 'blue', seed: Math.floor(Math.random() * 1e6) }, cam: 'front', badge: cat === 'services' ? '' : cat === 'odoo20' ? 'o20' : 'ready',
+      var cat = $('#t-cat').value, d = { id: uid('new-drip'), cat: cat, name: 'New drip', v: 4, ground: SP.GROUND, badge: cat === 'services' ? '' : cat === 'odoo20' ? 'o20' : 'ready',
         copy: { head: 'Your headline,|*in blue.*', sub: 'One supporting line.' }, layers: [], createdAt: new Date().toISOString() };
       lib.push(d); saveNow(d); closeDlg(); openDrip(d.id);
     });
@@ -893,7 +898,7 @@
   var genCtl = null;
   function openGenerate() {
     var c = catObj(st.cat) || catObj('fnb') || cats[0], catIds = cats.map(function (x) { return x.id; });
-    openDlg('<h2>' + sparkIcon() + ' Generate with Claude</h2><p>Claude reads the technext.asia content for the category and designs a set of posts. Each one gets its own story, Odoo screens with data that match the headline, workflow arrows, callouts and look (background, camera angle, layout). They arrive as drafts.</p>' +
+    openDlg('<h2>' + sparkIcon() + ' Generate with Claude</h2><p>Claude reads the technext.asia content for the category and writes a set of posts. Each one gets its own story and the one visual that shows it (a phone, a record with Nexi, a chart, an Odoo board, a chat…), filled with words that match the headline. The frame and the clean background stay the same. They arrive as drafts.</p>' +
       '<div class="row"><label class="f"><span>Category</span><select id="g-cat">' + opts(catIds, c.id, cats.map(function (x) { return x.name; })) + '</select></label>' +
       '<label class="f"><span>Industry focus</span><select id="g-ind">' + opts([''].concat(INDUSTRIES), c.industry || '', ['Any / none'].concat(INDUSTRIES.map(indName))) + '</select></label></div>' +
       '<div class="row"><label class="f"><span>How many posts</span><select id="g-n">' + opts(['3', '6', '9'], '6') + '</select></label>' +
@@ -937,15 +942,15 @@
     AI.generate(o, function (n) { $('#g-stage').textContent = 'Designing post ' + Math.min(n, o.count) + ' of ' + o.count + '…'; $('#g-bar').style.width = Math.max(8, Math.min(96, n / o.count * 96)) + '%'; }, genCtl.signal)
       .then(function (r) {
         genCtl = null;
-        var gid = 'g' + Date.now().toString(36), made = [], scenes = K.diversify(r.concepts.slice(0, o.count), Date.now() % 1e6);
-        scenes.forEach(function (sc, i) {
-          var d = K.compose(sc, { cat: o.cat, industry: o.industry, index: i, source: 'Claude · ' + o.catName + (o.industry ? ' · ' + indName(o.industry) : '') + ' · ' + new Date().toISOString().slice(0, 10) });
+        var gid = 'g' + Date.now().toString(36), made = [], posts = SP.diversify(r.concepts.slice(0, o.count));
+        posts.forEach(function (sc, i) {
+          var d = SP.compose(sc, { cat: o.cat, industry: o.industry, index: i, source: 'Claude · ' + o.catName + (o.industry ? ' · ' + indName(o.industry) : '') + ' · ' + new Date().toISOString().slice(0, 10) });
           d.id = uid(d.name); d.draft = true; d.gen = gid; d.createdAt = new Date().toISOString(); d.order = lib.length + i;
           lib.push(d); made.push(d); saveNow(d);
         });
         var entry = { at: new Date().toISOString(), cat: o.cat, industry: o.industry, asked: o.count, made: made.length, tier: r.tier, input: r.input, output: r.output, ms: r.ms };
         usage.push(entry); S.logUsage(usage);
-        $('.dlg-card').innerHTML = '<h2>' + made.length + ' drafts added to ' + esc(o.catName) + '</h2><p>Each post has its own design. Open any of them to edit, restyle it from the Design panel, or keep the ones you like.</p>' +
+        $('.dlg-card').innerHTML = '<h2>' + made.length + ' drafts added to ' + esc(o.catName) + '</h2><p>Each post has its own visual. Open any of them to change a word or move things, or keep the ones you like.</p>' +
           '<div class="est"><b>This run:</b> about ' + nf(r.input) + ' tokens in + ' + nf(r.output) + ' out = <b>' + nf(r.input + r.output) + ' tokens</b> (estimate, ' + esc(tierName(r.tier)) + ' model, ' + Math.round(r.ms / 1000) + ' s).</div>' +
           '<div class="dlg-foot"><button class="btn" id="dlg-close" type="button">Close</button><button class="btn primary" id="g-review" type="button">Review drafts</button></div>';
         $('#g-review').addEventListener('click', function () { closeDlg(); st.cat = o.cat; showGallery(); });
