@@ -65,7 +65,7 @@
       '<path d="M0 230C200 170 360 270 560 236C780 198 900 170 1080 196V300H0Z" fill="url(#' + g + ')"/></svg>';
   }
   function sparkles(color) {
-    var c = color || '#FFC83D', c2 = '#3F86F7';
+    var c = color || '#FFC83D', c2 = 'currentColor';
     var star = function (x, y, s, f) { return '<path transform="translate(' + x + ' ' + y + ') scale(' + s + ')" d="M0-50C6-10 10-6 50 0C10 6 6 10 0 50C-6 10-10 6-50 0C-10-6-6-10 0-50Z" fill="' + f + '"/>'; };
     return '<svg viewBox="0 0 200 200" aria-hidden="true">' + star(70, 80, 1, c) + star(150, 40, .45, c2) + star(160, 150, .55, c) + star(30, 170, .3, c2) + '</svg>';
   }
@@ -421,13 +421,19 @@
     var el = document.createElement('div');
     var tall = d.format === '4:5', H = tall ? 1350 : 1080, v3 = d.bg && typeof d.bg === 'object', dark = false, h = '';
     if (v3) { var B = bgx(d.bg, H, false); h += B.html; dark = B.dark; }
-    el.className = 'drip' + (tall ? ' r45' : '') + (v3 ? ' v3' + (dark ? ' dark' : '') : d.bg && d.bg !== 'light' ? ' bg-' + d.bg : '') + (!v3 && d.tint ? ' tint-' + d.tint : '');
+    var c0 = d.copy || {}, panel = /^(band|navy|corner)$/.test(d.look || '');
+    el.className = 'drip' + (tall ? ' r45' : '') + (v3 ? ' v3' + (dark ? ' dark' : '') : d.bg && d.bg !== 'light' ? ' bg-' + d.bg : '') + (!v3 && d.tint ? ' tint-' + d.tint : '') +
+      (d.look && d.look !== 'clean' ? ' look-' + esc(d.look) : '') + (d.accent && d.accent !== 'blue' ? ' acc-' + esc(d.accent) : '') + (c0.decor && c0.decor !== 'none' ? ' hd-' + esc(c0.decor) : '');
     el.setAttribute('data-id', d.id);
     if (!v3) {
       var ground = d.ground == null ? 'blobs' : d.ground;
       if (d.grid) h += '<div class="d-grid"></div>';
       if (d.pattern) h += '<div class="d-pat pat-' + esc(d.pattern) + '"></div>';
-      if (ground) h += '<div class="d-ground">' + (ground === 'wave' ? wave() : ground.indexOf('blobs') === 0 ? blobs(ground) : ground === 'haze' ? '<i class="haze"></i>' : '') + '</div>';
+      if (ground && !panel) h += '<div class="d-ground">' + (ground === 'wave' ? wave() : ground.indexOf('blobs') === 0 ? blobs(ground) : ground === 'haze' ? '<i class="haze"></i>' : '') + '</div>';
+      var py = (d.panelY || 430) + (tall ? 150 : 0);
+      if (panel) h += '<div class="d-panel ' + esc(d.look) + '"' + (d.look === 'corner' ? '' : ' style="top:' + py + 'px"') + '></div>';
+      if (d.look === 'spotlight') h += '<div class="d-panel spot" style="top:' + (py - 120) + 'px"></div>';
+      if (d.watermark && window.TNProps) h += '<div class="d-wm">' + window.TNProps.svg(d.watermark) + '</div>';
     }
     if (d.brand) h += brandHTML(d.brand, d);
     else h += '<img class="d-logo" src="' + asset('assets/brand/logo-horizontal.png') + '" alt="TechNext">' + badge(d.badge);

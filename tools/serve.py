@@ -67,11 +67,11 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json(400, {"error": "bad JSON"})
         if self.path == "/api/render":
             d = data.get("drip") or {}
-            scale = 2 if data.get("scale") == 2 else 1
+            scale = data.get("scale") if data.get("scale") in (1, 2, 3) else 1
             tok = uuid.uuid4().hex
             DRIPS[tok] = d
             cat, did = safe(d.get("cat") or "misc"), safe(d.get("id") or "drip")
-            name = did + ("@2x" if scale == 2 else "") + ("-4x5" if d.get("format") == "4:5" else "") + ".png"
+            name = did + ("@%dx" % scale if scale > 1 else "") + ("-4x5" if d.get("format") == "4:5" else "") + ".png"
             out = os.path.join(ROOT, "exports", cat, name)
             try:
                 with LOCK:

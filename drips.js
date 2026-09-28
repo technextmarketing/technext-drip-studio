@@ -102,10 +102,13 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "dots",
+  "look": "navy",
+  "tilt": "flat",
   "badge": "o20",
   "copy": {
    "head": "No signal? *Keep working.*",
-   "sub": "Odoo 20 lets on-site teams create and edit records offline. Everything syncs when you are back online."
+   "sub": "Odoo 20 lets on-site teams create and edit records offline. Everything syncs when you are back online.",
+   "decor": "marker"
   },
   "layers": [
    {
@@ -118,7 +121,7 @@ window.DRIPS = [
    {
     "type": "phone",
     "w": 336,
-    "rot": -5,
+    "rot": 0,
     "z": 12,
     "screen": "offline-receipt",
     "app": "stock",
@@ -154,7 +157,7 @@ window.DRIPS = [
    {
     "type": "pill",
     "text": "Warehouse floor",
-    "rot": -5,
+    "rot": 0,
     "z": 19,
     "x": 62,
     "y": 498
@@ -162,7 +165,7 @@ window.DRIPS = [
    {
     "type": "pill",
     "text": "Construction site",
-    "rot": 3,
+    "rot": 0,
     "z": 19,
     "x": 44,
     "y": 656
@@ -170,7 +173,7 @@ window.DRIPS = [
    {
     "type": "pill",
     "text": "Field visit",
-    "rot": -3,
+    "rot": 0,
     "z": 19,
     "x": 104,
     "y": 812
@@ -207,7 +210,7 @@ window.DRIPS = [
     "icon": "cloudOk",
     "tone": "ok",
     "z": 18,
-    "rot": 3,
+    "rot": 0,
     "x": 700,
     "y": 770
    },
@@ -280,8 +283,15 @@ window.DRIPS = [
    ],
    "mirror": false,
    "variant": 0,
+   "look": "navy",
+   "accent": "yellow",
+   "decor": "marker",
+   "heroSize": "normal",
+   "tilt": "flat",
    "background": "dots"
-  }
+  },
+  "accent": "yellow",
+  "panelY": 331
  },
  {
   "id": "fnb-supplier-to-books",
@@ -294,10 +304,14 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "hex",
+  "look": "band",
+  "heroSize": "big",
+  "tilt": "strong",
   "badge": "ready",
   "copy": {
    "head": "From supplier to table|to the books, *in one Odoo.*",
-   "sub": "Six steps every restaurant runs, and the Odoo app behind each one."
+   "sub": "Six steps every restaurant runs, and the Odoo app behind each one.",
+   "decor": "circle"
   },
   "layers": [
    {
@@ -343,17 +357,19 @@ window.DRIPS = [
     "layout": "snake",
     "hot": 4,
     "x": 70,
-    "y": 442
+    "y": 466,
+    "s": 1.1
    },
    {
     "type": "note",
     "text": "paper tickets",
     "variant": "red strike",
     "size": 46,
-    "rot": -4,
+    "rot": -7.6,
     "z": 20,
-    "x": 267,
-    "y": 938
+    "x": 250,
+    "y": 991,
+    "s": 1.1
    },
    {
     "type": "arrow",
@@ -362,32 +378,25 @@ window.DRIPS = [
     "z": 20,
     "kind": "right",
     "x": 486,
-    "y": 924
+    "y": 977,
+    "s": 1.1
    },
    {
     "type": "note",
     "text": "kitchen display",
     "size": 46,
-    "rot": -3,
+    "rot": -5.7,
     "z": 20,
-    "x": 606,
-    "y": 934
+    "x": 624,
+    "y": 987,
+    "s": 1.1
    },
    {
     "type": "sparkles",
     "w": 100,
     "z": 21,
     "x": 946,
-    "y": 390
-   },
-   {
-    "type": "prop",
-    "name": "bowl",
-    "w": 150,
-    "rot": -6,
-    "z": 17,
-    "x": 106,
-    "y": 898
+    "y": 391
    }
   ],
   "caption": "Buy, prep, deliver, serve, cook and close: six steps every restaurant group runs. In Odoo each one has its app, on one database, so food cost and takings per outlet are ready without retyping. Which step still runs on paper in your kitchen?",
@@ -447,8 +456,14 @@ window.DRIPS = [
    ],
    "mirror": false,
    "variant": 0,
+   "look": "band",
+   "accent": "blue",
+   "decor": "circle",
+   "heroSize": "big",
+   "tilt": "strong",
    "background": "hex"
-  }
+  },
+  "panelY": 411
  },
  {
   "id": "ai-bill-you-approve",
@@ -460,10 +475,13 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "rings",
+  "look": "stack",
+  "heroSize": "small",
   "badge": "ready",
   "copy": {
    "head": "AI prepares the bill.|*You approve it.*",
-   "sub": "TechNext builds AI inside your Odoo. It reads the vendor bill, matches the purchase order and waits for your OK."
+   "sub": "TechNext builds AI inside your Odoo. It reads the vendor bill, matches the purchase order and waits for your OK.",
+   "decor": "underline"
   },
   "layers": [
    {
@@ -471,9 +489,9 @@ window.DRIPS = [
     "pose": "point",
     "w": 444,
     "z": 16,
-    "x": 43,
-    "y": 510,
-    "s": 0.956
+    "x": 59,
+    "y": 498,
+    "s": 0.9
    },
    {
     "type": "record",
@@ -508,18 +526,19 @@ window.DRIPS = [
     "w": 540,
     "rot": 2.5,
     "z": 12,
-    "x": 477,
-    "y": 437,
-    "s": 0.956
+    "x": 464,
+    "y": 433,
+    "stack": 2,
+    "s": 0.9
    },
    {
     "type": "bubble",
     "text": "PO matched!",
     "rot": -3,
     "z": 20,
-    "x": 76,
-    "y": 439,
-    "s": 0.956
+    "x": 96,
+    "y": 444,
+    "s": 0.9
    },
    {
     "type": "chip",
@@ -527,9 +546,9 @@ window.DRIPS = [
     "icon": "spark",
     "rot": -1.5,
     "z": 18,
-    "x": 542,
-    "y": 832,
-    "s": 0.956
+    "x": 535,
+    "y": 814,
+    "s": 0.9
    },
    {
     "type": "chip",
@@ -537,9 +556,9 @@ window.DRIPS = [
     "icon": "search",
     "rot": 1.5,
     "z": 19,
-    "x": 596,
-    "y": 907,
-    "s": 0.956
+    "x": 584,
+    "y": 885,
+    "s": 0.9
    },
    {
     "type": "chip",
@@ -548,25 +567,23 @@ window.DRIPS = [
     "tone": "ok",
     "rot": -1,
     "z": 20,
-    "x": 552,
-    "y": 982,
-    "s": 0.956
+    "x": 542,
+    "y": 955,
+    "s": 0.9
    },
    {
     "type": "sparkles",
     "w": 110,
     "z": 21,
-    "x": 408,
-    "y": 465,
-    "s": 0.956
+    "x": 404,
+    "y": 476
    },
    {
     "type": "sphere",
     "w": 52,
     "z": 6,
-    "x": 969,
-    "y": 755,
-    "s": 0.956
+    "x": 990,
+    "y": 778
    }
   ],
   "caption": "Supplier bills still typed in by hand? TechNext builds AI inside your Odoo: it reads the bill, fills the fields and matches the purchase order. A person still approves every bill. Book a call at technext.asia.",
@@ -626,8 +643,14 @@ window.DRIPS = [
    ],
    "mirror": false,
    "variant": 0,
+   "look": "stack",
+   "accent": "purple",
+   "decor": "underline",
+   "heroSize": "small",
+   "tilt": "soft",
    "background": "rings"
-  }
+  },
+  "accent": "purple"
  },
  {
   "id": "fnb-food-cost-per-outlet",
@@ -640,10 +663,13 @@ window.DRIPS = [
   "mirror": true,
   "ground": "haze",
   "pattern": "diagonal",
+  "look": "outline",
+  "tilt": "flat",
   "badge": "ready",
   "copy": {
    "head": "Food cost per outlet,|*every single day.*",
-   "sub": "Every dish sold deducts its recipe, so Odoo shows which outlet runs over target before month end."
+   "sub": "Every dish sold deducts its recipe, so Odoo shows which outlet runs over target before month end.",
+   "decor": "strokes"
   },
   "layers": [
    {
@@ -683,7 +709,7 @@ window.DRIPS = [
    {
     "type": "stat",
     "w": 300,
-    "rot": -3,
+    "rot": 0,
     "z": 13,
     "value": "30.8%",
     "label": "Food cost today · -1.2%",
@@ -696,7 +722,7 @@ window.DRIPS = [
     "small": "36% vs 32% target",
     "icon": "bell",
     "z": 18,
-    "rot": 2,
+    "rot": 0,
     "x": 76,
     "y": 621
    },
@@ -719,7 +745,7 @@ window.DRIPS = [
     "type": "prop",
     "name": "bell",
     "w": 150,
-    "rot": 6,
+    "rot": 0,
     "z": 17,
     "x": 648,
     "y": 852
@@ -789,8 +815,14 @@ window.DRIPS = [
    ],
    "mirror": true,
    "variant": 0,
+   "look": "outline",
+   "accent": "navy",
+   "decor": "strokes",
+   "heroSize": "normal",
+   "tilt": "flat",
    "background": "diagonal"
-  }
+  },
+  "accent": "navy"
  },
  {
   "id": "crm-one-pipeline",
@@ -802,10 +834,14 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "waves",
+  "look": "spotlight",
+  "heroSize": "big",
+  "tilt": "strong",
   "badge": "ready",
   "copy": {
    "head": "Every lead,|*one pipeline.*",
-   "sub": "Odoo CRM shows every opportunity by stage, so nobody chases the same deal twice."
+   "sub": "Odoo CRM shows every opportunity by stage, so nobody chases the same deal twice.",
+   "decor": "box"
   },
   "layers": [
    {
@@ -879,15 +915,17 @@ window.DRIPS = [
     "tag": "12 open deals",
     "w": 920,
     "x": 80,
-    "y": 456
+    "y": 469,
+    "s": 1.1
    },
    {
     "type": "pill",
     "text": "Drag it to Won",
-    "rot": -4,
+    "rot": -7.6,
     "z": 19,
-    "x": 40,
-    "y": 904
+    "x": 29,
+    "y": 942,
+    "s": 1.1
    },
    {
     "type": "chip",
@@ -896,16 +934,17 @@ window.DRIPS = [
     "icon": "check",
     "tone": "ok",
     "z": 18,
-    "rot": 2,
-    "x": 765,
-    "y": 912
+    "rot": 3.8,
+    "x": 777,
+    "y": 951,
+    "s": 1.1
    },
    {
     "type": "sparkles",
     "w": 96,
     "z": 21,
     "x": 930,
-    "y": 406
+    "y": 396
    }
   ],
   "caption": "When leads live in inboxes and spreadsheets, two people end up chasing the same deal. Odoo CRM puts every opportunity on one pipeline, by stage, with the next step on each card. Book a call at technext.asia.",
@@ -1003,8 +1042,16 @@ window.DRIPS = [
    ],
    "mirror": false,
    "variant": 0,
+   "look": "spotlight",
+   "accent": "coral",
+   "decor": "box",
+   "heroSize": "big",
+   "tilt": "strong",
    "background": "waves"
-  }
+  },
+  "accent": "coral",
+  "watermark": "rocket",
+  "panelY": 411
  },
  {
   "id": "retail-whatsapp-orders",
@@ -1017,6 +1064,9 @@ window.DRIPS = [
   "mirror": true,
   "ground": "haze",
   "pattern": "spots",
+  "tint": "sand",
+  "look": "paper",
+  "heroSize": "small",
   "badge": "ready",
   "copy": {
    "head": "WhatsApp orders|*land in Odoo.*",
@@ -1045,8 +1095,9 @@ window.DRIPS = [
       "Online please, thanks"
      ]
     ],
-    "x": 588,
-    "y": 461
+    "x": 561,
+    "y": 455,
+    "s": 0.9
    },
    {
     "type": "record",
@@ -1075,8 +1126,9 @@ window.DRIPS = [
     "w": 500,
     "rot": -2,
     "z": 13,
-    "x": 46,
-    "y": 545
+    "x": 70,
+    "y": 531,
+    "s": 0.9
    },
    {
     "type": "arrow",
@@ -1084,8 +1136,9 @@ window.DRIPS = [
     "rot": -10,
     "z": 22,
     "kind": "right",
-    "x": 532,
-    "y": 467,
+    "x": 527,
+    "y": 472,
+    "s": 0.9,
     "flip": true
    },
    {
@@ -1096,15 +1149,16 @@ window.DRIPS = [
     "tone": "ok",
     "z": 18,
     "rot": 1.5,
-    "x": 245,
-    "y": 893
+    "x": 262,
+    "y": 856,
+    "s": 0.9
    },
    {
     "type": "sparkles",
     "w": 90,
     "z": 21,
     "x": 520,
-    "y": 631
+    "y": 641
    },
    {
     "type": "prop",
@@ -1112,8 +1166,8 @@ window.DRIPS = [
     "w": 150,
     "rot": 6,
     "z": 17,
-    "x": 736,
-    "y": 785
+    "x": 714,
+    "y": 773
    }
   ],
   "caption": "Customers order on WhatsApp; your team re-types it into the system later. Connected to Odoo, the chat becomes a quotation with the stock reserved, ready to confirm. How many WhatsApp orders does your team re-type every day?",
@@ -1185,8 +1239,14 @@ window.DRIPS = [
    ],
    "mirror": true,
    "variant": 0,
+   "look": "paper",
+   "accent": "coral",
+   "decor": "none",
+   "heroSize": "small",
+   "tilt": "soft",
    "background": "spots"
-  }
+  },
+  "accent": "coral"
  },
  {
   "id": "web-best-salesperson",
@@ -1198,10 +1258,13 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "fine",
+  "look": "corner",
+  "tilt": "flat",
   "badge": "",
   "copy": {
    "head": "Your website,|*your best salesperson.*",
-   "sub": "TechNext builds fast, mobile-first sites where every inquiry reaches the right person."
+   "sub": "TechNext builds fast, mobile-first sites where every inquiry reaches the right person.",
+   "decor": "circle"
   },
   "layers": [
    {
@@ -1225,7 +1288,7 @@ window.DRIPS = [
     "text": "Fast on every phone",
     "icon": "check",
     "tone": "ok",
-    "rot": 2,
+    "rot": 0,
     "z": 18,
     "x": 750,
     "y": 523
@@ -1235,7 +1298,7 @@ window.DRIPS = [
     "text": "Every inquiry routed",
     "icon": "check",
     "tone": "ok",
-    "rot": -1.5,
+    "rot": 0,
     "z": 18,
     "x": 750,
     "y": 619
@@ -1245,7 +1308,7 @@ window.DRIPS = [
     "text": "Built to be found",
     "icon": "check",
     "tone": "ok",
-    "rot": 1.5,
+    "rot": 0,
     "z": 18,
     "x": 762,
     "y": 715
@@ -1293,6 +1356,11 @@ window.DRIPS = [
    ],
    "mirror": false,
    "variant": 0,
+   "look": "corner",
+   "accent": "blue",
+   "decor": "circle",
+   "heroSize": "normal",
+   "tilt": "flat",
    "background": "fine"
   }
  },
@@ -1307,10 +1375,13 @@ window.DRIPS = [
   "mirror": true,
   "ground": "haze",
   "pattern": "plus",
+  "heroSize": "big",
+  "tilt": "strong",
   "badge": "ready",
   "copy": {
    "head": "The kitchen quote,|*signed the same day.*",
-   "sub": "Equipment, fabrication and installation on one Odoo quotation that the owner signs online."
+   "sub": "Equipment, fabrication and installation on one Odoo quotation that the owner signs online.",
+   "decor": "strokes"
   },
   "layers": [
    {
@@ -1318,7 +1389,7 @@ window.DRIPS = [
     "pose": "point",
     "w": 418,
     "z": 16,
-    "x": 611,
+    "x": 610,
     "y": 505,
     "s": 0.917
    },
@@ -1355,18 +1426,18 @@ window.DRIPS = [
     "note": "Signed online by the owner",
     "btns": [],
     "w": 560,
-    "rot": -2,
+    "rot": -3.8,
     "z": 12,
-    "x": 45,
+    "x": 46,
     "y": 421,
     "s": 0.917
    },
    {
     "type": "bubble",
     "text": "Signed!",
-    "rot": 3,
+    "rot": 5.7,
     "z": 20,
-    "x": 831,
+    "x": 830,
     "y": 438,
     "s": 0.917
    },
@@ -1374,7 +1445,7 @@ window.DRIPS = [
     "type": "chip",
     "text": "Layout approved",
     "icon": "spark",
-    "rot": 1.5,
+    "rot": 2.8,
     "z": 18,
     "x": 261,
     "y": 911,
@@ -1385,7 +1456,7 @@ window.DRIPS = [
     "text": "Signed online",
     "icon": "check",
     "tone": "ok",
-    "rot": -1.5,
+    "rot": -2.8,
     "z": 19,
     "x": 246,
     "y": 983,
@@ -1395,9 +1466,9 @@ window.DRIPS = [
     "type": "sparkles",
     "w": 96,
     "z": 21,
-    "x": 558,
-    "y": 479,
-    "s": 0.917
+    "x": 552,
+    "y": 471,
+    "s": 0.834
    },
    {
     "type": "stamp",
@@ -1405,9 +1476,9 @@ window.DRIPS = [
     "tone": "b",
     "rot": 9,
     "z": 24,
-    "x": 53,
+    "x": 85,
     "y": 837,
-    "s": 0.917
+    "s": 0.834
    }
   ],
   "caption": "Commercial kitchen quotes still built in spreadsheets? In Odoo the equipment, the fabrication and the installation sit on one quotation, and the owner signs it online the same day. Book a call at technext.asia.",
@@ -1474,8 +1545,14 @@ window.DRIPS = [
    ],
    "mirror": true,
    "variant": 0,
+   "look": "clean",
+   "accent": "teal",
+   "decor": "strokes",
+   "heroSize": "big",
+   "tilt": "strong",
    "background": "plus"
-  }
+  },
+  "accent": "teal"
  },
  {
   "id": "kitchen-growth-pyramid",
@@ -1488,6 +1565,8 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "grid",
+  "look": "navy",
+  "heroSize": "small",
   "badge": "ready",
   "copy": {
    "head": "The business growth|*pyramid.*",
@@ -1522,39 +1601,43 @@ window.DRIPS = [
     ],
     "hot": 4,
     "x": 220,
-    "y": 464
+    "y": 417,
+    "s": 0.9
    },
    {
     "type": "pill",
     "text": "Start here",
     "rot": -4,
     "z": 19,
-    "x": 30,
-    "y": 806
+    "x": 69,
+    "y": 746,
+    "s": 0.9
    },
    {
     "type": "pill",
     "text": "Then scale",
     "rot": 4,
     "z": 19,
-    "x": 821,
-    "y": 553
+    "x": 781,
+    "y": 519,
+    "s": 0.9
    },
    {
     "type": "sparkles",
     "w": 96,
     "z": 21,
     "x": 490,
-    "y": 414
+    "y": 392
    },
    {
     "type": "prop",
     "name": "chefhat",
     "w": 150,
+    "tile": true,
     "rot": -6,
     "z": 17,
-    "x": 62,
-    "y": 634
+    "x": 458,
+    "y": 898
    }
   ],
   "caption": "Growth starts at the bottom: one system for sales, operations and admin. Marketing, design and technology, and connected equipment come after. Which stage is your kitchen business at?",
@@ -1604,8 +1687,15 @@ window.DRIPS = [
     "#CommercialKitchen"
    ],
    "mirror": false,
-   "variant": 0
-  }
+   "variant": 0,
+   "look": "navy",
+   "accent": "yellow",
+   "decor": "none",
+   "heroSize": "small",
+   "tilt": "soft"
+  },
+  "accent": "yellow",
+  "panelY": 411
  },
  {
   "id": "kitchen-happy-head-chef",
@@ -1618,11 +1708,14 @@ window.DRIPS = [
   "mirror": true,
   "ground": "haze",
   "pattern": "floor",
+  "look": "band",
+  "tilt": "flat",
   "badge": "ready",
   "copy": {
    "head": "Happy head chef,|*happy kitchen.*",
    "sub": "Equipment, parts and service visits in one Odoo, so the kitchen team gets what it needs on time.",
-   "kicker": "Reasons your customer"
+   "kicker": "Reasons your customer",
+   "decor": "circle"
   },
   "layers": [
    {
@@ -1636,7 +1729,7 @@ window.DRIPS = [
     "type": "prop",
     "name": "chefhat",
     "w": 400,
-    "rot": 4,
+    "rot": 0,
     "z": 12,
     "x": 340,
     "y": 520
@@ -1644,7 +1737,7 @@ window.DRIPS = [
    {
     "type": "pill",
     "text": "Parts in stock",
-    "rot": 5,
+    "rot": 0,
     "z": 19,
     "x": 753,
     "y": 566
@@ -1652,7 +1745,7 @@ window.DRIPS = [
    {
     "type": "pill",
     "text": "Service on time",
-    "rot": -4,
+    "rot": 0,
     "z": 19,
     "x": 40,
     "y": 726
@@ -1660,7 +1753,7 @@ window.DRIPS = [
    {
     "type": "pill",
     "text": "One call",
-    "rot": 2,
+    "rot": 0,
     "z": 19,
     "x": 823,
     "y": 916
@@ -1672,7 +1765,7 @@ window.DRIPS = [
     "icon": "check",
     "tone": "ok",
     "z": 18,
-    "rot": -3,
+    "rot": 0,
     "x": 130,
     "y": 936
    },
@@ -1716,8 +1809,14 @@ window.DRIPS = [
     "#FieldService"
    ],
    "mirror": true,
-   "variant": 0
-  }
+   "variant": 0,
+   "look": "band",
+   "accent": "blue",
+   "decor": "circle",
+   "heroSize": "normal",
+   "tilt": "flat"
+  },
+  "panelY": 481
  },
  {
   "id": "it-ticket-to-solved",
@@ -1730,16 +1829,20 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "dots",
+  "look": "stack",
+  "heroSize": "big",
+  "tilt": "strong",
   "badge": "ready",
   "copy": {
    "head": "Every IT issue,|*tracked to solved.*",
-   "sub": "Requests from email or WhatsApp become tickets with an SLA, and the customer rates the fix."
+   "sub": "Requests from email or WhatsApp become tickets with an SLA, and the customer rates the fix.",
+   "decor": "strokes"
   },
   "layers": [
    {
     "type": "chat",
     "w": 420,
-    "rot": -3,
+    "rot": -5.7,
     "z": 12,
     "channel": "whatsapp",
     "title": "Sample Logistics",
@@ -1753,13 +1856,15 @@ window.DRIPS = [
       "Ticket #2041 opened. Ravi is on his way."
      ]
     ],
-    "x": 44,
-    "y": 446
+    "x": 35,
+    "y": 455,
+    "stack": 2,
+    "s": 1.1
    },
    {
     "type": "ticket",
     "w": 540,
-    "rot": 2,
+    "rot": 3.8,
     "z": 13,
     "app": "helpdesk",
     "title": "#2041 · CCTV offline",
@@ -1773,36 +1878,39 @@ window.DRIPS = [
      "CCTV",
      "Onsite"
     ],
-    "x": 496,
-    "y": 556
+    "x": 499,
+    "y": 578,
+    "stack": 2,
+    "s": 1.1
    },
    {
     "type": "rating",
     "w": 400,
-    "rot": -2,
+    "rot": -3.8,
     "z": 14,
     "stars": 5,
     "text": "Back online in an hour. Thanks team!",
     "who": "Daniel K.",
     "meta": "Rated ticket #2041",
-    "x": 60,
-    "y": 726
+    "x": 34,
+    "y": 760,
+    "s": 1.1
    },
    {
     "type": "sparkles",
     "w": 90,
     "z": 21,
     "x": 976,
-    "y": 500
+    "y": 496
    },
    {
     "type": "prop",
     "name": "cctv",
     "w": 170,
-    "rot": -6,
+    "rot": -9,
     "z": 17,
     "x": 458,
-    "y": 858
+    "y": 876
    }
   ],
   "caption": "A camera goes offline and the customer messages on WhatsApp. In Odoo it becomes a ticket with an SLA, the engineer is assigned, and the customer rates the fix. How do your support requests arrive today?",
@@ -1860,7 +1968,12 @@ window.DRIPS = [
     "#ITServices"
    ],
    "mirror": false,
-   "variant": 0
+   "variant": 0,
+   "look": "stack",
+   "accent": "blue",
+   "decor": "strokes",
+   "heroSize": "big",
+   "tilt": "strong"
   }
  },
  {
@@ -1874,6 +1987,8 @@ window.DRIPS = [
   "mirror": true,
   "ground": "haze",
   "pattern": "hex",
+  "look": "outline",
+  "heroSize": "small",
   "badge": "ready",
   "copy": {
    "head": "Your shop|*open all night.*",
@@ -1902,8 +2017,9 @@ window.DRIPS = [
     ],
     "cart": "2",
     "btn": "Add to cart",
-    "x": 404,
-    "y": 455
+    "x": 386,
+    "y": 426,
+    "s": 0.9
    },
    {
     "type": "notif",
@@ -1914,23 +2030,25 @@ window.DRIPS = [
     "title": "New order S00412",
     "text": "Paid online · 2 items",
     "time": "02:14",
-    "x": 30,
-    "y": 805
+    "x": 62,
+    "y": 759,
+    "s": 0.9
    },
    {
     "type": "pill",
     "text": "Same stock as the store",
     "rot": 3,
     "z": 19,
-    "x": 582,
-    "y": 921
+    "x": 556,
+    "y": 864,
+    "s": 0.9
    },
    {
     "type": "sparkles",
     "w": 90,
     "z": 21,
     "x": 354,
-    "y": 409
+    "y": 402
    },
    {
     "type": "prop",
@@ -1938,8 +2056,8 @@ window.DRIPS = [
     "w": 170,
     "rot": 6,
     "z": 17,
-    "x": 232,
-    "y": 597
+    "x": 408,
+    "y": 854
    }
   ],
   "caption": "Your stores close at 10; your online shop does not. The Odoo shop sells from the same stock and prices as your stores, and every order arrives paid and ready to pick. Book a call at technext.asia.",
@@ -1991,8 +2109,14 @@ window.DRIPS = [
     "#eCommerce"
    ],
    "mirror": true,
-   "variant": 0
-  }
+   "variant": 0,
+   "look": "outline",
+   "accent": "navy",
+   "decor": "none",
+   "heroSize": "small",
+   "tilt": "soft"
+  },
+  "accent": "navy"
  },
  {
   "id": "apps-quote-order-invoice",
@@ -2004,10 +2128,13 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "rings",
+  "look": "spotlight",
+  "tilt": "flat",
   "badge": "ready",
   "copy": {
    "head": "Quote, order, invoice:|*one record, handed on.*",
-   "sub": "The sales order carries the customer and the lines from the quote to the invoice, so nothing is typed twice."
+   "sub": "The sales order carries the customer and the lines from the quote to the invoice, so nothing is typed twice.",
+   "decor": "circle"
   },
   "layers": [
    {
@@ -2022,7 +2149,7 @@ window.DRIPS = [
     "btns": [],
     "compact": true,
     "w": 336,
-    "rot": -6,
+    "rot": 0,
     "z": 11,
     "x": 34,
     "y": 529
@@ -2057,7 +2184,7 @@ window.DRIPS = [
     "btns": [],
     "compact": true,
     "w": 336,
-    "rot": 6,
+    "rot": 0,
     "z": 12,
     "x": 710,
     "y": 529
@@ -2083,7 +2210,7 @@ window.DRIPS = [
    {
     "type": "pill",
     "text": "Nothing retyped",
-    "rot": -3,
+    "rot": 0,
     "z": 19,
     "x": 70,
     "y": 816
@@ -2091,7 +2218,7 @@ window.DRIPS = [
    {
     "type": "pill",
     "text": "Paid online",
-    "rot": 3,
+    "rot": 0,
     "z": 19,
     "x": 778,
     "y": 816
@@ -2149,7 +2276,15 @@ window.DRIPS = [
     "#Accounting"
    ],
    "mirror": false,
-   "variant": 0
-  }
+   "variant": 0,
+   "look": "spotlight",
+   "accent": "purple",
+   "decor": "circle",
+   "heroSize": "normal",
+   "tilt": "flat"
+  },
+  "accent": "purple",
+  "watermark": "rocket",
+  "panelY": 411
  }
 ];

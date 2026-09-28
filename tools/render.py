@@ -104,7 +104,7 @@ def main():
     try:
         for i, cat in items:
             q = f"?id={i}" + (f"&format={a.format}" if a.format else "")
-            suffix = ("@2x" if a.scale == 2 else "") + ("-4x5" if a.format == "4:5" else "")
+            suffix = ("@%dx" % a.scale if a.scale > 1 else "") + ("-4x5" if a.format == "4:5" else "")
             out = os.path.join(a.out, cat, f"{i}{suffix}.png")
             ch.shoot(base + q, out, a.scale)
             print("saved", os.path.relpath(out, ROOT))

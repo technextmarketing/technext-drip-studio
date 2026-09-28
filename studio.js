@@ -48,11 +48,14 @@
   function setStatus(kind) {
     var el = $('#savestate'); if (!el) return;
     el.dataset.kind = kind;
-    el.textContent = kind === 'saving' ? 'Saving…' : kind === 'error' ? 'Not saved: check your connection' : kind === 'readonly' ? 'View only' : S.mode !== 'hub' ? 'Saved in this browser' : 'All changes saved';
+    el.textContent = kind === 'saving' ? 'Saving…' : kind === 'error' ? 'Not saved: check your connection' : kind === 'toobig' ? 'Not saved: too large' : kind === 'readonly' ? 'View only' : S.mode !== 'hub' ? 'Saved in this browser' : 'All changes saved';
   }
   S.on('saving', function () { setStatus('saving'); });
   S.on('saved', function () { if (!S.pending()) setStatus('saved'); });
-  S.on('saveError', function (e) { setStatus(e && e.code === 'invalid_argument' ? 'readonly' : 'error'); if (e && e.code === 'quota') toast('This browser is out of storage: remove large embedded images'); });
+  S.on('saveError', function (e) {
+    if (e && e.code === 'too_big') { setStatus('toobig'); toast('Not saved: this drip is ' + Math.round(e.size / 1024) + ' KB, over the hub\'s 256 KB limit. Select the embedded photo and use Replace image, so it is uploaded instead.', 8000); return; }
+    setStatus(e && e.code === 'invalid_argument' ? 'readonly' : 'error'); if (e && e.code === 'quota') toast('This browser is out of storage: remove large embedded images');
+  });
   function queueSave(d) {
     if (!d) return;
     dirtyAt[d.id] = Date.now(); setStatus('saving');
@@ -226,17 +229,22 @@
   }
 
   /* ---------- gallery ---------- */
+  function inCatFn(d) { return st.cat === 'all' || (st.cat === 'drafts' ? d.draft : d.cat === st.cat); }
+  function dlIcon() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M4 19h16"/></svg>'; }
+  var PNGQ = [['1', 'Standard · 1080 px'], ['2', 'HD · 2160 px'], ['3', 'Ultra · 3240 px']];
+  function pngScale() { var v = 2; try { v = +localStorage.getItem('tn-drip-pngq') || 2; } catch (e) {} return [1, 2, 3].indexOf(v) > -1 ? v : 2; }
+  function qualitySel(id) { return '<select class="sel" id="' + id + '" data-pngq="1" title="Image size" aria-label="Image size">' + opts(PNGQ.map(function (q) { return q[0]; }), String(pngScale()), PNGQ.map(function (q) { return q[1]; })) + '</select>'; }
   function showGallery() {
     st.id = null; st.sel = -1; st.multi = []; closePop(); closeMenu();
     $('#shell').classList.remove('editing'); $('#insp').hidden = true;
     renderRail();
-    var inCat = function (d) { return st.cat === 'all' || (st.cat === 'drafts' ? d.draft : d.cat === st.cat); };
-    var list = lib.filter(inCat), drafts = list.filter(function (d) { return d.draft; }), kept = list.filter(function (d) { return !d.draft; });
+    var list = lib.filter(inCatFn), drafts = list.filter(function (d) { return d.draft; }), kept = list.filter(function (d) { return !d.draft; });
     var c = catObj(st.cat), ind = c && c.industry && C.industries[c.industry];
     var head = st.cat === 'drafts' ? 'Drafts to review' : c ? c.name : 'All drips';
     var h = '<div class="gallery"><div class="gal-head"><div><h2>' + esc(head) + '</h2><p>' +
       (ind ? 'Workflow on technext.asia: ' + esc(ind.flow_title) : st.cat === 'drafts' ? 'Posts Claude designed. Keep the ones you like; everything is already saved.' : c ? esc(c.group) + ' · ' + list.length + ' drip' + (list.length === 1 ? '' : 's') : lib.length + ' drips across ' + cats.length + ' categories.') +
-      '</p></div><span class="sp"></span>' + (S.canWrite ? '<button class="btn" data-gen="1">' + sparkIcon() + 'Generate with Claude</button><button class="btn primary" data-new="1">New drip</button>' : '') + '</div>';
+      '</p></div><span class="sp"></span>' + (list.length ? qualitySel('pngq2') + '<button class="btn" data-saveall="1" title="Save every drip shown here as PNG, in one zip">' + dlIcon() + 'Save all</button>' : '') +
+      (S.canWrite ? '<button class="btn" data-gen="1">' + sparkIcon() + 'Generate with Claude</button><button class="btn primary" data-new="1">New drip</button>' : '') + '</div>';
     if (lib.length === 0 && S.mode === 'hub') h += '<div class="empty" style="margin-bottom:18px"><b>This hub is empty.</b> Import the starter drips, or generate new ones with Claude.' + (S.canWrite ? ' <button class="btn sm" id="import-starters">Import the starter drips</button>' : '') + '</div>';
     if (drafts.length && st.cat !== 'drafts') h += '<div class="sec-h"><h3>New from Claude <span class="tag">' + drafts.length + '</span></h3><span class="sp"></span>' + (S.canWrite ? '<button class="btn sm" data-keepall="1">Keep all</button>' : '') + '</div>' + cards(drafts, true);
     if (st.cat === 'drafts') h += cards(drafts, true);
@@ -250,7 +258,7 @@
     var h = '<div class="grid">';
     list.forEach(function (d) {
       h += '<div class="card"><button class="thumb' + (d.format === '4:5' ? ' r45' : '') + '" data-open="' + esc(d.id) + '" data-thumb="' + esc(d.id) + '" aria-label="Edit ' + esc(d.name || d.id) + '"></button>' +
-        '<span class="meta"><b>' + esc(d.name || d.id) + '</b>' + (st.cat === 'all' || st.cat === 'drafts' ? '<span class="tag">' + esc(catName(d.cat)) + '</span>' : '') + '</span>' +
+        '<span class="meta"><b>' + esc(d.name || d.id) + '</b>' + (st.cat === 'all' || st.cat === 'drafts' ? '<span class="tag">' + esc(catName(d.cat)) + '</span>' : '') + '<button class="btn sm save" data-save="' + esc(d.id) + '" title="Save as PNG (' + PNGQ[pngScale() - 1][1] + ')" aria-label="Save ' + esc(d.name || d.id) + ' as PNG">' + dlIcon() + 'Save</button></span>' +
         (drafts && S.canWrite ? '<span class="draft-act"><button class="btn sm primary" data-keep="' + esc(d.id) + '">Keep</button><button class="btn sm" data-open="' + esc(d.id) + '">Edit</button><button class="btn sm danger" data-discard="' + esc(d.id) + '">Discard</button></span>' : '') + '</div>';
     });
     if (withNew && S.canWrite) h += '<div class="card new"><button class="thumb" data-new="1"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New drip</span></button><span class="meta"><b>Start from a starter</b></span></div>';
@@ -269,7 +277,7 @@
       '<span class="seg" role="group" aria-label="Zoom"><button id="zoom-out" title="Zoom out" aria-label="Zoom out">−</button><button id="zoom-fit" title="Fit">Fit</button><button id="zoom-in" title="Zoom in" aria-label="Zoom in">+</button></span>' +
       '<span class="seg" role="group" aria-label="Format"><button data-fmt="1:1">1:1</button><button data-fmt="4:5">4:5</button></span>' +
       '<button class="btn sm icon" id="undo" title="Undo (Ctrl+Z)" aria-label="Undo">↶</button><button class="btn sm icon" id="redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo">↷</button>' +
-      '<button class="btn sm" id="png2">PNG 2x</button><button class="btn sm primary" id="png">Download PNG</button></div>' +
+      qualitySel('pngq') + '<button class="btn sm primary" id="png">' + dlIcon() + 'Save PNG</button></div>' +
       '<div class="canvas-wrap" id="wrap"><div class="canvas-box" id="box"></div><div class="guides" id="guides"></div><div class="marq" id="marq" hidden></div><div class="tools" id="tools" hidden></div>' +
       '<span class="hint">Click to select · Shift-click or drag a box to select several · double-click text to type · right-click for more</span></div></div>';
     drawCanvas(); renderInspector();
@@ -652,19 +660,55 @@
   }
 
   /* images */
+  function loadImg(file) {
+    return new Promise(function (res, rej) {
+      var url = URL.createObjectURL(file), im = new Image();
+      im.onload = function () { URL.revokeObjectURL(url); res(im); };
+      im.onerror = function () { URL.revokeObjectURL(url); rej(new Error('this image cannot be read here; use a PNG, JPG or WebP')); };
+      im.src = url;
+    });
+  }
+  function toBlob(cv, type, q) { return new Promise(function (res, rej) { cv.toBlob(function (b) { b ? res(b) : rej(new Error('the image could not be encoded')); }, type, q); }); }
+  /* photos are resized before they are stored: the long side becomes `max` px; with `bytes` (an embedded copy) they shrink until they fit */
+  function shrinkImage(file, o) {
+    o = o || {};
+    if (file.type === 'image/svg+xml') return Promise.resolve(file);
+    return loadImg(file).then(function (im) {
+      var w = im.naturalWidth || im.width, h = im.naturalHeight || im.height, max = o.max || 2400;
+      if (!o.bytes && Math.max(w, h) <= max && /^image\/(png|jpeg|webp)$/.test(file.type)) return file;
+      var pc = document.createElement('canvas'); pc.width = pc.height = 32; var px = pc.getContext('2d'); px.drawImage(im, 0, 0, 32, 32);
+      var pd = px.getImageData(0, 0, 32, 32).data, alpha = false;
+      for (var i = 3; i < pd.length; i += 4) if (pd[i] < 250) { alpha = true; break; }
+      var tries = [];
+      (o.bytes ? [max, 1100, 900, 700, 520] : [max]).forEach(function (mx) { (o.bytes ? [.85, .72, .6] : [.92]).forEach(function (q) { tries.push([mx, q]); }); });
+      return tries.reduce(function (p, tr, k) {
+        return p.then(function (found) {
+          if (found) return found;
+          var sc = Math.min(1, tr[0] / Math.max(w, h)), cw = Math.max(1, Math.round(w * sc)), chh = Math.max(1, Math.round(h * sc));
+          var cv = document.createElement('canvas'); cv.width = cw; cv.height = chh; var cx = cv.getContext('2d'); cx.imageSmoothingQuality = 'high'; cx.drawImage(im, 0, 0, cw, chh);
+          var type = o.bytes ? (alpha ? 'image/webp' : 'image/jpeg') : (alpha ? 'image/png' : 'image/jpeg');
+          return toBlob(cv, type, type === 'image/png' ? undefined : tr[1]).then(function (b) { return !o.bytes || b.size <= o.bytes || k === tries.length - 1 ? b : null; });
+        });
+      }, Promise.resolve(null));
+    });
+  }
   function addImage(file) {
     if (!file || !/^image\//.test(file.type)) { toast('Use a PNG, JPG, WebP or SVG image'); return; }
-    if (file.size > 20e6) { toast('That image is over 20 MB'); return; }
-    toast(S.assets ? 'Uploading…' : 'Adding image…');
-    S.uploadImage(file).then(function (url) {
-      change(function (d) {
-        var L = d.layers[st.sel];
-        if (L && L.type === 'nexi') { L.type = 'person'; delete L.pose; delete L.glow; L.src = url; }
-        else if (L && /^(person|shot|img|phone)$/.test(L.type)) L.src = url;
-        else { d.layers.push({ type: 'person', src: url, x: 560, y: 380, w: 480, z: Math.max.apply(null, zs().concat([10])) + 1 }); st.sel = d.layers.length - 1; }
-      }, { insp: true, now: true });
-      toast('Image added. Drag it into place.');
-    }).catch(function (e) { toast('Could not add the image: ' + (e && (e.message || e.code) || e)); });
+    var embed = !S.assets, small = { max: 1400, bytes: 120e3 };
+    toast(embed ? 'Preparing the image…' : 'Uploading…', 8000);
+    shrinkImage(file, embed ? small : { max: 2400 })
+      .then(function (b) { return S.uploadImage(b).catch(function (e) { if (embed) throw e; return shrinkImage(file, small).then(S.embed).then(function (u) { u.fallback = e; return u; }); }); })
+      .then(function (url) {
+        var fallback = url && url.fallback; if (fallback) url = String(url);
+        change(function (d) {
+          var L = d.layers[st.sel];
+          if (L && L.type === 'nexi') { L.type = 'person'; delete L.pose; delete L.glow; L.src = url; }
+          else if (L && /^(person|shot|img|phone)$/.test(L.type)) L.src = url;
+          else { d.layers.push({ type: 'person', src: url, x: 560, y: 380, w: 480, z: Math.max.apply(null, zs().concat([10])) + 1 }); st.sel = d.layers.length - 1; }
+        }, { insp: true, now: true });
+        toast(fallback ? 'Image added as a small embedded copy (the upload failed: ' + (fallback.code || fallback.message || 'error') + ')' : 'Image added. Drag it into place.');
+      })
+      .catch(function (e) { toast('Could not add the image: ' + (e && (e.message || e.code) || e), 6000); });
   }
   document.addEventListener('dragover', function (e) { if (!st.id) return; if ((e.dataTransfer.types || []).indexOf('Files') > -1) { e.preventDefault(); var b = $('#box'); if (b) b.classList.add('drop'); } });
   document.addEventListener('dragleave', function (e) { var b = $('#box'); if (b && !e.relatedTarget) b.classList.remove('drop'); });
@@ -729,6 +773,9 @@
     return String(t || '').replace(/[*~|=]/g, '');
   }
   var PATLAB = { dots: 'Dots', grid: 'Grid lines', fine: 'Fine grid', diagonal: 'Diagonal', rings: 'Rings', plus: 'Plus', hex: 'Hexagons', waves: 'Waves', spots: 'Light spots', floor: 'Floor grid' };
+  var LOOKLAB = { clean: 'Clean', band: 'Blue panel', navy: 'Navy panel', corner: 'Blue corner', outline: 'Outline', paper: 'Paper', spotlight: 'Spotlight', stack: 'Desk stack' };
+  var ACCC = { blue: '#3167CA', navy: '#1F1F3D', teal: '#21B799', coral: '#E5534B', purple: '#714B67', yellow: '#FFC83D' };
+  var DECLAB = { none: 'None', circle: 'Circle', underline: 'Underline', marker: 'Marker', strokes: 'Strokes', box: 'Box' };
   function designPanel(d) {
     var b = d.brand || {}, V = d.post && SP.VIS[d.visual], g = d.bg && typeof d.bg === 'object' ? 'v3' : d.ground == null ? 'blobs' : String(d.ground);
     var badgeSel = '<label class="f"><span>Odoo badge (top right)</span><select id="d-badge2">' + opts(['ready', 'o20', ''], d.brand ? (b.badge === 'none' ? '' : b.badge || 'ready') : d.badge == null ? 'ready' : d.badge, ['Odoo Ready Partner', 'Meet Odoo 20', 'None']) + '</select></label>';
@@ -738,6 +785,12 @@
       '<div class="f"><span>Background</span><div class="chips">' + [['', 'Clean'], ['haze', 'Soft blue floor'], ['blobs', 'Blue shapes']].map(function (o) { return '<button data-ground="' + o[0] + '"' + (g === o[0] || (o[0] === 'blobs' && g.indexOf('blobs') === 0) ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join('') + '</div></div>' +
       '<div class="f"><span>Pattern</span><div class="chips">' + [['', 'None']].concat(SP.PATTERNS.map(function (x) { return [x, PATLAB[x] || x]; })).map(function (o) { return '<button data-pattern="' + o[0] + '"' + ((d.pattern || '') === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join('') + '</div></div>' +
       '<div class="f"><span>Tint</span><div class="chips">' + [['', 'White']].concat(SP.TINTS.map(function (x) { return [x, x.charAt(0).toUpperCase() + x.slice(1)]; })).map(function (o) { return '<button data-tint="' + o[0] + '"' + ((d.tint || '') === o[0] ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join('') + '</div></div>' +
+      '<div class="f"><span>Look</span><div class="chips">' + SP.LOOKS.map(function (x) { return '<button data-look="' + x + '"' + ((d.look || 'clean') === x ? ' class="on"' : '') + ' title="' + esc(SP.LOOK_ABOUT[x]) + '">' + LOOKLAB[x] + '</button>'; }).join('') + '</div></div>' +
+      '<div class="f"><span>Accent colour' + (SP.LOOK_ACC[d.look] ? ' · set by the look' : '') + '</span><div class="chips accs">' + SP.ACCENTS.map(function (x) { return '<button class="acc-sw' + ((d.accent || 'blue') === x ? ' on' : '') + '" data-acc="' + x + '" title="' + x + '" style="--c:' + ACCC[x] + '"></button>'; }).join('') + '</div></div>' +
+      '<div class="f"><span>Headline accent</span><div class="chips">' + SP.DECORS.map(function (x) { return '<button data-decor="' + x + '"' + (((d.copy && d.copy.decor) || 'none') === x ? ' class="on"' : '') + '>' + DECLAB[x] + '</button>'; }).join('') + '</div></div>' +
+      (V ? '<div class="row"><div class="f"><span>Card size</span><div class="chips">' + SP.HERO.map(function (x) { return '<button data-hero="' + x + '"' + ((d.heroSize || 'normal') === x ? ' class="on"' : '') + '>' + x + '</button>'; }).join('') + '</div></div>' +
+        '<div class="f"><span>Tilt</span><div class="chips">' + SP.TILTS.map(function (x) { return '<button data-tilt="' + x + '"' + ((d.tilt || 'soft') === x ? ' class="on"' : '') + '>' + x + '</button>'; }).join('') + '</div></div></div>' +
+        '<div class="f"><button class="btn sm primary" data-fresh="1" type="button">' + sparkIcon() + 'Fresh design</button><p class="help" style="margin:6px 0 0">A look, colour, headline accent, pattern, size and tilt this post does not have yet.</p></div>' : '') +
       (V ? '<div class="f"><span>Layout · ' + esc(V.label) + '</span><div class="chips">' + (SP.canMirror(d.visual) ? '<button data-mirror="1"' + (d.mirror ? ' class="on"' : '') + '>Mirror</button>' : '') + (SP.hasVariants(d.visual) ? '<button data-variant="1">Other arrangement</button>' : '') +
         '<button data-relayout="1">Reset layout</button></div><p class="help" style="margin:6px 0 0">Rebuilds the visual from its content; moved or added elements go back to the standard layout.</p></div>' : '') +
       frame + badgeSel + '</section>';
@@ -820,7 +873,8 @@
     var d = cur(); if (!d || !d.post) return;
     snapshot();
     var n = SP.relayout(d, ch, { cat: d.cat, industry: d.industry || (catObj(d.cat) || {}).industry });
-    ['layers', 'mirror', 'variant', 'visual', 'post'].forEach(function (k) { if (n[k] === undefined) delete d[k]; else d[k] = n[k]; });
+    ['layers', 'mirror', 'variant', 'visual', 'post', 'look', 'accent', 'heroSize', 'tilt', 'panelY', 'watermark', 'pattern', 'tint'].forEach(function (k) { if (n[k] === undefined) delete d[k]; else d[k] = n[k]; });
+    d.copy = d.copy || {}; if (n.copy && n.copy.decor) d.copy.decor = n.copy.decor; else delete d.copy.decor;
     st.sel = -1; st.multi = []; queueSave(d); drawCanvas(); renderInspector();
   }
 
@@ -874,6 +928,14 @@
     if (ds.ground !== undefined) { change(function (d) { d.ground = ds.ground; }, { now: true, insp: true }); return; }
     if (ds.pattern !== undefined) { change(function (d) { if (ds.pattern) d.pattern = ds.pattern; else delete d.pattern; }, { now: true, insp: true }); return; }
     if (ds.tint !== undefined) { change(function (d) { if (ds.tint) d.tint = ds.tint; else delete d.tint; }, { now: true, insp: true }); return; }
+    if (ds.look) { if (cur().post) simpleRelayout({ look: ds.look }); else change(function (d) { if (ds.look === 'clean') delete d.look; else d.look = ds.look; }, { now: true, insp: true }); return; }
+    if (ds.acc) { change(function (d) { if (ds.acc === 'blue') delete d.accent; else d.accent = ds.acc; if (d.post) d.post.accent = ds.acc; }, { now: true, insp: true }); return; }
+    if (ds.decor) { change(function (d) { d.copy = d.copy || {}; if (ds.decor === 'none') delete d.copy.decor; else d.copy.decor = ds.decor; }, { now: true, insp: true }); return; }
+    if (ds.hero) { simpleRelayout({ heroSize: ds.hero }); return; }
+    if (ds.tilt) { simpleRelayout({ tilt: ds.tilt }); return; }
+    if (ds.fresh) { var fr = SP.fresh(cur()); simpleRelayout(fr); toast('Fresh design: ' + LOOKLAB[fr.look] + ' · ' + fr.accent + ' · ' + DECLAB[fr.decor] + ' · ' + PATLAB[fr.pattern]); return; }
+    if (ds.save) { var sd = lib.filter(function (x) { return x.id === ds.save; })[0]; if (sd) exportPng(sd, pngScale()); return; }
+    if (ds.saveall) { exportAll(lib.filter(inCatFn)); return; }
     if (ds.mirror) { simpleRelayout({ mirror: !cur().mirror }); return; }
     if (ds.variant) { simpleRelayout({ variant: (cur().variant || 0) + 1 }); return; }
     if (ds.relayout) { simpleRelayout({}); toast('Layout reset'); return; }
@@ -898,8 +960,7 @@
       case 'del': confirmDelete(); break;
       case 'del-yes': var gone = cur(); removeDrip(gone); st.cat = gone.cat; showGallery(); toast('Deleted ' + (gone.name || gone.id)); break;
       case 'del-no': var cf = $('#confirm'); if (cf) cf.remove(); break;
-      case 'png': exportPng(1); break;
-      case 'png2': exportPng(2); break;
+      case 'png': exportPng(cur(), pngScale()); break;
       case 'copycap': var dc = cur(); copyText((dc.caption || '') + ((dc.hashtags || []).length ? '\n\n' + dc.hashtags.join(' ') : '')); break;
       case 'pop-done': case 'pop-x': closePop(); break;
       case 'usage': openUsage(); break;
@@ -912,6 +973,7 @@
   });
   document.addEventListener('change', function (e) {
     var t = e.target;
+    if (t.dataset && t.dataset.pngq) { try { localStorage.setItem('tn-drip-pngq', t.value); } catch (err) {} $$('[data-pngq]').forEach(function (x) { x.value = t.value; }); $$('[data-save]').forEach(function (b) { b.title = 'Save as PNG (' + PNGQ[+t.value - 1][1] + ')'; }); return; }
     if (t.dataset && t.dataset.tool === 'pose') change(function (d) { d.layers[st.sel].pose = t.value; }, { insp: true, now: true });
     if (t.dataset && t.dataset.tool === 'view') change(function (d) { d.layers[st.sel].view = t.value; }, { insp: true, now: true });
   });
@@ -994,6 +1056,7 @@
     var cat = $('#g-cat').value, ind = $('#g-ind').value || (catObj(cat) || {}).industry || AI.detectIndustry($('#g-brief').value) || '';
     return { cat: cat, catName: catName(cat), industry: ind || null, count: +$('#g-n').value, tier: $('#g-tier').value, brief: $('#g-brief').value.trim(),
       angles: $$('[data-angle]').filter(function (b) { return b.checked; }).map(function (b) { return b.dataset.angle; }),
+      existingDesigns: lib.filter(function (d) { return d.cat === cat && d.visual; }).map(function (d) { return d.visual + ' + ' + (d.look || 'clean'); }).filter(function (v, i, a) { return a.indexOf(v) === i; }),
       existing: lib.filter(function (d) { return d.cat === cat; }).map(function (d) { return String(d.copy && d.copy.head || '').replace(/[*~|=]/g, ' ').replace(/\s+/g, ' ').trim(); }) };
   }
   function runGenerate() {
@@ -1007,7 +1070,7 @@
     AI.generate(o, function (n) { $('#g-stage').textContent = 'Designing post ' + Math.min(n, o.count) + ' of ' + o.count + '…'; $('#g-bar').style.width = Math.max(8, Math.min(96, n / o.count * 96)) + '%'; }, genCtl.signal)
       .then(function (r) {
         genCtl = null;
-        var gid = 'g' + Date.now().toString(36), made = [], posts = SP.diversify(r.concepts.slice(0, o.count), Date.now() % 1e6);
+        var gid = 'g' + Date.now().toString(36), made = [], posts = SP.diversify(r.concepts.slice(0, o.count), Date.now() % 1e6, lib.filter(function (x) { return x.cat === o.cat; }));
         posts.forEach(function (sc, i) {
           var d = SP.compose(sc, { cat: o.cat, industry: o.industry, index: i, source: 'Claude · ' + o.catName + (o.industry ? ' · ' + indName(o.industry) : '') + ' · ' + new Date().toISOString().slice(0, 10) });
           d.id = uid(d.name); d.draft = true; d.gen = gid; d.createdAt = new Date().toISOString(); d.order = lib.length + i;
@@ -1015,7 +1078,7 @@
         });
         var entry = { at: new Date().toISOString(), cat: o.cat, industry: o.industry, asked: o.count, made: made.length, tier: r.tier, input: r.input, output: r.output, ms: r.ms };
         usage.push(entry); S.logUsage(usage);
-        $('.dlg-card').innerHTML = '<h2>' + made.length + ' drafts added to ' + esc(o.catName) + '</h2><p>Each post has its own visual. Open any of them to change a word or move things, or keep the ones you like.</p>' +
+        $('.dlg-card').innerHTML = '<h2>' + made.length + ' drafts added to ' + esc(o.catName) + '</h2><p>Each post has its own visual and its own design. Open any of them to change a word or move things, or keep the ones you like.</p>' +
           '<div class="est"><b>This run:</b> about ' + nf(r.input) + ' tokens in + ' + nf(r.output) + ' out = <b>' + nf(r.input + r.output) + ' tokens</b> (estimate, ' + esc(tierName(r.tier)) + ' model, ' + Math.round(r.ms / 1000) + ' s).</div>' +
           '<div class="dlg-foot"><button class="btn" id="dlg-close" type="button">Close</button><button class="btn primary" id="g-review" type="button">Review drafts</button></div>';
         $('#g-review').addEventListener('click', function () { closeDlg(); st.cat = o.cat; showGallery(); });
@@ -1080,14 +1143,43 @@
     }).then(function (b) { host.remove(); return b; }, function (e) { host.remove(); throw e; });
   }
   window.TNStudioRender = clientRender;
-  function exportPng(scale) {
-    var d = cur(), fname = d.id + (scale === 2 ? '@2x' : '') + (d.format === '4:5' ? '-4x5' : '') + '.png';
-    if (location.protocol === 'file:') { openDlg('<h2>Export needs a server</h2><p>Browsers block image export for pages opened straight from a folder. Double-click <code>Open Drip Studio.bat</code>, use the live link, or run <code>python tools/render.py</code>.</p><div class="dlg-foot"><button class="btn primary" id="dlg-close">OK</button></div>'); return; }
-    toast('Rendering ' + (d.name || d.id) + '…', 8000);
-    var job = SERVER ? fetch('api/render', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ drip: d, scale: scale }) }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.blob(); }) : clientRender(d, scale);
-    job.then(function (b) { return S.download(fname, b); })
-      .then(function (ok) { toast(ok ? 'Saved ' + fname + (SERVER ? ' (also in exports/)' : '') : 'Save cancelled'); })
-      .catch(function (err) { toast('Export failed: ' + (err && (err.message || err.code) || err)); });
+  var exporting = false;
+  function pngName(d, scale) { return d.id + (scale > 1 ? '@' + scale + 'x' : '') + (d.format === '4:5' ? '-4x5' : '') + '.png'; }
+  function renderBlob(d, scale) {
+    if (SERVER) return fetch('api/render', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ drip: d, scale: scale }) }).then(function (r) { if (!r.ok) throw new Error('render ' + r.status); return r.blob(); });
+    return clientRender(d, scale);
+  }
+  function needsServer() {
+    if (location.protocol !== 'file:') return false;
+    openDlg('<h2>Export needs a server</h2><p>Browsers block image export for pages opened straight from a folder. Double-click <code>Open Drip Studio.bat</code>, use the live link, or run <code>python tools/render.py</code>.</p><div class="dlg-foot"><button class="btn primary" id="dlg-close">OK</button></div>');
+    return true;
+  }
+  function exportPng(d, scale) {
+    if (!d || needsServer()) return;
+    if (exporting) { toast('Still saving the previous image: answer its prompt first'); return; }
+    scale = scale || 2; exporting = true;
+    var fname = pngName(d, scale), px = 1080 * scale;
+    toast('Rendering ' + (d.name || d.id) + ' at ' + px + ' px…', 10000);
+    renderBlob(d, scale).then(function (b) { return S.download(fname, b).then(function (ok) { toast(ok ? 'Saved ' + fname + ' (' + Math.round(b.size / 1024) + ' KB' + (SERVER ? ', also in exports/' : '') + ')' : 'Save cancelled'); }); })
+      .catch(function (err) { toast('Could not save: ' + (err && (err.message || err.code) || err), 6000); })
+      .then(function () { exporting = false; });
+  }
+  function loadZip() {
+    if (window.JSZip) return Promise.resolve(window.JSZip);
+    return new Promise(function (res, rej) { var sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'; sc.onload = function () { res(window.JSZip); }; sc.onerror = function () { rej(new Error('The zip library could not load; save the posts one by one')); }; document.head.appendChild(sc); });
+  }
+  function exportAll(list) {
+    if (!list.length || needsServer()) return;
+    if (exporting) { toast('Still saving the previous image: answer its prompt first'); return; }
+    var scale = pngScale(), n = list.length, zipName = 'technext-drips-' + (st.cat === 'all' ? 'all' : st.cat) + (scale > 1 ? '@' + scale + 'x' : '') + '.zip';
+    exporting = true; toast('Rendering 1 of ' + n + '…', 20000);
+    loadZip().then(function (JSZip) {
+      var zip = new JSZip();
+      return list.reduce(function (p, d, i) { return p.then(function () { toast('Rendering ' + (i + 1) + ' of ' + n + ': ' + (d.name || d.id), 20000); return renderBlob(d, scale).then(function (b) { zip.file(pngName(d, scale), b); }); }); }, Promise.resolve())
+        .then(function () { toast('Packing ' + n + ' images…', 20000); return zip.generateAsync({ type: 'blob', compression: 'STORE' }); });
+    }).then(function (b) { return S.download(zipName, b).then(function (ok) { toast(ok ? 'Saved ' + zipName + ' (' + n + ' images, ' + Math.round(b.size / 1048576 * 10) / 10 + ' MB)' : 'Save cancelled'); }); })
+      .catch(function (err) { toast('Could not save: ' + (err && (err.message || err.code) || err), 6000); })
+      .then(function () { exporting = false; });
   }
   function saveLibraryFile() {
     var js = '/* TechNext Drip Studio — the drip library, saved from the studio on ' + new Date().toISOString().slice(0, 10) + '. See README.md. */\n\nwindow.CATEGORIES = ' + JSON.stringify(cats, null, 2) + ';\n\nwindow.DRIPS = ' + JSON.stringify(lib.map(stripMeta), null, 2) + ';\n';

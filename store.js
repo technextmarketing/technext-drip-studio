@@ -59,6 +59,8 @@
   var inflight = {}, queued = {};
   function write(path, body, del) {
     if (inflight[path]) { queued[path] = { body: body, del: del }; return inflight[path]; }
+    var size = 0; if (!del) { try { size = JSON.stringify(body).length; } catch (e) {} }
+    if (size > 250 * 1024) { emit('saveError', { code: 'too_big', size: size }); return Promise.resolve(); }
     var ref = S.db.doc(path);
     var failed = false;
     var p = (del ? ref.delete() : ref.set(body)).catch(function (e) {
@@ -95,14 +97,22 @@
   S.resetLocal = function () { try { localStorage.removeItem(KEY); localStorage.removeItem(KEY_CATS); } catch (e) {} };
 
   /* images people add: the hub's asset store, else embedded */
+  S.embed = function (blob) { return new Promise(function (res, rej) { var f = new FileReader(); f.onload = function () { res(f.result); }; f.onerror = rej; f.readAsDataURL(blob); }); };
   S.uploadImage = function (file) {
     if (S.assets) return S.assets.upload(file).then(function (r) { return r.url; });
-    return new Promise(function (res, rej) { var f = new FileReader(); f.onload = function () { res(f.result); }; f.onerror = rej; f.readAsDataURL(file); });
+    return S.embed(file);
   };
 
   /* hand a file to the viewer */
   S.download = function (filename, blob) {
-    if (S.downloads) return S.downloads.save({ filename: filename, data: blob }).then(function () { return true; }, function (e) { if (e && e.code === 'declined') return false; throw e; });
+    if (S.downloads) return S.downloads.save({ filename: filename, data: blob }).then(function () { return true; }, function (e) {
+      var c = e && e.code;
+      if (c === 'declined') return false;
+      if (c === 'rate_limited') throw new Error('one save at a time; answer the open prompt, then try again');
+      if (c === 'too_large') throw new Error('the file is too large for this device; pick a smaller size');
+      if (c === 'rejected_extension' || c === 'extension_not_enabled') throw new Error('this file type cannot be saved here');
+      throw new Error(c || (e && e.message) || 'save failed');
+    });
     var url = URL.createObjectURL(blob), a = document.createElement('a');
     a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 4000);

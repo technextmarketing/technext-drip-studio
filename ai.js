@@ -111,7 +111,11 @@
     proof: 'proof: the three approved company figures (10+ countries, 11+ enterprise clients, 4 AI disciplines) as big numbers. {"pills":["0-2 ≤20"],"nexi":' + POSE + '}'
   };
   var KNOBS = [
-    'DESIGN KNOBS (optional, per post), so every post looks like its own poster; the layout engine places everything cleanly:',
+    'DESIGN KNOBS (per post), so every post is its own poster; the layout engine places everything cleanly:',
+    '- "look": the whole design direction. clean = white cards on a light floor | band = a blue panel across the lower half, white cards and white pills on it | navy = a navy panel, white cards, yellow pills | corner = a big blue rounded shape in the lower-right corner behind the visual | outline = printed-sticker look, navy outlines and hard shadows on every card | paper = cream cards and coral handwriting on a sand background | spotlight = a warm glow and a huge faded industry illustration behind the visual | stack = cards on a desk, paper sheets behind each, tilted.',
+    '- "accent": blue | navy | teal | coral | purple | yellow: the colour of pills, handwriting, chip icons and sparkles (the navy, outline and paper looks set their own).',
+    '- "decor": none | circle | underline | marker | strokes | box: a hand-drawn touch on the blue words of the headline (a coral circle, a yellow brush underline, a yellow marker, yellow strokes, or white on blue).',
+    '- "heroSize": normal | big | small, and "tilt": flat | soft | strong: how large the cards are and how much they lean.',
     '- "arrangement": "a" or "b" (visuals marked "b =" have a second arrangement).',
     '- "background": dots | grid | fine | diagonal | rings | plus | hex | waves | spots | floor | none: a light pattern under the visual. Every post in a set gets a different one.',
     '- "tint": sky | mint | lilac | sand: a light colour wash, for at most one post in three.',
@@ -146,7 +150,7 @@
     caption: 'Supplier bills still typed by hand? With AI inside Odoo, the bill is read, filled and matched to the purchase order. Finance only approves. Book a call at technext.asia.', hashtags: ['#Odoo', '#AI', '#Accounting'],
     visual: 'record', app: 'accountant', title: 'Vendor bill', crumb: 'Accounting · Draft', status: 'Draft', rows: [['Vendor', 'Harbourline Supplies', 'ai'], ['Bill date', '12 Sep 2026', 'ai'], ['Total', 'S$ 1,284.00', 'ai'], ['PO match', 'PO00123', 'ok']],
     note: 'Prepared by AI · a person approves', btn: 'Approve', steps: ['AI read the bill', 'Matched to PO00123', 'Approved by Finance'], bubble: 'PO matched!', nexi: 'point',
-    background: 'hex', props: ['invoice'], accents: [{ type: 'stamp', text: 'MATCHED', tone: 'blue' }] });
+    look: 'corner', accent: 'blue', decor: 'circle', heroSize: 'big', tilt: 'soft', background: 'hex', props: ['invoice'], accents: [{ type: 'stamp', text: 'MATCHED', tone: 'blue' }] });
 
   function buildPrompt(o) {
     var angles = ANGLES.filter(function (a) { return o.angles.indexOf(a[0]) > -1; }), vis = visualsFor(o);
@@ -165,8 +169,13 @@
       '4. When the post is about Odoo, show Odoo from the inside: the right app (module), its menu, realistic record names (S00231, BILL/2026/0311, WH/IN/00042) and sample data.',
       '5. Make it look like a poster: mix the visuals, arrangements, backgrounds, props and accents (see DESIGN KNOBS) so no two posts look alike.' + (o.industry ? ' Every post should show ' + C.industries[o.industry].noun + ': their records, their products, their props.' : ''),
       '',
-      'EVERY POST DIFFERENT',
+      'FRESH DESIGN, EVERY TIME',
       '- Use a different visual for every post; repeat one only when there are more posts than visuals, and then with different content and callouts.',
+      '- No two posts in this set share a look, an accent, a headline decor, a hero size or a background pattern. Mix them so the set reads as eight different posters, not one template.',
+      '- Never repeat a visual + look pair already in the library' + ((o.existingDesigns || []).length ? ': ' + o.existingDesigns.slice(0, 40).join(', ') : '') + '.',
+      '- Vary the weight: one post with a big hero and nothing else, one busy with props and accents, one carried by a single number or a single sticker.',
+      '- Nexi appears in at most one post out of three; the others use props, stickers or nothing.',
+      '- Match the look to the story: a colour panel for a bold hook, paper for documents and bills, outline for checklists and steps, spotlight for an industry poster, stack for a desk full of paperwork.',
       '- Each post takes a different angle, from: ' + angles.map(function (a) { return a[1]; }).join('; ') + '.',
       '- No two headlines start with the same word.' + ((o.existing || []).length ? ' Do not repeat these existing headlines: ' + o.existing.slice(0, 25).join(' / ') : ''),
       '',
@@ -194,7 +203,7 @@
   }
 
   function tokens(text) { return Math.ceil(String(text || '').length / 4); }
-  var OUT_PER_POST = 440;
+  var OUT_PER_POST = 470;
   function estimate(o) { var p = buildPrompt(o); return { prompt: p, input: tokens(p), output: o.count * OUT_PER_POST }; }
 
   var SAMPLE = null;

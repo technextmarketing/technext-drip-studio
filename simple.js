@@ -72,8 +72,9 @@
   /* the builder's toolkit: every builder places its elements for a subline ending near y 406 (T = 440);
      settle() then moves and, if needed, scales the whole group into the space the real copy leaves */
   function stage(d) {
-    var a = { T: T0, m: size };
+    var a = { T: T0, m: size, tiltK: d._tiltK == null ? 1 : d._tiltK };
     a.add = function (L, vx, vy, role) {
+      if (L.rot && role !== 'fx' && a.tiltK !== 1) L.rot = +Math.max(-9, Math.min(9, L.rot * a.tiltK)).toFixed(1);
       var m = size(L), s = L.s || 1;
       L.x = Math.round(vx - m.w * (1 - s) / 2); L.y = Math.round(vy - m.h * (1 - s) / 2); L._m = m; L._r = role || 'main';
       d.layers.push(L); return box(vx, vy, m.w * s, m.h * s);
@@ -429,6 +430,15 @@
 
   /* ================= v5: Odoo documents and cards, poster layouts ================= */
   var PATTERNS = ['dots', 'grid', 'fine', 'diagonal', 'rings', 'plus', 'hex', 'waves', 'spots', 'floor'];
+  /* looks: whole-post design directions under the fixed frame */
+  var LOOKS = ['clean', 'band', 'navy', 'corner', 'outline', 'paper', 'spotlight', 'stack'];
+  var LOOK_ABOUT = { clean: 'white cards on a light floor', band: 'a blue panel across the lower half, white cards and white pills on it', navy: 'a navy panel, white cards, yellow pills', corner: 'a big blue rounded shape in the lower-right corner behind the visual', outline: 'printed sticker look: navy outlines and hard offset shadows on every card and pill', paper: 'warm cream cards and coral handwriting on a sand background', spotlight: 'a warm glow and a huge faded industry illustration behind the visual', stack: 'cards on a desk: paper sheets behind each one, stronger tilts, a floor grid' };
+  var ACCENTS = ['blue', 'navy', 'teal', 'coral', 'purple', 'yellow'];
+  var DECORS = ['none', 'circle', 'underline', 'marker', 'strokes', 'box'];
+  var LOOK_ACC = { navy: 'yellow', outline: 'navy', paper: 'coral', band: 'blue', corner: 'blue' };
+  var HERO = ['normal', 'big', 'small'], TILTS = ['soft', 'flat', 'strong'], TILT_K = { flat: 0, soft: 1, strong: 1.9 };
+  var NEXI_OPT = { workorder: 1, chart: 1, board: 1, spotlight: 1, pyramid: 1, groups: 1, phases: 1, people: 1 };
+  function shuffle(list, r) { var a = list.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)), t2 = a[i]; a[i] = a[j]; a[j] = t2; } return a; }
   var TINTS = ['sky', 'mint', 'lilac', 'sand'];
   var DOCKINDS = ['quote', 'order', 'invoice', 'bill', 'po', 'delivery', 'receipt'];
   var PICOS = ['box', 'shirt', 'cup', 'bag', 'bowl', 'bottle', 'tool', 'pill', 'chair', 'plant'];
@@ -768,38 +778,76 @@
       visual: vis, variant: (({ a: 0, b: 1, c: 2 })[clean(p.arrangement).toLowerCase()] != null ? ({ a: 0, b: 1, c: 2 })[clean(p.arrangement).toLowerCase()] : parseInt(p.variant, 10) || 0) % (VIS[vis].variants || 1),
       mirror: !!p.mirror && !!VIS[vis].mirror, ground: p.ground != null ? p.ground : GROUND,
       pattern: PATTERNS.indexOf(p.background) > -1 ? p.background : undefined, tint: TINTS.indexOf(p.tint) > -1 ? p.tint : undefined,
+      look: pick(LOOKS, p.look, 'clean'), heroSize: pick(HERO, p.heroSize, 'normal'), tilt: pick(TILTS, p.tilt, 'soft'),
       badge: ctx.cat === 'services' ? '' : ctx.cat === 'odoo20' || p.badge === 'o20' ? 'o20' : 'ready',
-      copy: ctx.copy ? JSON.parse(JSON.stringify(ctx.copy)) : { head: head, sub: sub || undefined, kicker: t(p.kicker, 28) || undefined }, layers: [],
+      copy: ctx.copy ? JSON.parse(JSON.stringify(ctx.copy)) : { head: head, sub: sub || undefined, kicker: t(p.kicker, 28) || undefined, decor: pick(DECORS, p.decor, 'none') }, layers: [],
       caption: t(p.caption, 900) || undefined, hashtags: strs(p.hashtags, 6, 30).map(function (h) { h = h.replace(/\s+/g, ''); return h.charAt(0) === '#' ? h : '#' + h; }),
       source: ctx.source || '', post: p
     };
+    d.accent = LOOK_ACC[d.look] || pick(ACCENTS, p.accent, 'blue');
+    if (d.look === 'paper' && !d.tint) d.tint = 'sand';
+    if (d.look === 'stack') { if (p.tilt == null) d.tilt = 'strong'; if (!d.pattern && p.background !== 'none') d.pattern = 'floor'; }
+    if (d.look === 'spotlight') d.watermark = propName(p.prop, ctx) || propName('', ctx, (ctx.index || 0) + 2) || 'rocket';
+    d._tiltK = TILT_K[d.tilt];
     var a = stage(d);
     VIS[vis].build(p, a, ctx, d);
+    if (d.look === 'stack') d.layers.forEach(function (L) { if (L._r === 'main' && CARDISH[L.type] && !L.stack) L.stack = 2; });
+    var hk = { big: 1.1, small: .9 }[d.heroSize] || 1;
+    if (hk !== 1) {
+      var grp = d.layers.filter(function (L) { return L._r && L.type !== 'sparkles' && L.type !== 'sphere'; }), gtop = Infinity;
+      grp.forEach(function (L) { gtop = Math.min(gtop, vbox(L).y); });
+      grp.forEach(function (L) { scaleAbout(L, W / 2, gtop, hk); });
+    }
     var acc = arr(p.accents).slice(0, 3);
     strs(p.props, 2, 20).forEach(function (n) { acc.push({ type: 'prop', name: n }); });
     if (p.sticker) acc.push(Object.assign({ type: 'sticker' }, obj(p.sticker)));
     if (p.stamp) acc.push(Object.assign({ type: 'stamp' }, obj(p.stamp)));
     var hasProp = acc.some(function (x) { x = obj(x); return x.type === 'prop' || (!x.type && x.name); }) || vis === 'spotlight' || d.layers.some(function (L) { return L.type === 'prop'; });
     if (!hasProp && ctx.industry && p.autoProp !== false) acc.push({ type: 'prop', name: '', w: 150 });
+    if (/^(band|navy|corner)$/.test(d.look)) acc.forEach(function (x) { if (x && typeof x === 'object' && (x.type === 'prop' || (!x.type && x.name))) x.tile = true; });
     placeAccents(a, d, acc.slice(0, 4), ctx);
     if (d.mirror) mirror(d);
-    settle(d, copyBottom(d.copy) + 34, VIS[vis].center);
+    var T2 = copyBottom(d.copy) + 34;
+    settle(d, T2, VIS[vis].center);
+    if (/^(band|navy|spotlight)$/.test(d.look)) d.panelY = T2 - 30;
+    delete d._tiltK;
+    if (d.look === 'clean') delete d.look; if (d.accent === 'blue') delete d.accent; if (d.heroSize === 'normal') delete d.heroSize; if (d.tilt === 'soft') delete d.tilt;
+    if (d.copy && d.copy.decor === 'none') delete d.copy.decor;
     d.layers.forEach(function (L) { delete L._m; delete L._r; Object.keys(L).forEach(function (k) { if (L[k] === undefined) delete L[k]; }); });
     if (!d.hashtags.length) delete d.hashtags;
     Object.keys(d).forEach(function (k) { if (d[k] === undefined) delete d[k]; });
     return d;
   }
-  /* every post in a set: a different visual where Claude chose one, alternating sides and arrangements,
-     and its own background pattern (a different order on every run) */
-  function diversify(posts, seed) {
-    var seen = {}, last = {}, used = {}, r = R.rng((seed || Date.now()) % 1e9), pool = PATTERNS.slice(), pi = 0;
-    for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)), tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp; }
-    return arr(posts).map(function (p, i) {
-      p = p || {}; var v = VIS[p.visual] ? p.visual : guess(p), n = seen[v] || 0; seen[v] = n + 1;
+  /* every post in a set gets its own design: visual, arrangement, side, look, accent colour, headline
+     decoration, hero size, tilt and background pattern, all different from the other posts in the set and
+     from the visual+look pairs already in the library (usedLib), so a second generation never repeats the first */
+  function diversify(posts, seed, usedLib) {
+    var seen = {}, last = {}, used = {}, r = R.rng((seed || Date.now()) % 1e9), pool = shuffle(PATTERNS, r), pi = 0;
+    var looksPool = shuffle(LOOKS, r), accPool = shuffle(ACCENTS, r), decPool = shuffle(DECORS.slice(1), r).concat(['none']), li = 0, ai = 0, di = 0;
+    var libPairs = {}, setLooks = {}, setAcc = {}, setDec = {}, list = arr(posts), n = list.length, nexiN = 0, quota = Math.ceil(n / 3);
+    arr(usedLib).forEach(function (u) { if (u) libPairs[(u.visual || '') + '|' + (u.look || 'clean')] = 1; });
+    return list.map(function (p, i) {
+      p = p || {}; var v = VIS[p.visual] ? p.visual : guess(p), k = seen[v] || 0; seen[v] = k + 1;
       p.visual = v;
-      if (p.mirror == null) p.mirror = !!VIS[v].mirror && (n ? !last[v] : i % 2 === 1);
+      if (p.mirror == null) p.mirror = !!VIS[v].mirror && (k ? !last[v] : i % 2 === 1);
       last[v] = !!p.mirror;
-      if (p.variant == null && p.arrangement == null) p.variant = n;
+      if (p.variant == null && p.arrangement == null) p.variant = k;
+      var lk = LOOKS.indexOf(p.look) > -1 && !setLooks[p.look] && !libPairs[v + '|' + p.look] ? p.look : null, g;
+      if (!lk) { for (g = 0; g < LOOKS.length && !lk; g++) { var c1 = looksPool[(li + g) % LOOKS.length]; if (!setLooks[c1] && !libPairs[v + '|' + c1]) lk = c1; } }
+      if (!lk) { for (g = 0; g < LOOKS.length && !lk; g++) { var c1b = looksPool[(li + g) % LOOKS.length]; if (!setLooks[c1b]) lk = c1b; } }
+      if (!lk) lk = looksPool[li % LOOKS.length];
+      li++; setLooks[lk] = 1; p.look = lk;
+      var ac = LOOK_ACC[lk] || (ACCENTS.indexOf(p.accent) > -1 && !setAcc[p.accent] ? p.accent : null);
+      if (!ac) { for (g = 0; g < ACCENTS.length && !ac; g++) { var c2 = accPool[(ai + g) % ACCENTS.length]; if (!setAcc[c2]) ac = c2; } ai++; }
+      if (!ac) ac = accPool[ai++ % ACCENTS.length];
+      setAcc[ac] = 1; p.accent = ac;
+      var dc = DECORS.indexOf(p.decor) > -1 && !setDec[p.decor] ? p.decor : null;
+      if (!dc) { for (g = 0; g < DECORS.length && !dc; g++) { var c3 = decPool[(di + g) % DECORS.length]; if (!setDec[c3]) dc = c3; } di++; }
+      if (!dc) dc = decPool[di++ % DECORS.length];
+      setDec[dc] = 1; p.decor = dc;
+      if (HERO.indexOf(p.heroSize) < 0) p.heroSize = HERO[i % 3];
+      if (TILTS.indexOf(p.tilt) < 0) p.tilt = TILTS[(i + 1) % 3];
+      if (p.nexi) { if (nexiN >= quota && NEXI_OPT[v]) delete p.nexi; else nexiN++; }
       var bg = p.background;
       if (bg !== 'none' && (PATTERNS.indexOf(bg) < 0 || used[bg])) { var guard = 0; while (used[pool[pi % pool.length]] && guard++ < pool.length) pi++; bg = pool[pi % pool.length]; pi++; }
       if (bg !== 'none') used[bg] = 1;
@@ -807,19 +855,32 @@
       return p;
     });
   }
+  /* a design the drip does not have yet, for the editor's "Fresh design" button */
+  function fresh(d) {
+    var r = R.rng(Date.now() % 1e9), not = function (list, cur) { var o = list.filter(function (x) { return x !== cur; }); return o[Math.floor(r() * o.length)]; };
+    var look = not(LOOKS, d.look || 'clean');
+    return { look: look, accent: LOOK_ACC[look] || not(ACCENTS, d.accent || 'blue'), decor: not(DECORS, (d.copy && d.copy.decor) || 'none'), pattern: not(PATTERNS, d.pattern || ''),
+      tilt: not(TILTS, d.tilt || 'soft'), heroSize: not(HERO, d.heroSize || 'normal'), variant: (d.variant || 0) + 1, mirror: !d.mirror };
+  }
   /* the editor's "Mirror" and "Re-layout": rebuild from the post, keeping the edited headline, subline and caption */
   function relayout(d, change, ctx) {
     var p = JSON.parse(JSON.stringify(d.post || {}));
     p.head = (d.copy && d.copy.head) || p.head; p.sub = (d.copy && d.copy.sub) || p.sub;
     p.caption = d.caption || p.caption; p.hashtags = d.hashtags || p.hashtags; p.name = d.name || p.name; p.ground = d.ground;
     p.mirror = change && change.mirror != null ? change.mirror : d.mirror; p.variant = change && change.variant != null ? change.variant : d.variant; delete p.arrangement;
-    p.background = d.pattern || 'none'; p.tint = d.tint;
-    var c2 = {}; Object.keys(ctx || {}).forEach(function (k) { c2[k] = ctx[k]; }); c2.copy = d.copy;
+    change = change || {};
+    p.background = change.pattern != null ? change.pattern : (d.pattern || 'none'); p.tint = change.tint != null ? change.tint : d.tint;
+    ['look', 'accent', 'tilt', 'heroSize'].forEach(function (k) { p[k] = change[k] != null ? change[k] : d[k]; });
+    if (change.look != null && !LOOK_ACC[change.look] && change.accent == null && LOOK_ACC[d.look]) p.accent = undefined;
+    var c2 = {}; Object.keys(ctx || {}).forEach(function (k) { c2[k] = ctx[k]; }); c2.copy = JSON.parse(JSON.stringify(d.copy || {}));
+    if (change.decor != null) c2.copy.decor = change.decor;
     var n = compose(p, c2);
+    if (n.copy && (n.copy.decor === 'none' || !n.copy.decor)) delete n.copy.decor;
     if (d.badge != null) n.badge = d.badge;
     return n;
   }
 
-  window.TNSimple = { compose: compose, diversify: diversify, relayout: relayout, forCat: forCat, VIS: VIS, POSES: POSES, GROUND: GROUND, PATTERNS: PATTERNS, TINTS: TINTS, IND_VIS: IND_VIS,
+  window.TNSimple = { compose: compose, diversify: diversify, relayout: relayout, fresh: fresh, forCat: forCat, VIS: VIS, POSES: POSES, GROUND: GROUND, PATTERNS: PATTERNS, TINTS: TINTS, IND_VIS: IND_VIS,
+    LOOKS: LOOKS, LOOK_ABOUT: LOOK_ABOUT, LOOK_ACC: LOOK_ACC, ACCENTS: ACCENTS, DECORS: DECORS, HERO: HERO, TILTS: TILTS,
     canMirror: function (v) { return !!(VIS[v] && VIS[v].mirror); }, hasVariants: function (v) { return !!(VIS[v] && (VIS[v].variants || 1) > 1); } };
 })();

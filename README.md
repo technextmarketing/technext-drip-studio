@@ -8,15 +8,28 @@ badge top right. The headline and subline are centred on top at the standard siz
 no Odoo badge. A short blue bar above the headline (the "kicker", such as "Reasons your customer") is
 optional.
 
-**Under the subline sits one visual** that shows the headline, in flat white cards:
+**Under the subline sits one visual** that shows the headline, and every post gets its own design:
 
-- the visuals: Odoo documents and screens, a phone, Nexi (the TechNext robot), handwritten blue pills,
+- the visuals: Odoo documents and screens, a phone, Nexi (the TechNext robot), handwritten pills,
   step chips and sparkles;
-- depth effects: stacked paper sheets, tilts and pop-outs;
+- a **look**, the whole design direction: Clean (white cards on a light floor), Blue panel, Navy panel,
+  Blue corner, Outline (printed-sticker look with hard shadows), Paper (cream cards, coral handwriting),
+  Spotlight (a warm glow and a huge faded industry illustration) or Desk stack (paper sheets behind
+  tilted cards);
+- an **accent colour** for pills, handwriting, chip icons and sparkles: blue, navy, teal, coral, purple
+  or yellow;
+- a **headline accent** on the blue words: a coral circle, a yellow brush underline, a marker, strokes
+  or a white-on-blue box;
+- card size (small, normal, big) and tilt (flat, soft, strong), stacked paper sheets and pop-outs;
 - stamps, stickers and industry props (a chef hat, an oven, a hard hat, a server…);
 - a light background: plain, a soft blue floor, or one of ten patterns (dots, grid lines, fine grid,
   diagonal, rings, plus, hexagons, waves, light spots, floor grid). The patterns fade out behind the
   headline.
+
+**Fresh design, every time.** Posts in one set never share a look, an accent, a headline accent, a size
+or a pattern, and a new set never repeats a visual + look pair already in that category's library. The
+same applies when you generate again for the same industry: the studio passes what the library already
+has to Claude and checks the answer.
 
 ## Where it runs
 
@@ -95,10 +108,12 @@ phases, dashboard, app record flows, service pages, portfolio sites). For every 
 - which visual to use (a different one for every post);
 - every word inside the visual, tied to the headline, using sample data only;
 - the **design knobs**, so each post looks like its own poster:
+  - the look, the accent colour, the headline accent, the card size and tilt;
   - arrangement (a or b), background pattern, tint and a kicker bar;
   - 1-2 industry props;
   - up to two accents: sticker, stamp, sticky note, avatars, toggle, timer, progress ring, search bar,
     map pin, barcode, button or scribble.
+- Nexi appears in at most one post out of three.
 
 `simple.js` lays each post out. Posts arrive as **drafts**: Keep, Edit or Discard. Drafts are saved too.
 
@@ -106,14 +121,14 @@ phases, dashboard, app record flows, service pages, portfolio sites). For every 
 
 | Category | 3 posts | 6 posts | 9 posts |
 |---|---|---|---|
-| Industry (F&B, Kitchen, Retail…) | ~7,200 | ~8,600 | ~9,900 |
-| Meet Odoo 20 | ~7,200 | ~8,500 | ~9,800 |
-| Meet Odoo 20 + an industry focus | ~8,400 | ~9,700 | ~11,000 |
-| Odoo apps | ~8,600 | ~9,900 | ~11,200 |
-| AI in Odoo | ~7,300 | ~8,700 | ~10,000 |
-| Websites & marketing | ~4,100 | ~5,400 | ~6,700 |
+| Industry (F&B, Kitchen, Retail…) | ~8,000 | ~9,400 | ~10,800 |
+| Meet Odoo 20 | ~7,900 | ~9,300 | ~10,700 |
+| Meet Odoo 20 + an industry focus | ~9,200 | ~10,600 | ~12,000 |
+| Odoo apps | ~9,300 | ~10,700 | ~12,100 |
+| AI in Odoo | ~8,100 | ~9,500 | ~10,900 |
+| Websites & marketing | ~4,900 | ~6,300 | ~7,700 |
 
-The prompt (input) is about 2,700-7,300 tokens. Each post adds about 440 output tokens (the post, its
+The prompt (input) is about 3,500-8,000 tokens. Each post adds about 470 output tokens (the post, its
 visual's data and its design knobs). The Balanced and Best models also think before answering; that is
 billed on the plan but not reported. Fast does not think first. Everything runs on the viewer's own
 Claude plan, not an API bill. **Claude usage** logs every run.
@@ -132,16 +147,31 @@ Claude plan, not an API bill. **Claude usage** logs every run.
 - **Keyboard:** arrows nudge (Shift = 10 px), Delete, Ctrl+D duplicate, Ctrl+C / Ctrl+V (also between drips),
   `]` / `[` forward / backward, Ctrl+Z / Ctrl+Shift+Z undo / redo, Esc deselects. Zoom with − Fit + in the bar.
 - **Design panel:**
-  - Background: Clean, Soft blue floor, or Blue shapes (the old blobs).
-  - Pattern: the ten patterns, or none.
-  - Tint: white, sky, mint, lilac or sand.
+  - Background: Clean, Soft blue floor, or Blue shapes (the old blobs); Pattern; Tint.
+  - Look, Accent colour and Headline accent (they restyle the post without moving anything).
+  - Card size and Tilt (they rebuild the layout).
+  - **Fresh design**: a look, colour, headline accent, pattern, size and tilt the post does not have yet.
   - Layout: **Mirror**, **Other arrangement** and **Reset layout**, which rebuilds the visual from its
     content and keeps the headline you edited.
   - The Odoo badge.
   - Drips made in the older v3 look get a **Switch to the clean style** button.
 - **Cards** can carry one or two paper sheets behind them ("Paper sheets behind" in the panel).
 - **Drop an image** on the canvas to add a person or product cut-out; a selected photo or Nexi gets replaced.
+  Any size works: photos are resized to 2400 px and uploaded to the hub's file store (cut-outs keep their
+  transparency). If the upload is not available, a small copy is embedded instead, so the drip always saves
+  (the hub keeps one drip under 256 KB).
 - Every drip has a **Post caption** and hashtags, with a Copy button. **4:5** portrait is in the bar.
+
+## Saving images
+
+- **Save PNG** in the editor bar, and a **Save** button on every card in the gallery, so a post can be
+  saved without opening it.
+- Image size: Standard (1080 px), **HD (2160 px, the default)** or Ultra (3240 px), chosen next to the
+  button and remembered on this browser. The PNG is rendered fresh at that size (vector cards and text,
+  not an upscaled screenshot).
+- **Save all** saves every drip shown in the gallery as one zip.
+- There is no size limit on saving; the hub shows one save prompt at a time, so answer it before saving
+  the next one. Locally, the server also writes the file into `exports/`.
 
 ## Elements
 
@@ -166,10 +196,10 @@ Claude plan, not an API bill. **Claude usage** logs every run.
 | `drips.js` | Categories and the starter library (13 drips; seeds new hubs and the mirror; the hub's database is the live copy). Each drip keeps the post it was built from, so Mirror and Reset layout work. |
 | `content.js` | technext.asia content. Refresh: `python tools/export_content.py` |
 | `industries-extra.js` | The Kitchen, IT & Tech and Field Service profiles written for the studio |
-| `drip.css`, `drip-render.js` | The drip design system, patterns, tints, logo, badge and renderer |
+| `drip.css`, `drip-render.js` | The drip design system: looks, accents, headline decorations, patterns, tints, logo, badge and renderer |
 | `odoo-ui.js`, `cards.js` | Inside-Odoo screens and cards (documents, product, work order, ticket, calendar…), charts, poster elements |
 | `props.js` | The industry props |
-| `simple.js` | The layout engine: one post → a drip, accents in free space, and the variety across a set |
+| `simple.js` | The layout engine: one post → a drip, accents in free space, looks and the variety across a set (`diversify`, `fresh`) |
 | `starters.js` | The 30 starters for "New drip" (built from the website content; some follow the chosen industry) |
 | `ai.js` | The prompt (visuals, design knobs, props), industry detection, the Claude call and token estimates |
 | `store.js` | Saving: hub database / asset store / downloads, or this browser |
