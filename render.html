@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Drip render</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="drip.css">
+<style>html,body{margin:0;background:#fff}#out{display:block;width:max-content}</style>
+</head>
+<body>
+<!-- Renders one drip at full size for tools/render.py and tools/serve.py: render.html?id=<drip id>[&format=4:5] or ?src=<json url> -->
+<div id="out"></div>
+<script src="content.js"></script>
+<script src="drips.js"></script>
+<script src="drip-render.js"></script>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search), id = q.get('id');
+  function go(d) {
+    d = JSON.parse(JSON.stringify(d));
+    if (q.get('format')) d.format = q.get('format');
+    var out = document.getElementById('out'); out.appendChild(TNDrip.render(d)); TNDrip.fit(out);
+    var imgs = [].slice.call(document.images).map(function (im) { return im.complete ? 1 : new Promise(function (r) { im.onload = im.onerror = r; }); });
+    Promise.all(imgs.concat([document.fonts.ready])).then(function () { TNDrip.fit(out); document.body.setAttribute('data-ready', '1'); });
+  }
+  if (q.get('src')) fetch(q.get('src')).then(function (r) { return r.json(); }).then(go);
+  else go(window.DRIPS.filter(function (x) { return x.id === id; })[0] || window.DRIPS[0]);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+/* TechNext Drip Studio — renderer. Turns one drip object (see drips.js) into a 1080px canvas.
+   Used by the studio (index.html) and by tools/render.py for batch PNG export. */
+(function () {
+  var C = window.TN_CONTENT || {};
+  var uid = 0;
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  /* headline markup: *blue*  ~brush underline~  ==marker==  [[blue box]]  {odoo}purple{/odoo}  | line break */
+  function rich(s) {
+    return esc(s)
+      .replace(/\[\[(.+?)\]\]/g, '<span class="hl">$1</span>')
+      .replace(/==(.+?)==/g, '<mark>$1</mark>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/~(.+?)~/g, '<u>$1</u>')
+      .replace(/\{odoo\}(.+?)\{\/odoo\}/g, '<span class="odoo">$1</span>')
+      .replace(/\s*\|\s*/g, '<br>');
+  }
+  function asset(p) { if (!p) return ''; if (/^(data:|blob:|https?:)/.test(p)) return p; return (window.TN_ASSET_BASE || '') + p; }
+  function oi(app, cls) { return '<img class="oi' + (cls ? ' ' + cls : '') + '" src="' + asset('assets/odoo/' + app + '.svg') + '" alt="">'; }
+  function icon(name) {
+    var s = (C.icons && C.icons[name]) || '';
+    return s.replace('class="ic"', 'class="ic" style="width:100%;height:100%"');
+  }
+
+  /* ---------- inline SVG kit ---------- */
+  var SVG = {
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+    spark: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c.6 4.6 2.4 7.1 7 8-4.6.9-6.4 3.4-7 8-.6-4.6-2.4-7.1-7-8 4.6-.9 6.4-3.4 7-8Z"/><path d="M19 15c.3 2 1 3 3 3.4-2 .4-2.7 1.4-3 3.6-.3-2.2-1-3.2-3-3.6 2-.4 2.7-1.4 3-3.4Z"/></svg>',
+    wifiOff: '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><g stroke="#1F1F3D" stroke-width="2.3"><path d="M3.5 9.2a12 12 0 0 1 17 0"/><path d="M6.8 12.6a7.3 7.3 0 0 1 10.4 0"/><path d="M10 15.9a2.8 2.8 0 0 1 4 0"/></g><circle cx="12" cy="19.2" r="1.3" fill="#1F1F3D"/><path d="M4 3.5 20 20.5" stroke="#fff" stroke-width="5.5"/><path d="M4 3.5 20 20.5" stroke="#D93A30" stroke-width="2.8"/></svg>',
+    cloudOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10.5a3.5 3.5 0 0 0 .9-6.9A6 6 0 0 0 7.2 9.1 4.5 4.5 0 0 0 7 18Z"/><path d="m3 3 18 18"/></svg>',
+    cloudOk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10.5a3.5 3.5 0 0 0 .9-6.9A6 6 0 0 0 7.2 9.1 4.5 4.5 0 0 0 7 18Z"/><path d="m9.5 13.5 2 2 3.5-4"/></svg>',
+    sync: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.3-4.3L4 8.5"/><path d="M4 4v4.5h4.5"/><path d="M4 13a8 8 0 0 0 14.3 4.3l1.7-1.8"/><path d="M20 20v-4.5h-4.5"/></svg>',
+    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>'
+  };
+  function kit(name) { return SVG[name] || icon(name); }
+
+  function blobs(variant) {
+    var g = 'b' + (++uid);
+    var dy = variant === 'blobs-low' ? 70 : 0;
+    var L = 'M-60 300C-10 178 170 150 282 226C372 288 356 372 318 440H-60Z', R = 'M1140 236C1052 170 884 196 846 290C814 368 858 420 884 440H1140Z';
+    return '<svg viewBox="0 0 1080 440" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><defs>' +
+      '<linearGradient id="' + g + 'a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DFE9FC"/><stop offset="1" stop-color="#B3CCF6"/></linearGradient>' +
+      '<linearGradient id="' + g + 'b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#63A8FF"/><stop offset=".5" stop-color="#2F72EA"/><stop offset="1" stop-color="#1A48A8"/></linearGradient>' +
+      '<linearGradient id="' + g + 'c" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#72B4FF"/><stop offset=".55" stop-color="#3474E8"/><stop offset="1" stop-color="#1A46A6"/></linearGradient>' +
+      '<radialGradient id="' + g + 'h" cx=".32" cy=".18" r=".62"><stop offset="0" stop-color="#fff" stop-opacity=".62"/><stop offset=".45" stop-color="#fff" stop-opacity=".14"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>' +
+      '<radialGradient id="' + g + 'k" cx=".7" cy=".16" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".58"/><stop offset=".45" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>' +
+      '<linearGradient id="' + g + 's" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>' +
+      '<g transform="translate(0 ' + dy + ')">' +
+      '<path d="M0 262C130 196 262 182 392 232C520 282 628 318 780 286C914 258 1004 206 1080 214V440H0Z" fill="url(#' + g + 'a)" opacity=".9"/>' +
+      '<path d="M120 300C300 250 460 330 620 320C780 310 900 250 1080 262" stroke="url(#' + g + 's)" stroke-width="5" fill="none" opacity=".8"/>' +
+      '<path d="' + L + '" fill="url(#' + g + 'b)"/><path d="' + L + '" fill="url(#' + g + 'h)"/>' +
+      '<path d="M-24 250C30 200 118 190 176 214" stroke="#fff" stroke-opacity=".55" stroke-width="7" stroke-linecap="round" fill="none"/>' +
+      '<path d="' + R + '" fill="url(#' + g + 'c)"/><path d="' + R + '" fill="url(#' + g + 'k)"/>' +
+      '<path d="M916 228C962 204 1022 200 1076 216" stroke="#fff" stroke-opacity=".5" stroke-width="7" stroke-linecap="round" fill="none"/>' +
+      '</g></svg>';
+  }
+  function wave() {
+    var g = 'w' + (++uid);
+    return '<svg viewBox="0 0 1080 300" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><defs><linearGradient id="' + g + '" x1="0" x2="1"><stop offset="0" stop-color="#2F72EA"/><stop offset="1" stop-color="#5DA4FF"/></linearGradient></defs>' +
+      '<path d="M0 180C180 120 320 230 540 190C760 150 880 90 1080 130V300H0Z" fill="#DCE8FC"/>' +
+      '<path d="M0 230C200 170 360 270 560 236C780 198 900 170 1080 196V300H0Z" fill="url(#' + g + ')"/></svg>';
+  }
+  function sparkles(color) {
+    var c = color || '#FFC83D', c2 = '#3F86F7';
+    var star = function (x, y, s, f) { return '<path transform="translate(' + x + ' ' + y + ') scale(' + s + ')" d="M0-50C6-10 10-6 50 0C10 6 6 10 0 50C-6 10-10 6-50 0C-10-6-6-10 0-50Z" fill="' + f + '"/>'; };
+    return '<svg viewBox="0 0 200 200" aria-hidden="true">' + star(70, 80, 1, c) + star(150, 40, .45, c2) + star(160, 150, .55, c) + star(30, 170, .3, c2) + '</svg>';
+  }
+  function arrowSvg(kind) {
+    var p = {
+      down: 'M20 10C70 20 110 60 100 150', right: 'M10 80C60 20 140 20 190 60', loop: 'M10 120C40 40 120 20 130 80C138 130 70 130 90 70C110 20 170 30 190 60',
+      left: 'M190 80C140 20 60 20 10 60', up: 'M100 150C60 120 40 80 60 10'
+    }[kind || 'right'];
+    var head = { down: 'M78 128 100 152 118 126', right: 'M164 40 192 62 162 78', loop: 'M166 40 192 62 164 76', left: 'M36 40 8 62 38 78', up: 'M40 30 60 8 80 30' }[kind || 'right'];
+    return '<svg viewBox="0 0 200 160" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + p + '"/><path d="' + head + '"/></svg>';
+  }
+  function storm() {
+    var g = 's' + (++uid);
+    return '<svg viewBox="0 0 320 300" aria-hidden="true"><defs>' +
+      '<linearGradient id="' + g + 'a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9B6D3"/><stop offset="1" stop-color="#5C6B90"/></linearGradient>' +
+      '<linearGradient id="' + g + 'b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE27A"/><stop offset="1" stop-color="#FFB21F"/></linearGradient></defs>' +
+      '<g stroke="#6FA0F5" stroke-width="6" stroke-linecap="round" opacity=".85"><path d="M88 170 70 214"/><path d="M130 176 108 232"/><path d="M226 172 206 222"/><path d="M262 166 250 196"/></g>' +
+      '<path d="M78 164C36 164 14 138 18 110C22 80 50 64 78 70C84 36 116 14 152 18C188 22 210 46 214 74C246 64 286 82 294 116C302 150 276 168 246 168Z" fill="url(#' + g + 'a)"/>' +
+      '<path d="M60 96C70 80 90 74 108 80M150 40C172 38 190 48 198 64" stroke="#fff" stroke-opacity=".5" stroke-width="8" stroke-linecap="round" fill="none"/>' +
+      '<path d="M168 140 128 214H164L140 292 222 188H182L206 140Z" fill="url(#' + g + 'b)" stroke="#E08A00" stroke-width="5" stroke-linejoin="round"/></svg>';
+  }
+  function speed() {
+    return '<svg viewBox="0 0 300 200" fill="none" stroke="#3F86F7" stroke-linecap="round" aria-hidden="true"><path d="M20 40H200" stroke-width="10" opacity=".9"/><path d="M60 90H280" stroke-width="12"/><path d="M10 140H170" stroke-width="8" opacity=".7"/><path d="M90 185H240" stroke-width="6" opacity=".5"/></svg>';
+  }
+  function confetti() {
+    var cols = ['#3F86F7', '#FFC83D', '#21B799', '#714B67', '#6FA0F5'], s = '';
+    for (var i = 0; i < 26; i++) {
+      var x = (i * 73) % 400, y = (i * 131) % 300, r = (i * 47) % 180, c = cols[i % cols.length];
+      s += i % 3 ? '<rect x="' + x + '" y="' + y + '" width="16" height="7" rx="3" fill="' + c + '" transform="rotate(' + r + ' ' + x + ' ' + y + ')"/>' : '<circle cx="' + x + '" cy="' + y + '" r="5" fill="' + c + '"/>';
+    }
+    return '<svg viewBox="0 0 400 300" aria-hidden="true">' + s + '</svg>';
+  }
+
+  /* ---------- phone screens ---------- */
+  var SCREENS = {
+    'offline-receipt': function (L) {
+      var lines = L.lines || [['Cement, 40 kg bags', '20 / 20', 1], ['Rebar, 12 mm', '150 / 150', 1], ['Tile adhesive, 25 kg', '18 / 35', 0]];
+      return '<div class="ph-status"><span>9:41</span><span class="sig"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="x">✕</span></span></div>' +
+        '<div class="ph-top">' + oi(L.app || 'stock') + '<div><b>' + esc(L.title || 'Receipt WH/IN/00042') + '</b><small>' + esc(L.crumb || 'Inventory · Receipts') + '</small></div></div>' +
+        '<div class="ph-offline">' + SVG.cloudOff + '<span>' + esc(L.banner || "You're offline. Changes are saved on this phone.") + '</span></div>' +
+        '<div class="ph-body">' +
+        '<div class="ph-field"><small>Receive from</small><span>' + esc(L.partner || 'Sample Supplier Pte Ltd') + '</span></div>' +
+        lines.map(function (l) { return '<div class="ph-line"><span class="ck' + (l[2] ? '' : ' todo') + '">' + (l[2] ? SVG.check : '') + '</span>' + esc(l[0]) + '<span class="q">' + esc(l[1]) + '</span></div>'; }).join('') +
+        '</div><div class="ph-btn">' + esc(L.btn || 'Validate') + '</div>' +
+        (L.toast ? '<div class="ph-toast">' + SVG.sync + '<span>' + esc(L.toast) + '</span></div>' : '');
+    }
+  };
+
+  /* ---------- layers ---------- */
+  function flowSteps(L) {
+    if (L.steps) return L.steps;
+    var m = /^industry:(.+)$/.exec(L.from || '');
+    var ind = m && C.industries && C.industries[m[1]];
+    return ind ? ind.flow.map(function (f) { return { app: f.app, icon: f.icon, t: f.t, h: f.h }; }) : [];
+  }
+  function flow(L) {
+    var steps = flowSteps(L), cols = L.cols || 3, nw = L.nodeW || 270, nh = L.nodeH || 214, gx = L.gapX || 65, gy = L.gapY || 46;
+    var pos = steps.map(function (s, i) {
+      var r = Math.floor(i / cols), c = i % cols;
+      if ((L.layout || 'snake') === 'snake' && r % 2) c = cols - 1 - c;
+      return { x: c * (nw + gx), y: r * (nh + gy) };
+    });
+    var rows = Math.ceil(steps.length / cols), W = cols * nw + (cols - 1) * gx, H = rows * nh + (rows - 1) * gy;
+    var wires = '', mk = 'm' + (++uid);
+    for (var i = 0; i < steps.length - 1; i++) {
+      var a = pos[i], b = pos[i + 1], d;
+      if (a.y === b.y) {
+        var dir = b.x > a.x ? 1 : -1, y = a.y + nh / 2, x1 = dir > 0 ? a.x + nw + 8 : a.x - 8, x2 = dir > 0 ? b.x - 14 : b.x + nw + 14;
+        d = 'M' + x1 + ' ' + y + 'L' + x2 + ' ' + y;
+      } else {
+        var xx = a.x + nw / 2; d = 'M' + xx + ' ' + (a.y + nh + 8) + 'L' + xx + ' ' + (b.y - 14);
+      }
+      wires += '<path d="' + d + '" marker-end="url(#' + mk + ')"/>';
+    }
+    var svg = '<svg class="wires" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" fill="none" stroke="#3167CA" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 14" aria-hidden="true">' +
+      '<defs><marker id="' + mk + '" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#3167CA" stroke="none"/></marker></defs>' + wires + '</svg>';
+    var nodes = steps.map(function (s, i) {
+      return '<div class="fnode' + (L.hot === i ? ' hot' : '') + '" style="left:' + pos[i].x + 'px;top:' + pos[i].y + 'px;width:' + nw + 'px;height:' + nh + 'px">' +
+        (L.numbers === false ? '' : '<span class="n">' + (i + 1) + '</span>') +
+        (s.app ? oi(s.app) : '<span class="oi" style="color:#3167CA">' + icon(s.icon || 'check') + '</span>') +
+        '<span class="t">' + esc(s.t) + '</span><span class="h">' + esc(s.h) + '</span></div>';
+    }).join('');
+    return '<div class="flow" style="width:' + W + 'px;height:' + H + 'px">' + svg + nodes + '</div>';
+  }
+  function record(L) {
+    var rows = (L.rows || []).map(function (r) {
+      var mode = r[2] || '';
+      return '<div class="rec-row' + (mode === 'ai' ? ' ai' : '') + '"><span class="k">' + esc(r[0]) + '</span><span class="v">' + esc(r[1]) + '</span>' +
+        (mode === 'ok' ? '<span class="flag">' + SVG.check + (r[3] ? esc(r[3]) : '') + '</span>' : mode === 'ai' ? '<span class="spark">' + SVG.spark + '</span>' : '') + '</div>';
+    }).join('');
+    return '<div class="rec"><div class="rec-top">' + oi(L.app || 'accountant') + '<div><b>' + esc(L.title || '') + '</b><small>' + esc(L.crumb || '') + '</small></div>' +
+      (L.status ? '<span class="st' + (L.statusOk ? ' ok' : '') + '">' + esc(L.status) + '</span>' : '') + '</div>' +
+      '<div class="rec-rows">' + rows + '</div>' +
+      '<div class="rec-foot">' + (L.ai ? '<span class="ai">' + SVG.spark + esc(L.ai) + '</span>' : '') + (L.btn ? '<span class="btn">' + esc(L.btn) + '</span>' : '') + '</div></div>';
+  }
+  function frameShot(L) {
+    var img = '<img src="' + asset(L.src) + '" alt="">';
+    switch (L.frame) {
+      case 'browser': return '<div class="frame-browser"><div class="bar"><i></i><i></i><i></i><span>' + esc(L.url || 'yourcompany.odoo.com') + '</span></div>' + img + '</div>';
+      case 'laptop': return '<div class="frame-laptop"><div class="lid">' + img + '</div><div class="base"></div></div>';
+      case 'tablet': return '<div class="frame-tablet">' + img + '</div>';
+      default: return '<div class="shot" style="border-radius:' + (L.radius == null ? 18 : L.radius) + 'px">' + img + '</div>';
+    }
+  }
+
+  var LAYERS = {
+    nexi: function (L) { return (L.glow === false ? '' : '<span class="glow"></span>') + '<img src="' + asset('assets/nexi/nexi-' + (L.pose || 'wave') + '.png') + '" alt="Nexi">'; },
+    person: function (L, edit) {
+      if (!L.src) return edit ? '<div class="placeholder">Drop a person cut-out here<br><small style="font:500 20px Inter">(transparent PNG)</small></div>' : '';
+      return '<img src="' + asset(L.src) + '" alt="">' + (L.fade ? '<span class="fade"></span>' : '');
+    },
+    img: function (L) { return L.src ? '<img src="' + asset(L.src) + '" alt="" style="border-radius:' + (L.radius || 0) + 'px">' : ''; },
+    shot: function (L, edit) { return L.src ? frameShot(L) : (edit ? '<div class="placeholder" style="aspect-ratio:16/10">Drop a screenshot here</div>' : ''); },
+    phone: function (L) { var sc = L.src ? '<img src="' + asset(L.src) + '" alt="">' : (SCREENS[L.screen || 'offline-receipt'] || SCREENS['offline-receipt'])(L); return '<div class="phone"><div class="scr">' + sc + '</div></div>'; },
+    record: record,
+    flow: flow,
+    apps: function (L) {
+      var list = L.list || [];
+      return '<div class="apps" style="grid-template-columns:repeat(' + (L.cols || 4) + ',1fr)">' + list.map(function (a) {
+        var p = a.split(':'); return '<span class="a">' + oi(p[0]) + (L.labels === false ? '' : esc(p[1] || '')) + '</span>';
+      }).join('') + '</div>';
+    },
+    pill: function (L) { return '<span class="pill ' + esc(L.variant || '') + '">' + (L.icon ? kit(L.icon) : '') + esc(L.text) + '</span>'; },
+    chip: function (L) { return '<span class="chip"><span class="ico ' + esc(L.tone || '') + '">' + kit(L.icon || 'check') + '</span><span>' + esc(L.text) + (L.small ? '<small>' + esc(L.small) + '</small>' : '') + '</span></span>'; },
+    note: function (L) { return '<span class="note ' + esc(L.variant || '') + '" style="' + (L.size ? 'font-size:' + L.size + 'px;' : '') + (L.color ? 'color:' + L.color : '') + '"><span>' + esc(L.text) + '</span>' + (L.small ? '<span class="small">' + esc(L.small) + '</span>' : '') + '</span>'; },
+    bubble: function (L) { return '<span class="bubble">' + esc(L.text) + '</span>'; },
+    text: function (L) {
+      var f = { hand: 'var(--font-hand)', display: 'var(--font-display)', body: 'var(--font-body)' }[L.font || 'display'];
+      return '<div style="font-family:' + f + ';font-size:' + (L.size || 40) + 'px;font-weight:' + (L.weight || 700) + ';line-height:' + (L.lh || 1.15) + ';color:' + (L.color || 'var(--ink)') + ';text-align:' + (L.align || 'left') + ';letter-spacing:' + (L.ls || '-.01em') + '">' + rich(L.text) + '</div>';
+    },
+    icon: function (L) { return '<span style="display:block;aspect-ratio:1;color:' + (L.color || 'var(--blue)') + '">' + kit(L.name) + '</span>'; },
+    odoo: function (L) { return oi(L.app, '') .replace('class="oi"', 'class="oi" style="width:100%;height:auto"'); },
+    arrow: function (L) { return '<span style="display:block;color:' + (L.color || 'var(--blue)') + '">' + arrowSvg(L.kind) + '</span>'; },
+    sparkles: function (L) { return sparkles(L.color); },
+    storm: storm, speed: speed, confetti: confetti,
+    nosignal: function () { return '<span style="display:grid;place-items:center;aspect-ratio:1;border-radius:50%;background:#fff;color:#D93A30;padding:22%;box-shadow:0 20px 40px -18px rgba(19,47,102,.6),0 0 0 8px rgba(217,58,48,.12)">' + SVG.wifiOff + '</span>'; },
+    burst: function () { return ''; }, glow: function () { return ''; }, sphere: function () { return ''; }, halftone: function () { return ''; }, scan: function () { return ''; }
+  };
+  var FX = { burst: 1, glow: 1, sphere: 1, halftone: 1, scan: 1, sparkles: 1, storm: 1, speed: 1, confetti: 1, arrow: 1 };
+
+  function layerHTML(L, i, edit, tall) {
+    if (L.hide) return '';
+    var fn = LAYERS[L.type]; if (!fn) return '';
+    var inner = fn(L, edit);
+    if (!inner && !FX[L.type]) return '';
+    var y = L.y || 0; if (tall) y = L.y45 != null ? L.y45 : y >= 380 ? y + 150 : y;
+    var st = 'left:' + (L.x || 0) + 'px;' + (L.b != null ? 'bottom:' + L.b + 'px;' : 'top:' + y + 'px;') + (L.w ? 'width:' + L.w + 'px;' : '') +
+      'z-index:' + (L.z == null ? 10 : L.z) + ';' + (L.op != null && L.op !== 1 ? 'opacity:' + L.op + ';' : '') +
+      ((L.rot || L.flip || L.s) ? 'transform:rotate(' + (L.rot || 0) + 'deg)' + (L.flip ? ' scaleX(-1)' : '') + (L.s ? ' scale(' + L.s + ')' : '') + ';' : '');
+    var cls = 'L L-' + L.type + (FX[L.type] ? ' fx fx-' + L.type : '') + (L.variant && FX[L.type] ? ' ' + L.variant : '') + (L.sticker ? ' sticker' : '');
+    return '<div class="' + cls + '" data-i="' + i + '" style="' + st + '"><div class="in">' + inner + '</div></div>';
+  }
+
+  function badge(b) {
+    if (b === 'ready') return '<div class="d-badge ready"><img src="' + asset('assets/brand/odoo-ready-partner.png') + '" alt="Odoo Ready Partner"></div>';
+    if (b === 'o20') return '<div class="d-badge o20"><span class="meet">Meet</span><img class="wm" src="' + asset('assets/brand/odoo-wordmark.png') + '" alt="Odoo"><span class="v">20</span></div>';
+    return '';
+  }
+
+  function render(d, opts) {
+    opts = opts || {};
+    var el = document.createElement('div');
+    el.className = 'drip' + (d.format === '4:5' ? ' r45' : '') + (d.bg && d.bg !== 'light' ? ' bg-' + d.bg : '');
+    el.setAttribute('data-id', d.id);
+    var ground = d.ground == null ? 'blobs' : d.ground;
+    var h = '';
+    if (d.grid) h += '<div class="d-grid"></div>';
+    if (ground) h += '<div class="d-ground">' + (ground === 'wave' ? wave() : ground.indexOf('blobs') === 0 ? blobs(ground) : '') + '</div>';
+    h += '<img class="d-logo" src="' + asset('assets/brand/logo-horizontal.png') + '" alt="TechNext">' + badge(d.badge);
+    var c = d.copy || {};
+    h += '<div class="d-copy' + (c.align === 'left' ? ' left' : '') + '" style="top:' + ((c.top != null ? c.top : 148) + (d.format === '4:5' ? 40 : 0)) + 'px">' +
+      (c.quote ? '<span class="d-quote">“</span>' : '') +
+      (c.kicker ? '<span class="d-kicker">' + esc(c.kicker) + '</span>' : '') +
+      '<h2 class="d-head' + (c.size ? ' s-' + c.size : '') + '"' + (c.lines ? ' data-lines="' + (+c.lines) + '"' : '') + '>' + rich(c.head || '') + '</h2>' +
+      (c.sub ? '<p class="d-sub">' + rich(c.sub) + '</p>' : '') + '</div>';
+    (d.layers || []).forEach(function (L, i) { h += layerHTML(L, i, opts.edit, d.format === '4:5'); });
+    if (d.cta) h += '<div class="d-cta">' + esc(d.cta.text || '') + (d.cta.btn ? '<b>' + esc(d.cta.btn) + '</b>' : '') + '</div>';
+    el.innerHTML = h;
+    return el;
+  }
+
+  /* shrink the headline until it fits its line budget (copy.lines, default 2) and the subline to 3 lines */
+  function fit(root) {
+    [].slice.call((root || document).querySelectorAll('.drip')).forEach(function (el) {
+      var h = el.querySelector('.d-head'), p = el.querySelector('.d-sub');
+      [[h, +(h && h.dataset.lines) || 2, 44, 1.0], [p, 3, 22, 1.36]].forEach(function (a) {
+        var n = a[0]; if (!n) return;
+        n.style.fontSize = '';
+        var fs = parseFloat(getComputedStyle(n).fontSize), guard = 40;
+        while (n.offsetHeight > fs * a[3] * a[1] + 4 && fs > a[2] && guard--) { fs -= 2; n.style.fontSize = fs + 'px'; }
+        n.dataset.fit = n.style.fontSize ? 'shrunk' : '';
+      });
+    });
+  }
+
+  window.TNDrip = { render: render, fit: fit, rich: rich, esc: esc, asset: asset, LAYERS: LAYERS, SCREENS: SCREENS, flowSteps: flowSteps };
+})();

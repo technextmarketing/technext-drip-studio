@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TechNext Drip Studio</title>
+<meta name="description" content="Build TechNext marketing drip images (Odoo, AI and industry posts) from brand templates, then export them as PNG.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/brand/logo-plane.png">
+<link rel="stylesheet" href="drip.css">
+<link rel="stylesheet" href="studio.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><img src="assets/brand/logo-horizontal.png" alt="TechNext"><h1>Drip Studio</h1></div>
+    <span class="notice" id="notice" hidden></span>
+    <span class="sp"></span>
+    <button class="btn ghost" id="reset" type="button" title="Drop the edits kept in this browser">Discard edits</button>
+    <button class="btn" id="save" type="button" title="Download drips.js with every drip and category">Save library<span class="cnt"></span></button>
+    <button class="btn primary" data-new="1" type="button">New drip</button>
+  </header>
+  <div class="shell" id="shell">
+    <nav class="rail" id="rail" aria-label="Categories"></nav>
+    <main class="main" id="main"></main>
+    <aside class="insp" id="insp" aria-label="Edit drip" hidden></aside>
+  </div>
+</div>
+<div class="dlg" id="dlg" hidden></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="content.js"></script>
+<script src="drips.js"></script>
+<script src="drip-render.js"></script>
+<script src="studio.js"></script>
+</body>
+</html>
