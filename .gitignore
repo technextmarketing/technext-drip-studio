@@ -2,3 +2,7 @@ backups/
 __pycache__/
 *.pyc
 .claude/
+
+# renders from tools/render.py and the local server stay on this computer; only the samples are published
+exports/*
+!exports/samples/
