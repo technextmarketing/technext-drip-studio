@@ -280,7 +280,7 @@
       var c = cur().copy || {};
       h = '<button data-tool="edit">Edit text</button><button data-fs="-4" title="Smaller">A−</button><button data-fs="4" title="Bigger">A+</button>' +
         ['#1F1F3D', '#3167CA', '#FFFFFF'].map(function (col) { return '<button class="sw" data-color="' + col + '" title="Colour" style="--sw:' + col + '"></button>'; }).join('') +
-        ['left', 'center', 'right'].map(function (a) { return '<button data-calign="' + a + '"' + ((c.align || (c.x == null ? 'center' : 'left')) === a ? ' class="on"' : '') + ' title="Align ' + a + '">' + ico(ALIGN_SVG[a.charAt(0) === 'c' ? 'c' : a.charAt(0)]) + '</button>'; }).join('');
+        (c.x != null ? '<button data-stdframe="1" title="Back to the standard position">Reset position</button>' : '');
     } else {
       var L = cur().layers[st.sel];
       h = (TEXTY[L.type] ? '<button data-tool="edit">Edit text</button>' : '') +
@@ -669,10 +669,8 @@
       '<div class="f"><span>Background</span><div class="chips">' + K.BGS.map(function (s) { return '<button data-bgs="' + s + '"' + (bg && bg.style === s ? ' class="on"' : '') + '>' + s + '</button>'; }).join('') + '</div></div>' +
       '<div class="f"><span>Palette</span><div class="pals">' + ['blue', 'sky', 'mint', 'violet', 'sunrise', 'slate', 'night'].map(sw).join('') + '<button class="btn sm" data-reseed="1" title="Same style, new shapes">New shapes</button></div></div>' +
       '<div class="f"><span>Camera angle</span><div class="chips">' + K.CAMS.map(function (c) { return '<button data-cam="' + c + '"' + ((d.cam || 'front') === c ? ' class="on"' : '') + '>' + c + '</button>'; }).join('') + '</div></div>' +
-      (d.scene ? '<div class="f"><span>Headline placement (re-lays out the post)</span><div class="chips">' + K.LAYOUTS.map(function (l) { return '<button data-lay="' + l + '"' + (lk.layout === l ? ' class="on"' : '') + '>' + l + '</button>'; }).join('') + '</div></div>' : '') +
-      '<div class="f"><span>Logo</span><div class="chips">' + ['tl', 'tr', 'bl', 'br', 'none'].map(function (p) { return '<button data-logo="' + p + '"' + ((b.logo || (d.brand ? 'tl' : '')) === p ? ' class="on"' : '') + '>' + { tl: 'top left', tr: 'top right', bl: 'bottom left', br: 'bottom right', none: 'hidden' }[p] + '</button>'; }).join('') +
-      '<button data-logostyle="1"' + (b.style === 'chip' ? ' class="on"' : '') + '>glass chip</button></div></div>' +
-      '<div class="row"><label class="f"><span>Partner badge</span><select id="d-badge2">' + opts(['ready', 'o20', 'none'], b.badge || (d.brand ? 'ready' : d.badge || 'ready'), ['Odoo Ready Partner', 'Meet Odoo 20', 'None']) + '</select></label>' +
+      (d.brand || (d.copy && d.copy.x != null) ? '<div class="confirm" style="background:#FFF4D6;color:#7A5200">This drip uses a moved logo or headline. <button class="btn sm" data-stdframe="1">Use the standard frame</button></div>' : '') +
+      '<div class="row"><label class="f"><span>Odoo badge (top right)</span><select id="d-badge2">' + opts(['ready', 'o20', ''], d.brand ? (b.badge === 'none' ? '' : b.badge || 'ready') : d.badge == null ? 'ready' : d.badge, ['Odoo Ready Partner', 'Meet Odoo 20', 'None']) + '</select></label>' +
       (d.scene ? '<div class="f" style="align-self:end"><button class="btn sm primary" data-shuffle="1" style="width:100%">' + sparkIcon() + 'Shuffle look</button></div>' : '') + '</div></section>';
   }
   function renderInspector() {
@@ -743,7 +741,10 @@
   /* design panel actions */
   function ensureV3(d) {
     if (!d.bg || typeof d.bg !== 'object') { d.bg = { style: 'aurora', palette: 'blue', seed: Math.floor(Math.random() * 1e6) }; delete d.ground; delete d.grid; }
-    if (!d.brand) { d.brand = { logo: 'tl', style: 'plain', badge: d.badge || (d.cat === 'services' ? 'none' : 'ready') }; delete d.badge; }
+  }
+  function stdFrame(d) {
+    if (d.brand) { d.badge = d.brand.badge === 'none' ? '' : d.brand.badge || 'ready'; delete d.brand; }
+    if (d.copy) ['x', 'y', 'w', 'fs', 'subFs', 'align', 'top', 'color'].forEach(function (k) { delete d.copy[k]; });
   }
   function recompose(look) {
     var d = cur(); if (!d.scene) return;
@@ -751,7 +752,7 @@
     var sc = clone(d.scene); sc.look = Object.assign({}, sc.look || {}, look || {});
     sc.head = (d.copy && d.copy.head) || sc.head; sc.sub = (d.copy && d.copy.sub) || sc.sub;
     var n = K.compose(sc, { cat: d.cat, industry: (catObj(d.cat) || {}).industry });
-    ['bg', 'cam', 'brand', 'copy', 'layers', 'scene'].forEach(function (k) { d[k] = n[k]; });
+    ['bg', 'cam', 'brand', 'badge', 'copy', 'layers', 'scene'].forEach(function (k) { if (n[k] === undefined) delete d[k]; else d[k] = n[k]; });
     st.sel = -1; st.multi = []; queueSave(d); drawCanvas(); renderInspector();
   }
 
@@ -763,7 +764,7 @@
     if (t.dataset.t === 'num') v = v === '' ? null : +v;
     if (t.dataset.t === 'tags') v = v.split(/[\s,]+/).filter(Boolean).map(function (x) { return x.charAt(0) === '#' ? x : '#' + x; });
     var soft = t.tagName === 'TEXTAREA' || t.type === 'text', o = { noHist: soft && burst() };
-    if (t.id === 'd-badge2') { change(function (d) { ensureV3(d); d.brand.badge = v; }, { now: true }); return; }
+    if (t.id === 'd-badge2') { change(function (d) { if (d.brand) d.brand.badge = v || 'none'; else d.badge = v; }, { now: true }); return; }
     if (t.dataset.c) change(function (d) { d.copy = d.copy || {}; if (v === '' || v === null || v === false) delete d.copy[t.dataset.c]; else d.copy[t.dataset.c] = v; if (d.scene && (t.dataset.c === 'head' || t.dataset.c === 'sub')) d.scene[t.dataset.c] = v; }, o);
     else if (t.dataset.d) change(function (d) {
       var k = t.dataset.d;
@@ -806,10 +807,8 @@
     if (ds.pal) { change(function (d) { ensureV3(d); d.bg.palette = ds.pal; if (ds.pal === 'night') d.bg.style = 'navy'; else if (d.bg.style === 'navy') d.bg.style = 'aurora'; if (d.scene) (d.scene.look = d.scene.look || {}).palette = ds.pal; }, { now: true, insp: true }); return; }
     if (ds.reseed) { change(function (d) { ensureV3(d); d.bg.seed = Math.floor(Math.random() * 1e6); }, { now: true }); return; }
     if (ds.cam) { change(function (d) { d.cam = ds.cam; if (d.scene) (d.scene.look = d.scene.look || {}).camera = ds.cam; (d.layers || []).forEach(function (L) { if (L.cam == null && /^(window|ophone|graph|kpis|timeline|steps|chat|receipt|notif|stat|route|record|checklist|ba|phases|appflow|orbit|devices|site|code|serp)$/.test(L.type)) L.cam = true; }); }, { now: true, insp: true }); return; }
-    if (ds.lay) { recompose({ layout: ds.lay }); return; }
-    if (ds.logo) { change(function (d) { ensureV3(d); d.brand.logo = ds.logo; }, { now: true, insp: true }); return; }
-    if (ds.logostyle) { change(function (d) { ensureV3(d); d.brand.style = d.brand.style === 'chip' ? 'plain' : 'chip'; }, { now: true, insp: true }); return; }
-    if (ds.shuffle) { var d0 = cur(); var sc = K.shuffleLook(d0); recompose(sc.look); toast('New look: ' + [sc.look.layout, sc.look.camera, sc.look.bg, sc.look.palette].join(' · ')); return; }
+    if (ds.stdframe) { if (cur().scene) recompose({}); else change(function (d) { stdFrame(d); }, { now: true, insp: true }); toast('Standard frame: logo top left, badge top right, headline centred'); return; }
+    if (ds.shuffle) { var d0 = cur(); var sc = K.shuffleLook(d0); recompose(sc.look); toast('New look: ' + [sc.look.camera, sc.look.bg, sc.look.palette].join(' · ')); return; }
     if (ds.tool) { if (ds.tool === 'edit') openPop(); else if (ds.tool === 'image') pickImage(); else layerAct(ds.tool === 'del' ? 'del' : ds.tool); return; }
     if (ds.lact) { layerAct(ds.lact, +t.closest('[data-li]').dataset.li); return; }
     if (ds.li != null && !e.target.closest('button')) { select(+ds.li, e.shiftKey); return; }
@@ -884,8 +883,8 @@
       d.id = uid(d.name); d.createdAt = new Date().toISOString(); lib.push(d); saveNow(d); closeDlg(); openDrip(d.id); toast('Created "' + d.name + '"');
     });
     $('#t-blank').addEventListener('click', function () {
-      var cat = $('#t-cat').value, d = { id: uid('new-drip'), cat: cat, name: 'New drip', v: 3, bg: { style: 'aurora', palette: 'blue', seed: Math.floor(Math.random() * 1e6) }, cam: 'front', brand: { logo: 'tl', style: 'plain', badge: cat === 'services' ? 'none' : cat === 'odoo20' ? 'o20' : 'ready' },
-        copy: { head: 'Your headline,|*in blue.*', sub: 'One supporting line.', x: 64, y: 138, w: 952, align: 'center', fs: 74, subFs: 28 }, layers: [], createdAt: new Date().toISOString() };
+      var cat = $('#t-cat').value, d = { id: uid('new-drip'), cat: cat, name: 'New drip', v: 3, bg: { style: 'aurora', palette: 'blue', seed: Math.floor(Math.random() * 1e6) }, cam: 'front', badge: cat === 'services' ? '' : cat === 'odoo20' ? 'o20' : 'ready',
+        copy: { head: 'Your headline,|*in blue.*', sub: 'One supporting line.' }, layers: [], createdAt: new Date().toISOString() };
       lib.push(d); saveNow(d); closeDlg(); openDrip(d.id);
     });
   }

@@ -76,37 +76,21 @@
   function compose(scene, ctx) {
     ctx = ctx || {};
     var sc = deepClean(scene, 0) || {}, look = sc.look || {}, rnd = R.rng((+look.seed || hash(JSON.stringify(sc.head || '') + (ctx.index || 0))) >>> 0);
-    var layout = pick(LAYOUTS, look.layout, 'top'), cam = pick(CAMS, look.camera, 'front');
+    /* the frame never moves (TechNext logo top left, Odoo badge top right, headline centred on top, like
+       every drip in the series); only the visual below the subline changes from post to post */
+    var layout = 'top', cam = pick(CAMS, look.camera, 'front');
     var bgStyle = pick(BGS, look.bg, 'aurora'), pal = bgStyle === 'navy' ? 'night' : pick(PALS, look.palette, 'blue');
     var H = 1080, d = {
       id: '', cat: ctx.cat || 'apps', name: s(sc.name, 60) || s(sc.head, 60).replace(/[*~|=]/g, ''), angle: s(sc.angle, 20), v: 3,
       bg: { style: bgStyle, palette: pal, seed: Math.floor(rnd() * 1e6) }, cam: cam,
-      brand: { logo: 'tl', style: bgStyle === 'mesh' || bgStyle === 'rays' ? 'chip' : 'plain', badge: ctx.cat === 'services' ? 'none' : ctx.cat === 'odoo20' || sc.badge === 'o20' ? 'o20' : 'ready' },
+      badge: ctx.cat === 'services' ? '' : ctx.cat === 'odoo20' || sc.badge === 'o20' ? 'o20' : 'ready',
       copy: {}, layers: [], caption: s(sc.caption, 900), hashtags: arr(sc.hashtags).slice(0, 6).map(function (h) { h = s(h, 30).replace(/\s+/g, ''); return h.charAt(0) === '#' ? h : '#' + h; }),
       source: ctx.source || '', scene: sc
     };
-    /* headline block + visual area per layout */
     var head = s(sc.head, 110) || 'Your headline,|*in blue.*', sub = s(sc.sub, 170), kick = s(sc.kicker, 30);
-    var logo = pick(['tl', 'tr', 'bl', 'br'], look.logo, layout === 'bottom' ? 'tl' : layout === 'right' ? 'tr' : 'tl'), V, cb;
-    if (layout === 'top') {
-      var top = logo.charAt(0) === 't' ? 138 : 70, align = look.align === 'left' ? 'left' : 'center';
-      d.copy = { head: head, sub: sub, kicker: kick || undefined, x: 64, y: top, w: 952, align: align, fs: 74, subFs: 28 };
-      cb = box(64, top, 952, estCopy(head, sub, 74, 952, !!kick)); V = box(36, cb.y1 + 26, 1008, H - cb.y1 - 26 - (logo.charAt(0) === 'b' ? 110 : 30));
-    } else if (layout === 'bottom') {
-      logo = logo.charAt(0) === 'b' ? 't' + logo.charAt(1) : logo;
-      var hb = estCopy(head, sub, 70, 952, !!kick), y0 = Math.round(H - 70 - hb);
-      d.copy = { head: head, sub: sub, kicker: kick || undefined, x: 64, y: y0, w: 952, align: look.align === 'center' ? 'center' : 'left', fs: 70, subFs: 27 };
-      cb = box(64, y0, 952, hb); V = box(36, 130, 1008, y0 - 150);
-    } else {
-      var left = layout === 'left', cx = left ? 64 : 596, cw = 420, hh = estCopy(head, sub, 60, cw, !!kick), cy0 = Math.round(Math.max(170, Math.min(300, (H - hh) / 2 - 40)));
-      if (left && logo === 'tr') logo = 'tl'; if (!left && logo === 'tl') logo = 'tr';
-      d.copy = { head: head, sub: sub, kicker: kick || undefined, x: cx, y: cy0, w: cw, align: 'left', fs: 60, subFs: 25 };
-      cb = box(cx, cy0, cw, hh); V = left ? box(500, 110, 560, H - 150) : box(20, 110, 560, H - 150);
-    }
-    d.brand.logo = logo;
-    var brandBox = logo === 'tl' ? box(40, 40, 440, 70) : logo === 'tr' ? box(600, 40, 440, 70) : logo === 'bl' ? box(40, H - 110, 440, 70) : box(600, H - 110, 440, 70);
-    var badgeBox = logo === 'tl' ? box(860, 30, 200, 80) : logo === 'tr' ? box(20, 30, 200, 80) : logo === 'bl' ? box(860, H - 120, 200, 90) : box(20, H - 120, 200, 90);
-    var shield = [cb, brandBox, badgeBox];
+    d.copy = { head: head, sub: sub, kicker: kick || undefined };
+    var cb = box(64, 148, 952, estCopy(head, sub, 80, 952, !!kick)), V = box(36, cb.y1 + 30, 1008, H - cb.y1 - 60);
+    var shield = [cb, box(56, 50, 270, 70), box(850, 36, 190, 90)];
 
     /* hero */
     var hero = layerOf(sc.hero || { type: 'window', app: 'sale', view: 'form' }, 'hero');
@@ -114,7 +98,7 @@
     var narrowBleed = (layout === 'left' || layout === 'right') && (hero.type === 'window' || hero.type === 'devices' || hero.type === 'site');
     if (narrowBleed) hw = hero.type === 'window' ? 690 : 680;
     var nSup = arr(sc.support).length, side = nSup && !narrowBleed && (layout === 'top' || layout === 'bottom') ? (rnd() > .5 ? 'l' : 'r') : '';
-    if (side && hero.type !== 'ophone') hw = Math.min(hw, V.w * (nSup > 1 ? .7 : .76));
+    if (side && hero.type !== 'ophone') hw = Math.min(hw, V.w * (nSup > 1 ? .64 : .68));
     hero.w = Math.round(hw);
     var m = measure(hero), bleed = hero.type === 'ophone' || hero.type === 'devices' || narrowBleed ? .12 : 0;
     var maxH = V.h * (1 + bleed);
@@ -145,8 +129,8 @@
         if (sl === 'bl') { x = HB.x - mm.w * o; y = HB.y1 - mm.h * .58; }
         if (sl === 'tr') { x = HB.x1 - mm.w * (1 - o); y = HB.y - mm.h * .36; }
         if (sl === 'tl') { x = HB.x - mm.w * o; y = HB.y - mm.h * .32; }
-        if (sl === 'r') { x = HB.x1 - mm.w * .3; y = HB.cy - mm.h * (.25 + i * .35); }
-        if (sl === 'l') { x = HB.x - mm.w * .7; y = HB.cy - mm.h * (.25 + i * .35); }
+        if (sl === 'r') { x = HB.x1 - mm.w * .2; y = HB.cy - mm.h * (.3 + i * .35); }
+        if (sl === 'l') { x = HB.x - mm.w * .8; y = HB.cy - mm.h * (.3 + i * .35); }
         var b = clampBox(box(x, y, mm.w, mm.h), H, cb), score = 0;
         shield.forEach(function (z) { score += area(b, z) * 6; });
         placed.slice(1).forEach(function (z) { score += area(b, z) * 3; });
@@ -159,6 +143,16 @@
       if (hero.type === 'devices' && hit(best.b, box(HB.x, HB.y - 40, HB.w * .6, 120))) hero.label = false;
       d.layers.push(L); placed.push(best.b); names['s' + i] = best.b; names['support' + i] = best.b; names[String(i + 1)] = best.b;
     });
+
+    /* balance the group (hero + supports) in the space under the subline */
+    var G = placed.reduce(function (a, b) { return box(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.max(a.x1, b.x1) - Math.min(a.x, b.x), Math.max(a.y1, b.y1) - Math.min(a.y, b.y)); });
+    var shift = Math.round(V.y + Math.max(0, V.h - G.h) * .38 - G.y);
+    if (!bleed && Math.abs(shift) > 8 && G.y1 + shift <= H - 20 && G.y + shift >= V.y) {
+      d.layers.forEach(function (L) { if (L.type !== 'link' && L.y != null) L.y += shift; });
+      placed = placed.map(function (b) { return box(b.x, b.y + shift, b.w, b.h); }); HB = placed[0];
+      Object.keys(names).forEach(function (k) { var b = names[k]; names[k] = box(b.x, b.y + shift, b.w, b.h); });
+      d.bg.focus[1] += shift;
+    }
 
     /* workflow arrows */
     arr(sc.links).slice(0, 3).forEach(function (k, i) {
@@ -226,10 +220,10 @@
     var r = R.rng(seed || 11), used = { lc: {}, bp: {}, hero: {} };
     return scenes.map(function (sc, i) {
       sc = sc || {}; var lk = sc.look = sc.look || {};
-      lk.layout = pick(LAYOUTS, lk.layout, LAYOUTS[i % 4]); lk.camera = pick(CAMS, lk.camera, CAMS[(i * 3) % CAMS.length]);
+      lk.layout = 'top'; lk.camera = pick(CAMS, lk.camera, CAMS[(i * 3) % CAMS.length]);
       lk.bg = pick(BGS, lk.bg, BGS[i % BGS.length]); lk.palette = pick(PALS, lk.palette, PALS[i % PALS.length]);
       var n = 0;
-      while (used.lc[lk.layout + lk.camera] && n++ < 40) { lk.camera = CAMS[Math.floor(r() * CAMS.length)]; if (n % 4 === 0) lk.layout = LAYOUTS[Math.floor(r() * 4)]; }
+      while (used.lc[lk.layout + lk.camera] && n++ < 40) lk.camera = CAMS[Math.floor(r() * CAMS.length)];
       n = 0;
       while (used.bp[lk.bg + (lk.bg === 'navy' ? '' : lk.palette)] && n++ < 40) { lk.palette = PALS[Math.floor(r() * PALS.length)]; if (n % 3 === 0) lk.bg = BGS[Math.floor(r() * BGS.length)]; }
       used.lc[lk.layout + lk.camera] = 1; used.bp[lk.bg + (lk.bg === 'navy' ? '' : lk.palette)] = 1;
@@ -239,7 +233,7 @@
   }
   function shuffleLook(d) {
     var r = R.rng(Date.now() % 1e9), sc = d.scene || {};
-    sc.look = { layout: LAYOUTS[Math.floor(r() * 4)], camera: CAMS[Math.floor(r() * CAMS.length)], bg: BGS[Math.floor(r() * BGS.length)], palette: PALS[Math.floor(r() * PALS.length)], seed: Math.floor(r() * 1e6) };
+    sc.look = { layout: 'top', camera: CAMS[Math.floor(r() * CAMS.length)], bg: BGS[Math.floor(r() * BGS.length)], palette: PALS[Math.floor(r() * PALS.length)], seed: Math.floor(r() * 1e6) };
     return sc;
   }
 

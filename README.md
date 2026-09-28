@@ -26,10 +26,13 @@ dashboard, app record flows, service pages, portfolio sites) and designs every p
   (the glowing AI-filled field, the stage the record reached, the bar that matters);
 - 0-3 **supporting cards** (the step before or after, a notification, a chart, a chat, a receipt, a route);
 - **workflow links** naming what one app hands to the next;
-- callouts (Nexi, handwritten pills, chips, notes) and the **look**: headline placement, camera angle,
-  background style and palette, logo corner.
+- callouts (Nexi, handwritten pills, chips, notes) and the **look**: camera angle, background style and palette.
 
-The rules force every post in a set to differ (hero screen, supports, layout + camera, background + palette,
+**The frame never moves:** the TechNext logo sits top left, the Odoo Ready Partner (or Meet Odoo 20) badge top
+right, and the headline and subline are centred on top at the standard size, as in every drip of the series
+(website posts carry no Odoo badge). Only the picture under the subline changes.
+
+The rules force every post in a set to differ (hero screen, supports, camera, background + palette,
 angle, first word). `compose.js` then lays each scene out, measuring every element so nothing covers the
 headline or runs off the canvas. Posts arrive as **drafts**: Keep, Edit or Discard. Drafts are saved too.
 
@@ -63,8 +66,9 @@ reported; Fast does not. It runs on the viewer's own Claude plan, not an API bil
 - **Keyboard:** arrows nudge (Shift = 10 px), Delete, Ctrl+D duplicate, Ctrl+C / Ctrl+V (also between drips),
   `]` / `[` forward / backward, Ctrl+Z / Ctrl+Shift+Z undo / redo, Esc deselects. Zoom with − Fit + in the bar.
 - **Design panel:** background style (aurora, grid, floor, rays, dots, mesh, rings, navy) and palette, "New shapes",
-  camera angle (front, tilt-l, tilt-r, iso-l, iso-r, top, low, dutch), headline placement (re-lays out the post),
-  logo corner and glass chip, partner badge, and **Shuffle look**.
+  camera angle (front, tilt-l, tilt-r, iso-l, iso-r, top, low, dutch), the Odoo badge, and **Shuffle look**
+  (a new camera, background and palette for the same content). Posts made with an older layout get a
+  "Use the standard frame" button.
 - **Drop an image** on the canvas to add a person or product cut-out; a selected photo or Nexi gets replaced.
 - Every drip has a **Post caption** and hashtags, with a Copy button. **4:5** portrait is in the bar.
 

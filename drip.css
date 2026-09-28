@@ -674,3 +674,9 @@ svg.chart .tip{font:800 17px var(--font-body);fill:#fff}
 svg.chart .cx.fz{font-size:26px}
 .L-link{pointer-events:none}.L-link path,.L-link .lk-lab{pointer-events:auto}
 .ow{font-size:calc(1.5cqw*var(--k))}
+
+/* standard frame on dark backgrounds */
+.drip.dark .d-logo{filter:brightness(0) invert(1)}
+.drip.dark .d-badge.ready{padding:8px 12px;border-radius:14px;background:#fff;box-shadow:0 10px 24px -14px rgba(0,0,0,.6)}
+.drip.dark .d-badge.ready img{height:62px}
+.drip.dark .d-badge.o20{padding:10px 14px 6px;border-radius:14px;background:#fff}

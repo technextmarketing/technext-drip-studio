@@ -91,12 +91,12 @@
     '- appflow: {"app":module from APP RECORD FLOWS}   - orbit: {"apps":[6-10 modules],"label"}   - devices: {"site": a key from WEBSITES}   - serp: {"query","title","desc"}   - code: {"file","lines":[4-6 short HTML lines]}',
     'LINKS (workflow arrows between components): [{"from":"hero|s0|s1|s2","to":"…","label":"what is handed over, max 26 chars"}]',
     'ACCENTS (flat callouts, 0-3): {"type":"nexi","pose":"wave|point|present|celebrate|cheer|surprise|love|think|clap"} (Nexi is the TechNext robot), {"type":"pill","text":"max 22 chars"} (handwritten), {"type":"chip","text","small","icon":"check|spark|search|sync"}, {"type":"note","text","strike":true for the old way}',
-    'LOOK: {"layout":"top|left|right|bottom" (where the headline sits),"camera":"front|tilt-l|tilt-r|iso-l|iso-r|top|low|dutch" (3D angle of the screens),"bg":"aurora|grid|floor|rays|dots|mesh|rings|navy","palette":"blue|sky|mint|violet|sunrise|slate","logo":"tl|tr|bl|br"}'
+    'LOOK: {"camera":"front|tilt-l|tilt-r|iso-l|iso-r|top|low|dutch" (3D angle of the screens),"bg":"aurora|grid|floor|rays|dots|mesh|rings|navy","palette":"blue|sky|mint|violet|sunrise|slate"}. The frame is fixed for every post (TechNext logo top left, Odoo badge top right, headline and subline centred on top); only the picture under the subline changes.'
   ].join('\n');
 
   var EXAMPLE = JSON.stringify({ name: 'AI vendor bill', angle: 'ai', head: 'The bill reads itself.|*You just approve.*', sub: 'AI inside Odoo reads the supplier PDF, fills the vendor bill and matches the purchase order.',
     caption: 'Supplier bills still typed by hand? With AI inside Odoo, the PDF fills the bill and the purchase order is matched. Finance only approves. Book a call at technext.asia.', hashtags: ['#Odoo', '#AI', '#Accounting'],
-    look: { layout: 'top', camera: 'iso-l', bg: 'rays', palette: 'sky', logo: 'bl' },
+    look: { camera: 'iso-l', bg: 'rays', palette: 'sky' },
     hero: { type: 'window', app: 'accountant', view: 'form', crumbs: ['Vendor Bills', 'BILL/2026/0311'], status: ['Draft', 'Posted'], statusAt: 0, buttons: ['Confirm'], record: 'Draft Bill', fields: [['Vendor', 'Sample Seafood Pte Ltd'], ['Bill date', '24 Sep 2026'], ['Purchase order', 'P00088']], highlight: ['Vendor', 'Bill date', 'Purchase order'], ai: true, lines: [['Prawns 2 kg', '6', 'S$ 32.00', 'S$ 192.00']], total: 'S$ 209.28', chatter: 'Odoo AI filled 3 fields from the PDF and matched P00088.' },
     support: [{ type: 'receipt', vendor: 'Sample Seafood Pte Ltd', doc: 'TAX INVOICE', lines: [['Prawns 2 kg x6', '192.00'], ['GST 9%', '17.28']], total: 'S$ 209.28', stamp: 'SCANNED' }],
     links: [{ from: 's0', to: 'hero', label: 'AI reads the PDF' }], accents: [{ type: 'nexi', pose: 'point' }] });
@@ -116,7 +116,7 @@
       '',
       'EVERY POST MUST BE DIFFERENT',
       '- Each post uses a different hero (a different type or view, and a different app where possible) and a different set of supports.',
-      '- No two posts share the same layout+camera or the same bg+palette. Vary the number of supports (0-3) and accents.',
+      '- No two posts share the same camera angle or the same bg+palette. Vary the number of supports (0-3) and accents.',
       '- Each post takes a different angle, from: ' + angles.map(function (a) { return a[1]; }).join('; ') + '.',
       '- No two headlines start with the same word.' + ((o.existing || []).length ? ' Do not repeat these existing headlines: ' + o.existing.slice(0, 25).join(' / ') : ''),
       '',

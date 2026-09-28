@@ -89,32 +89,22 @@ window.DRIPS = [
       "palette": "night",
       "seed": 389370,
       "focus": [
-        774,
-        575
+        883,
+        801
       ]
     },
     "cam": "dutch",
-    "brand": {
-      "logo": "tl",
-      "style": "plain",
-      "badge": "o20"
-    },
+    "badge": "o20",
     "copy": {
       "head": "No signal?|*The till keeps selling.*",
-      "sub": "Odoo keeps taking sales offline and syncs every order when the connection is back.",
-      "x": 64,
-      "y": 300,
-      "w": 420,
-      "align": "left",
-      "fs": 60,
-      "subFs": 25
+      "sub": "Odoo keeps taking sales offline and syncs every order when the connection is back."
     },
     "layers": [
       {
         "type": "glow",
-        "x": 566,
-        "y": 367,
-        "w": 416,
+        "x": 699,
+        "y": 618,
+        "w": 367,
         "z": 1,
         "op": 0.8
       },
@@ -161,9 +151,9 @@ window.DRIPS = [
         "total": "S$ 107.00",
         "btn": "Payment",
         "role": "hero",
-        "w": 347,
-        "x": 601,
-        "y": 217,
+        "w": 306,
+        "x": 730,
+        "y": 485,
         "cam": true,
         "z": 10
       },
@@ -174,9 +164,9 @@ window.DRIPS = [
         "text": "14 orders synced to Odoo",
         "time": "now",
         "role": "support",
-        "w": 380,
-        "x": 453,
-        "y": 843,
+        "w": 464,
+        "x": 359,
+        "y": 750,
         "cam": true,
         "z": 12
       },
@@ -187,13 +177,13 @@ window.DRIPS = [
         "variant": "red strike",
         "size": 44,
         "rot": 3,
-        "x": 840,
-        "y": 989
+        "x": 42,
+        "y": 1000
       },
       {
         "type": "sparkles",
-        "x": 504,
-        "y": 113,
+        "x": 40,
+        "y": 488,
         "w": 100,
         "z": 41
       }
@@ -289,32 +279,22 @@ window.DRIPS = [
       "palette": "sunrise",
       "seed": 286719,
       "focus": [
-        427,
-        711
+        387,
+        748
       ]
     },
     "cam": "tilt-r",
-    "brand": {
-      "logo": "tl",
-      "style": "plain",
-      "badge": "ready"
-    },
+    "badge": "ready",
     "copy": {
       "head": "The order hits the kitchen|*before the waiter walks back.*",
-      "sub": "Odoo POS sends every table order straight to the kitchen display, so nothing is lost on paper.",
-      "x": 64,
-      "y": 138,
-      "w": 952,
-      "align": "center",
-      "fs": 74,
-      "subFs": 28
+      "sub": "Odoo POS sends every table order straight to the kitchen display, so nothing is lost on paper."
     },
     "layers": [
       {
         "type": "glow",
-        "x": -33,
-        "y": 251,
-        "w": 919,
+        "x": -24,
+        "y": 337,
+        "w": 822,
         "z": 1,
         "op": 0.8
       },
@@ -373,9 +353,9 @@ window.DRIPS = [
         "total": "S$ 36.40",
         "btn": "Order",
         "role": "hero",
-        "w": 766,
+        "w": 685,
         "x": 44,
-        "y": 489,
+        "y": 547,
         "cam": true,
         "z": 10
       },
@@ -419,18 +399,18 @@ window.DRIPS = [
         ],
         "role": "support",
         "w": 504,
-        "x": 504,
-        "y": 841,
+        "x": 552,
+        "y": 703,
         "cam": true,
         "z": 12
       },
       {
         "type": "link",
         "labelOnly": true,
-        "x1": 631,
-        "y1": 835,
-        "x2": 631,
-        "y2": 835,
+        "x1": 622,
+        "y1": 697,
+        "x2": 622,
+        "y2": 697,
         "label": "→ Sent to the kitchen",
         "tone": "",
         "z": 45
@@ -445,8 +425,8 @@ window.DRIPS = [
       },
       {
         "type": "sparkles",
-        "x": 937,
-        "y": 475,
+        "x": 931,
+        "y": 922,
         "w": 100,
         "z": 41
       }
@@ -592,32 +572,22 @@ window.DRIPS = [
       "palette": "sky",
       "seed": 366240,
       "focus": [
-        427,
-        673
+        387,
+        764
       ]
     },
     "cam": "iso-l",
-    "brand": {
-      "logo": "bl",
-      "style": "chip",
-      "badge": "ready"
-    },
+    "badge": "ready",
     "copy": {
       "head": "The bill reads itself.|*You just approve.*",
-      "sub": "AI inside Odoo reads the supplier PDF, fills the vendor bill and matches the purchase order.",
-      "x": 64,
-      "y": 70,
-      "w": 952,
-      "align": "center",
-      "fs": 74,
-      "subFs": 28
+      "sub": "AI inside Odoo reads the supplier PDF, fills the vendor bill and matches the purchase order."
     },
     "layers": [
       {
         "type": "glow",
-        "x": -33,
-        "y": 213,
-        "w": 919,
+        "x": -24,
+        "y": 353,
+        "w": 822,
         "z": 1,
         "op": 0.8
       },
@@ -680,9 +650,9 @@ window.DRIPS = [
         "total": "S$ 333.54",
         "chatter": "Odoo AI filled 4 fields from the PDF and matched P00088. Waiting for your approval.",
         "role": "hero",
-        "w": 766,
+        "w": 685,
         "x": 44,
-        "y": 385,
+        "y": 489,
         "cam": true,
         "z": 10
       },
@@ -708,8 +678,8 @@ window.DRIPS = [
         "stamp": "SCANNED",
         "role": "support",
         "w": 343,
-        "x": 707,
-        "y": 600,
+        "x": 660,
+        "y": 676,
         "cam": true,
         "z": 12,
         "rot": 3
@@ -717,10 +687,10 @@ window.DRIPS = [
       {
         "type": "link",
         "labelOnly": true,
-        "x1": 716,
-        "y1": 746,
-        "x2": 716,
-        "y2": 746,
+        "x1": 661,
+        "y1": 823,
+        "x2": 661,
+        "y2": 823,
         "label": "→ AI reads the PDF",
         "tone": "",
         "z": 45
@@ -732,12 +702,12 @@ window.DRIPS = [
         "w": 254,
         "glow": false,
         "x": 791,
-        "y": 383
+        "y": 486
       },
       {
         "type": "sparkles",
         "x": 18,
-        "y": 371,
+        "y": 944,
         "w": 100,
         "z": 41
       }
