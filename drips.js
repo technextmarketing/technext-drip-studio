@@ -1,102 +1,862 @@
-/* TechNext Drip Studio — the drip library.
-   Edit a drip in the studio, then "Save library" downloads a new drips.js to replace this file.
-   Or edit by hand: copy a drip object, give it a new id, change the copy and layers.
-
-   Headline markup:  *blue words*   ~yellow brush underline~   ==yellow marker==   [[white on blue]]
-                     {odoo}Odoo purple{/odoo}   |  = line break
-   Layer fields (all in canvas px, the canvas is 1080 wide): x, y (or b = distance from the bottom), w, rot, z, op, flip, hide
-   Layer types: nexi · person · shot · img · phone · record · flow · apps · pill · chip · note · bubble · text · icon · odoo
-                burst · glow · sphere · halftone · scan · sparkles · storm · speed · confetti · arrow · nosignal
-   Content rules (from technext.asia): say "Odoo Partner", never "Certified"; only the approved figures
-   (10+ countries, 11+ enterprise clients, 4 AI disciplines); Marketing is its own service, never tied to Odoo. */
+/* TechNext Drip Studio — the starter library (v3 designs). The claude.ai hub keeps its own live copy in
+   its database; this file seeds new hubs and the GitHub mirror. See README.md for the fields. */
 
 window.CATEGORIES = [
-  { id: 'odoo20', group: 'Odoo', name: 'Meet Odoo 20' },
-  { id: 'apps', group: 'Odoo', name: 'Odoo apps' },
-  { id: 'ai', group: 'AI & Nexi', name: 'AI in Odoo' },
-  { id: 'fnb', group: 'Industries', name: 'F&B', industry: 'fnb' },
-  { id: 'retail', group: 'Industries', name: 'Retail', industry: 'retail' },
-  { id: 'ecommerce', group: 'Industries', name: 'Ecommerce', industry: 'ecommerce' },
-  { id: 'manufacturing', group: 'Industries', name: 'Manufacturing', industry: 'manufacturing' },
-  { id: 'construction', group: 'Industries', name: 'Construction', industry: 'construction' },
-  { id: 'medical', group: 'Industries', name: 'Medical', industry: 'medical' },
-  { id: 'travel', group: 'Industries', name: 'Travel', industry: 'travel' },
-  { id: 'health-wellness', group: 'Industries', name: 'Health & Wellness', industry: 'health-wellness' },
-  { id: 'field-service', group: 'Industries', name: 'Field Service' },
-  { id: 'services', group: 'TechNext', name: 'Websites & marketing' }
+  {
+    "id": "odoo20",
+    "group": "Odoo",
+    "name": "Meet Odoo 20"
+  },
+  {
+    "id": "apps",
+    "group": "Odoo",
+    "name": "Odoo apps"
+  },
+  {
+    "id": "ai",
+    "group": "AI & Nexi",
+    "name": "AI in Odoo"
+  },
+  {
+    "id": "fnb",
+    "group": "Industries",
+    "name": "F&B",
+    "industry": "fnb"
+  },
+  {
+    "id": "retail",
+    "group": "Industries",
+    "name": "Retail",
+    "industry": "retail"
+  },
+  {
+    "id": "ecommerce",
+    "group": "Industries",
+    "name": "Ecommerce",
+    "industry": "ecommerce"
+  },
+  {
+    "id": "manufacturing",
+    "group": "Industries",
+    "name": "Manufacturing",
+    "industry": "manufacturing"
+  },
+  {
+    "id": "construction",
+    "group": "Industries",
+    "name": "Construction",
+    "industry": "construction"
+  },
+  {
+    "id": "medical",
+    "group": "Industries",
+    "name": "Medical",
+    "industry": "medical"
+  },
+  {
+    "id": "travel",
+    "group": "Industries",
+    "name": "Travel",
+    "industry": "travel"
+  },
+  {
+    "id": "health-wellness",
+    "group": "Industries",
+    "name": "Health & Wellness",
+    "industry": "health-wellness"
+  },
+  {
+    "id": "field-service",
+    "group": "Industries",
+    "name": "Field Service"
+  },
+  {
+    "id": "services",
+    "group": "TechNext",
+    "name": "Websites & marketing"
+  }
 ];
 
 window.DRIPS = [
   {
-    id: 'o20-offline-mode',
-    cat: 'odoo20',
-    name: 'Odoo 20 · Offline mode',
-    source: 'technext.asia/blog/odoo-20-whats-new — "Offline mode and a better phone experience"',
-    badge: 'o20',
-    ground: 'blobs',
-    copy: {
-      head: 'No signal? *Keep working.*',
-      size: 'l',
-      sub: 'Odoo 20 lets on-site teams create and edit records offline. Everything syncs when you are back online.'
+    "id": "o20-offline-pos",
+    "cat": "odoo20",
+    "name": "Offline POS",
+    "angle": "",
+    "v": 3,
+    "bg": {
+      "style": "navy",
+      "palette": "night",
+      "seed": 389370,
+      "focus": [
+        774,
+        575
+      ]
     },
-    layers: [
-      { type: 'glow', x: 250, y: 470, w: 600, z: 2 },
-      { type: 'phone', x: 382, y: 452, w: 336, rot: -5, z: 12, screen: 'offline-receipt' },
-      { type: 'storm', x: 706, y: 438, w: 290, rot: 6, z: 14 },
-      { type: 'nosignal', x: 676, y: 628, w: 120, rot: 8, z: 16 },
-      { type: 'pill', x: 62, y: 548, rot: -5, z: 18, text: 'Warehouse floor' },
-      { type: 'pill', x: 44, y: 706, rot: 3, z: 18, text: 'Construction site' },
-      { type: 'pill', x: 104, y: 862, rot: -3, z: 18, text: 'Field visit' },
-      { type: 'chip', x: 700, y: 820, rot: 3, z: 18, icon: 'cloudOk', tone: 'ok', text: 'Back online', small: '3 changes synced' },
-      { type: 'sparkles', x: 930, y: 760, w: 110, z: 19 },
-      { type: 'arrow', x: 790, y: 712, w: 120, rot: 62, z: 17, kind: 'down' },
-      { type: 'sphere', x: 968, y: 626, w: 58, z: 6 }
-    ]
+    "cam": "dutch",
+    "brand": {
+      "logo": "tl",
+      "style": "plain",
+      "badge": "o20"
+    },
+    "copy": {
+      "head": "No signal?|*The till keeps selling.*",
+      "sub": "Odoo keeps taking sales offline and syncs every order when the connection is back.",
+      "x": 64,
+      "y": 300,
+      "w": 420,
+      "align": "left",
+      "fs": 60,
+      "subFs": 25
+    },
+    "layers": [
+      {
+        "type": "glow",
+        "x": 566,
+        "y": 367,
+        "w": 416,
+        "z": 1,
+        "op": 0.8
+      },
+      {
+        "type": "ophone",
+        "app": "point_of_sale",
+        "view": "pos",
+        "crumbs": [
+          "Shop 2"
+        ],
+        "table": "Order 0417",
+        "products": [
+          [
+            "Linen shirt",
+            "S$ 49"
+          ],
+          [
+            "Canvas tote",
+            "S$ 29"
+          ],
+          [
+            "Silk scarf",
+            "S$ 39"
+          ],
+          [
+            "Cap",
+            "S$ 19"
+          ]
+        ],
+        "order": [
+          [
+            "Linen shirt",
+            "1",
+            "S$ 49",
+            "S$ 49.00"
+          ],
+          [
+            "Canvas tote",
+            "2",
+            "S$ 29",
+            "S$ 58.00"
+          ]
+        ],
+        "total": "S$ 107.00",
+        "btn": "Payment",
+        "role": "hero",
+        "w": 347,
+        "x": 601,
+        "y": 217,
+        "cam": true,
+        "z": 10
+      },
+      {
+        "type": "notif",
+        "app": "point_of_sale",
+        "title": "Back online",
+        "text": "14 orders synced to Odoo",
+        "time": "now",
+        "role": "support",
+        "w": 380,
+        "x": 453,
+        "y": 843,
+        "cam": true,
+        "z": 12
+      },
+      {
+        "type": "note",
+        "z": 40,
+        "text": "sales lost",
+        "variant": "red strike",
+        "size": 44,
+        "rot": 3,
+        "x": 840,
+        "y": 989
+      },
+      {
+        "type": "sparkles",
+        "x": 504,
+        "y": 113,
+        "w": 100,
+        "z": 41
+      }
+    ],
+    "caption": "No signal on the shop floor? Odoo 20 keeps the till selling offline and syncs every order when the connection is back. Book a call at technext.asia.",
+    "hashtags": [
+      "#Odoo20",
+      "#OdooPOS",
+      "#Retail"
+    ],
+    "source": "Starter: Offline on the phone",
+    "scene": {
+      "name": "Offline POS",
+      "head": "No signal?|*The till keeps selling.*",
+      "sub": "Odoo keeps taking sales offline and syncs every order when the connection is back.",
+      "badge": "o20",
+      "hero": {
+        "type": "ophone",
+        "app": "point_of_sale",
+        "view": "pos",
+        "crumbs": [
+          "Shop 2"
+        ],
+        "table": "Order 0417",
+        "products": [
+          [
+            "Linen shirt",
+            "S$ 49"
+          ],
+          [
+            "Canvas tote",
+            "S$ 29"
+          ],
+          [
+            "Silk scarf",
+            "S$ 39"
+          ],
+          [
+            "Cap",
+            "S$ 19"
+          ]
+        ],
+        "order": [
+          [
+            "Linen shirt",
+            "1",
+            "S$ 49",
+            "S$ 49.00"
+          ],
+          [
+            "Canvas tote",
+            "2",
+            "S$ 29",
+            "S$ 58.00"
+          ]
+        ],
+        "total": "S$ 107.00",
+        "btn": "Payment"
+      },
+      "support": [
+        {
+          "type": "notif",
+          "app": "point_of_sale",
+          "title": "Back online",
+          "text": "14 orders synced to Odoo",
+          "time": "now"
+        }
+      ],
+      "accents": [
+        {
+          "type": "note",
+          "text": "sales lost",
+          "strike": true
+        }
+      ],
+      "look": {
+        "layout": "left",
+        "camera": "dutch",
+        "bg": "navy"
+      }
+    },
+    "order": 0,
+    "createdAt": "2026-09-28T12:00:00Z"
   },
   {
-    id: 'fnb-supplier-to-books',
-    cat: 'fnb',
-    name: 'F&B · Supplier to the books',
-    source: 'technext.asia/industries/fnb — the six-step flow and the before/after table',
-    badge: 'ready',
-    ground: 'blobs-low',
-    copy: {
-      head: 'From supplier to table|to the books, *in one Odoo.*',
-      size: 'm',
-      sub: 'Six steps every restaurant runs, and the Odoo app behind each one.'
+    "id": "fnb-pos-to-kitchen",
+    "cat": "fnb",
+    "name": "POS to kitchen",
+    "angle": "",
+    "v": 3,
+    "bg": {
+      "style": "floor",
+      "palette": "sunrise",
+      "seed": 286719,
+      "focus": [
+        427,
+        711
+      ]
     },
-    layers: [
-      { type: 'flow', x: 70, y: 410, z: 12, from: 'industry:fnb', cols: 3, nodeW: 270, nodeH: 200, gapX: 65, gapY: 50, layout: 'snake', hot: 4 },
-      { type: 'note', x: 262, y: 906, rot: -4, z: 20, text: 'paper tickets', variant: 'red strike', size: 48 },
-      { type: 'arrow', x: 500, y: 890, w: 110, rot: 8, z: 20, kind: 'right' },
-      { type: 'note', x: 626, y: 900, rot: -3, z: 20, text: 'kitchen display', size: 48 },
-      { type: 'sparkles', x: 906, y: 330, w: 120, z: 20 },
-      { type: 'sphere', x: 44, y: 330, w: 46, z: 6 }
-    ]
+    "cam": "tilt-r",
+    "brand": {
+      "logo": "tl",
+      "style": "plain",
+      "badge": "ready"
+    },
+    "copy": {
+      "head": "The order hits the kitchen|*before the waiter walks back.*",
+      "sub": "Odoo POS sends every table order straight to the kitchen display, so nothing is lost on paper.",
+      "x": 64,
+      "y": 138,
+      "w": 952,
+      "align": "center",
+      "fs": 74,
+      "subFs": 28
+    },
+    "layers": [
+      {
+        "type": "glow",
+        "x": -33,
+        "y": 251,
+        "w": 919,
+        "z": 1,
+        "op": 0.8
+      },
+      {
+        "type": "window",
+        "app": "pos_restaurant",
+        "view": "pos",
+        "appLabel": "Point of Sale",
+        "table": "Table 12 · 4 guests",
+        "products": [
+          [
+            "Laksa",
+            "S$ 9.50"
+          ],
+          [
+            "Chicken rice",
+            "S$ 7.80"
+          ],
+          [
+            "Satay (10)",
+            "S$ 12.00"
+          ],
+          [
+            "Iced lemon tea",
+            "S$ 3.20"
+          ],
+          [
+            "Kaya toast",
+            "S$ 4.50"
+          ],
+          [
+            "Teh tarik",
+            "S$ 2.80"
+          ]
+        ],
+        "order": [
+          [
+            "Laksa",
+            "2",
+            "S$ 9.50",
+            "S$ 19.00"
+          ],
+          [
+            "Chicken rice",
+            "1",
+            "S$ 7.80",
+            "S$ 7.80"
+          ],
+          [
+            "Iced lemon tea",
+            "3",
+            "S$ 3.20",
+            "S$ 9.60"
+          ]
+        ],
+        "total": "S$ 36.40",
+        "btn": "Order",
+        "role": "hero",
+        "w": 766,
+        "x": 44,
+        "y": 489,
+        "cam": true,
+        "z": 10
+      },
+      {
+        "type": "window",
+        "app": "pos_restaurant",
+        "view": "kds",
+        "frame": false,
+        "appLabel": "Kitchen Display",
+        "tickets": [
+          [
+            "Table 12",
+            [
+              [
+                "Laksa",
+                "2"
+              ],
+              [
+                "Chicken rice",
+                "1"
+              ]
+            ],
+            "Cooking",
+            "2 min"
+          ],
+          [
+            "Table 7",
+            [
+              [
+                "Satay (10)",
+                "1"
+              ],
+              [
+                "Kaya toast",
+                "2"
+              ]
+            ],
+            "Ready",
+            "6 min"
+          ]
+        ],
+        "role": "support",
+        "w": 504,
+        "x": 504,
+        "y": 841,
+        "cam": true,
+        "z": 12
+      },
+      {
+        "type": "link",
+        "labelOnly": true,
+        "x1": 631,
+        "y1": 835,
+        "x2": 631,
+        "y2": 835,
+        "label": "→ Sent to the kitchen",
+        "tone": "",
+        "z": 45
+      },
+      {
+        "type": "pill",
+        "z": 40,
+        "text": "No paper tickets",
+        "rot": -3,
+        "x": 30,
+        "y": 974
+      },
+      {
+        "type": "sparkles",
+        "x": 937,
+        "y": 475,
+        "w": 100,
+        "z": 41
+      }
+    ],
+    "caption": "Paper tickets get lost. In Odoo POS every table order goes straight to the kitchen display. How does your kitchen get orders today?",
+    "hashtags": [
+      "#OdooPOS",
+      "#FnB",
+      "#Singapore"
+    ],
+    "source": "Starter: POS to kitchen",
+    "scene": {
+      "name": "POS to kitchen",
+      "head": "The order hits the kitchen|*before the waiter walks back.*",
+      "sub": "Odoo POS sends every table order straight to the kitchen display, so nothing is lost on paper.",
+      "hero": {
+        "type": "window",
+        "app": "pos_restaurant",
+        "view": "pos",
+        "appLabel": "Point of Sale",
+        "table": "Table 12 · 4 guests",
+        "products": [
+          [
+            "Laksa",
+            "S$ 9.50"
+          ],
+          [
+            "Chicken rice",
+            "S$ 7.80"
+          ],
+          [
+            "Satay (10)",
+            "S$ 12.00"
+          ],
+          [
+            "Iced lemon tea",
+            "S$ 3.20"
+          ],
+          [
+            "Kaya toast",
+            "S$ 4.50"
+          ],
+          [
+            "Teh tarik",
+            "S$ 2.80"
+          ]
+        ],
+        "order": [
+          [
+            "Laksa",
+            "2",
+            "S$ 9.50",
+            "S$ 19.00"
+          ],
+          [
+            "Chicken rice",
+            "1",
+            "S$ 7.80",
+            "S$ 7.80"
+          ],
+          [
+            "Iced lemon tea",
+            "3",
+            "S$ 3.20",
+            "S$ 9.60"
+          ]
+        ],
+        "total": "S$ 36.40",
+        "btn": "Order"
+      },
+      "support": [
+        {
+          "type": "window",
+          "app": "pos_restaurant",
+          "view": "kds",
+          "frame": false,
+          "appLabel": "Kitchen Display",
+          "tickets": [
+            [
+              "Table 12",
+              [
+                [
+                  "Laksa",
+                  "2"
+                ],
+                [
+                  "Chicken rice",
+                  "1"
+                ]
+              ],
+              "Cooking",
+              "2 min"
+            ],
+            [
+              "Table 7",
+              [
+                [
+                  "Satay (10)",
+                  "1"
+                ],
+                [
+                  "Kaya toast",
+                  "2"
+                ]
+              ],
+              "Ready",
+              "6 min"
+            ]
+          ]
+        }
+      ],
+      "links": [
+        {
+          "from": "hero",
+          "to": "s0",
+          "label": "Sent to the kitchen"
+        }
+      ],
+      "accents": [
+        {
+          "type": "pill",
+          "text": "No paper tickets"
+        }
+      ],
+      "look": {
+        "layout": "top",
+        "camera": "tilt-r",
+        "bg": "floor",
+        "palette": "sunrise"
+      }
+    },
+    "order": 1,
+    "createdAt": "2026-09-28T12:00:01Z"
   },
   {
-    id: 'ai-bill-you-approve',
-    cat: 'ai',
-    name: 'AI in Odoo · Vendor bills, with Nexi',
-    source: 'technext.asia/odoo/ai-integration — the vendor bill record and its three steps',
-    badge: 'ready',
-    ground: 'blobs',
-    copy: {
-      head: 'AI prepares the bill.|*You approve it.*',
-      sub: 'TechNext builds AI inside your Odoo. It reads the vendor bill, matches the purchase order and waits for your OK.'
+    "id": "ai-bill-reads-itself",
+    "cat": "ai",
+    "name": "AI vendor bill",
+    "angle": "",
+    "v": 3,
+    "bg": {
+      "style": "rays",
+      "palette": "sky",
+      "seed": 366240,
+      "focus": [
+        427,
+        673
+      ]
     },
-    layers: [
-      { type: 'burst', x: -60, y: 470, w: 620, z: 2 },
-      { type: 'nexi', x: 34, y: 520, w: 440, z: 16, pose: 'point' },
-      { type: 'record', x: 486, y: 444, w: 540, rot: 2.5, z: 12, app: 'accountant', title: 'Vendor bill', crumb: 'Accounting · Draft', status: 'Draft',
-        rows: [['Vendor', 'Harbourline Supplies', 'ai'], ['Bill date', '12 Sep 2026', 'ai'], ['Total', 'S$ 1,284.00', 'ai'], ['PO match', 'PO00123', 'ok']],
-        ai: 'Prepared by AI · a person approves', btn: 'Approve' },
-      { type: 'chip', x: 548, y: 842, z: 18, rot: -1.5, icon: 'spark', text: 'AI read the bill' },
-      { type: 'chip', x: 606, y: 916, z: 18, rot: 1.5, icon: 'search', text: 'Matched to PO00123' },
-      { type: 'chip', x: 560, y: 990, z: 18, rot: -1, icon: 'check', tone: 'ok', text: 'Approved by Finance' },
-      { type: 'sphere', x: 986, y: 760, w: 54, z: 6 },
-      { type: 'sparkles', x: 400, y: 470, w: 110, z: 20 },
-      { type: 'bubble', x: 60, y: 440, z: 20, rot: -3, text: 'PO matched!' }
-    ]
+    "cam": "iso-l",
+    "brand": {
+      "logo": "bl",
+      "style": "chip",
+      "badge": "ready"
+    },
+    "copy": {
+      "head": "The bill reads itself.|*You just approve.*",
+      "sub": "AI inside Odoo reads the supplier PDF, fills the vendor bill and matches the purchase order.",
+      "x": 64,
+      "y": 70,
+      "w": 952,
+      "align": "center",
+      "fs": 74,
+      "subFs": 28
+    },
+    "layers": [
+      {
+        "type": "glow",
+        "x": -33,
+        "y": 213,
+        "w": 919,
+        "z": 1,
+        "op": 0.8
+      },
+      {
+        "type": "window",
+        "app": "accountant",
+        "view": "form",
+        "crumbs": [
+          "Vendor Bills",
+          "BILL/2026/0311"
+        ],
+        "status": [
+          "Draft",
+          "Posted"
+        ],
+        "statusAt": 0,
+        "buttons": [
+          "Confirm"
+        ],
+        "record": "Draft Bill",
+        "fields": [
+          [
+            "Vendor",
+            "Sample Seafood Pte Ltd"
+          ],
+          [
+            "Bill date",
+            "24 Sep 2026"
+          ],
+          [
+            "Reference",
+            "INV-88213"
+          ],
+          [
+            "Purchase order",
+            "P00088"
+          ]
+        ],
+        "highlight": [
+          "Vendor",
+          "Bill date",
+          "Reference",
+          "Purchase order"
+        ],
+        "ai": true,
+        "lines": [
+          [
+            "Prawns 2 kg",
+            "6",
+            "S$ 32.00",
+            "S$ 192.00"
+          ],
+          [
+            "Salmon fillet",
+            "4",
+            "S$ 28.50",
+            "S$ 114.00"
+          ]
+        ],
+        "total": "S$ 333.54",
+        "chatter": "Odoo AI filled 4 fields from the PDF and matched P00088. Waiting for your approval.",
+        "role": "hero",
+        "w": 766,
+        "x": 44,
+        "y": 385,
+        "cam": true,
+        "z": 10
+      },
+      {
+        "type": "receipt",
+        "vendor": "Sample Seafood Pte Ltd",
+        "doc": "TAX INVOICE",
+        "lines": [
+          [
+            "Prawns 2 kg ×6",
+            "192.00"
+          ],
+          [
+            "Salmon fillet ×4",
+            "114.00"
+          ],
+          [
+            "GST 9%",
+            "27.54"
+          ]
+        ],
+        "total": "S$ 333.54",
+        "stamp": "SCANNED",
+        "role": "support",
+        "w": 343,
+        "x": 707,
+        "y": 600,
+        "cam": true,
+        "z": 12,
+        "rot": 3
+      },
+      {
+        "type": "link",
+        "labelOnly": true,
+        "x1": 716,
+        "y1": 746,
+        "x2": 716,
+        "y2": 746,
+        "label": "→ AI reads the PDF",
+        "tone": "",
+        "z": 45
+      },
+      {
+        "type": "nexi",
+        "z": 40,
+        "pose": "point",
+        "w": 254,
+        "glow": false,
+        "x": 791,
+        "y": 383
+      },
+      {
+        "type": "sparkles",
+        "x": 18,
+        "y": 371,
+        "w": 100,
+        "z": 41
+      }
+    ],
+    "caption": "Supplier bills still typed by hand? With AI inside Odoo, the PDF fills the bill and the purchase order is matched. Finance only approves. Book a call at technext.asia.",
+    "hashtags": [
+      "#Odoo",
+      "#AI",
+      "#Accounting"
+    ],
+    "source": "Starter: AI reads the bill",
+    "scene": {
+      "name": "AI vendor bill",
+      "head": "The bill reads itself.|*You just approve.*",
+      "sub": "AI inside Odoo reads the supplier PDF, fills the vendor bill and matches the purchase order.",
+      "hero": {
+        "type": "window",
+        "app": "accountant",
+        "view": "form",
+        "crumbs": [
+          "Vendor Bills",
+          "BILL/2026/0311"
+        ],
+        "status": [
+          "Draft",
+          "Posted"
+        ],
+        "statusAt": 0,
+        "buttons": [
+          "Confirm"
+        ],
+        "record": "Draft Bill",
+        "fields": [
+          [
+            "Vendor",
+            "Sample Seafood Pte Ltd"
+          ],
+          [
+            "Bill date",
+            "24 Sep 2026"
+          ],
+          [
+            "Reference",
+            "INV-88213"
+          ],
+          [
+            "Purchase order",
+            "P00088"
+          ]
+        ],
+        "highlight": [
+          "Vendor",
+          "Bill date",
+          "Reference",
+          "Purchase order"
+        ],
+        "ai": true,
+        "lines": [
+          [
+            "Prawns 2 kg",
+            "6",
+            "S$ 32.00",
+            "S$ 192.00"
+          ],
+          [
+            "Salmon fillet",
+            "4",
+            "S$ 28.50",
+            "S$ 114.00"
+          ]
+        ],
+        "total": "S$ 333.54",
+        "chatter": "Odoo AI filled 4 fields from the PDF and matched P00088. Waiting for your approval."
+      },
+      "support": [
+        {
+          "type": "receipt",
+          "vendor": "Sample Seafood Pte Ltd",
+          "doc": "TAX INVOICE",
+          "lines": [
+            [
+              "Prawns 2 kg ×6",
+              "192.00"
+            ],
+            [
+              "Salmon fillet ×4",
+              "114.00"
+            ],
+            [
+              "GST 9%",
+              "27.54"
+            ]
+          ],
+          "total": "S$ 333.54",
+          "stamp": "SCANNED"
+        }
+      ],
+      "links": [
+        {
+          "from": "s0",
+          "to": "hero",
+          "label": "AI reads the PDF"
+        }
+      ],
+      "accents": [
+        {
+          "type": "nexi",
+          "pose": "point"
+        }
+      ],
+      "look": {
+        "layout": "top",
+        "camera": "iso-l",
+        "bg": "rays",
+        "palette": "sky",
+        "logo": "bl"
+      }
+    },
+    "order": 2,
+    "createdAt": "2026-09-28T12:00:02Z"
   }
 ];

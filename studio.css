@@ -251,3 +251,33 @@ h1,h2,h3{font-family:var(--font-display);color:var(--ink);margin:0;letter-spacin
 .tbl .n{text-align:right;font-variant-numeric:tabular-nums}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 @media (max-width:760px){.usage-sum{grid-template-columns:1fr 1fr}.angles{grid-template-columns:1fr}.savestate{display:none}}
+
+/* ---------- v3 editor ---------- */
+.canvas-box .L.locked{pointer-events:none}
+.canvas-wrap.zoomed{overflow:auto;place-items:start center}
+.marq{position:absolute;z-index:5;border:1.5px solid #3167CA;background:rgba(49,103,202,.1);border-radius:3px;pointer-events:none}
+.tools .tl-l{padding:0 8px;color:#B9C4DA;font:600 12px/1 var(--font-body);white-space:nowrap}
+.tools button.on{background:rgba(255,255,255,.2)}
+.tools button.sw{width:26px;padding:0;display:grid;place-items:center}
+.tools button.sw::after{content:"";width:14px;height:14px;border-radius:50%;background:var(--sw);box-shadow:0 0 0 2px rgba(255,255,255,.6)}
+.tools svg{display:block}
+.ctx{position:fixed;z-index:80;min-width:200px;padding:6px;border-radius:12px;background:var(--paper);border:1px solid var(--line);box-shadow:0 24px 50px -20px rgba(31,31,61,.5)}
+.ctx button{display:block;width:100%;padding:8px 12px;border:0;border-radius:8px;background:none;text-align:left;font:500 13.5px/1.2 var(--font-body);color:var(--ink);cursor:pointer}
+.ctx button:hover{background:var(--alt)}
+.ctx button.danger{color:var(--red)}
+.design .chips{display:flex;flex-wrap:wrap;gap:5px}
+.design .chips button{height:28px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper);font:600 12px/1 var(--font-body);color:var(--label);cursor:pointer}
+.design .chips button:hover{border-color:#C9D8F5;color:var(--blue-700)}
+.design .chips button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.design .pals{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pal-sw{width:30px;height:30px;border-radius:50%;border:2px solid #fff;cursor:pointer;box-shadow:0 0 0 1px var(--line);background:radial-gradient(circle at 25% 30%,var(--a) 0 35%,transparent 36%),radial-gradient(circle at 75% 35%,var(--b) 0 35%,transparent 36%),radial-gradient(circle at 50% 80%,var(--c) 0 40%,transparent 41%),var(--base)}
+.pal-sw.on{box-shadow:0 0 0 2px var(--blue)}
+.design .btn svg{width:14px;height:14px}
+textarea.bad{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(179,39,30,.15)!important}
+.starters{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;max-height:52vh;overflow:auto;padding:2px}
+.stc{display:grid;gap:4px;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--paper);text-align:left;cursor:pointer}
+.stc:hover{border-color:#C9D8F5;background:var(--blue-050)}
+.stc-t{position:relative;display:block;aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--alt)}
+.stc-t .drip{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none}
+.stc b{font:700 13px/1.25 var(--font-display);color:var(--ink)}
+.stc small{font-size:11.5px;line-height:1.35;color:var(--label)}

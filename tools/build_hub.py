@@ -16,7 +16,7 @@ body = re.search(r"<body>(.*)</body>", src, re.S).group(1).strip()
 out = f"{title}\n{links}\n<style>html,body{{height:100%}}</style>\n{body}\n"
 open(os.path.join(ROOT, "hub.html"), "w", encoding="utf-8").write(out)
 
-files = ["drip.css", "studio.css", "content.js", "drips.js", "drip-render.js", "recipes.js", "ai.js", "store.js", "studio.js", "assets/fonts.css"]
+files = ["drip.css", "studio.css", "content.js", "drips.js", "drip-render.js", "odoo-ui.js", "compose.js", "starters.js", "ai.js", "store.js", "studio.js", "assets/fonts.css"]
 for sub in ("assets/brand", "assets/fonts", "assets/nexi", "assets/odoo", "assets/sites"):
     for fn in sorted(os.listdir(os.path.join(ROOT, sub))):
         if not fn.startswith("."):
