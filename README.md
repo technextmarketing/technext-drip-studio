@@ -5,6 +5,10 @@ technext.asia brand, then export them as 1080 px PNGs. It follows the style of t
 Drive `SALES / 01_Drips`: square canvas, TechNext logo top left, Odoo badge top right, a bold
 two-tone headline, then a device, person, workflow or Nexi, with blue blobs at the bottom.
 
+**Live:** https://technextmarketing.github.io/technext-drip-studio/ (repo `technextmarketing/technext-drip-studio`, GitHub Pages from `main`).
+Online, everything works except writing to disk: edits stay in your browser, "Download PNG" renders in the
+browser, and "Save library" downloads a `drips.js` you commit to the repo to share your drips with the team.
+
 ## Start
 
 1. Double-click **`Open Drip Studio.bat`**. It runs `python tools/serve.py` and opens
@@ -16,7 +20,11 @@ two-tone headline, then a device, person, workflow or Nexi, with blue blobs at t
 
 Edits are also kept in this browser between visits. "Discard edits" drops them and reloads `drips.js`.
 
-Opening `index.html` directly (without the .bat) still lets you edit, but PNG export and saving need the server.
+Opening `index.html` directly (without the .bat) still lets you edit, but PNG export and saving need the server
+(or use the live URL).
+
+To publish changes: save the library, then `git add -A && git commit -m "..." && git push` in this folder.
+GitHub Pages redeploys in about a minute.
 
 Batch export without the studio: `python tools/render.py` (all drips), `python tools/render.py <id> --scale 2`,
 or `--format 4:5` for 1080 × 1350 portrait.
