@@ -1,92 +1,95 @@
 # TechNext Drip Studio
 
-Build TechNext marketing drip images (Odoo apps, Odoo 20, AI, and per-industry posts) in the
-technext.asia brand, then export them as 1080 px PNGs. It follows the style of the drips in
-Drive `SALES / 01_Drips`: square canvas, TechNext logo top left, Odoo badge top right, a bold
-two-tone headline, then a device, person, workflow or Nexi, with blue blobs at the bottom.
+Build TechNext marketing drip images (Odoo apps, Odoo 20, AI, industries, websites) in the
+technext.asia brand, have Claude write whole sets of posts from the website's own content, and
+export 1080 px PNGs. The style follows the drips in Drive `SALES / 01_Drips`.
 
-**Live:** https://technextmarketing.github.io/technext-drip-studio/ (repo `technextmarketing/technext-drip-studio`, GitHub Pages from `main`).
-Online, everything works except writing to disk: edits stay in your browser, "Download PNG" renders in the
-browser, and "Save library" downloads a `drips.js` you commit to the repo to share your drips with the team.
+## Where it runs
 
-## Start
+| Copy | Link | Saving | Claude |
+|---|---|---|---|
+| **The hub** (use this) | https://claude.ai/artifact/F2LKF69gAzjvQx6nkWFeKM | Automatic, shared with everyone the hub is shared with (the Artifact's database). Photos go to its file store. | Yes, on the viewer's own Claude plan |
+| GitHub mirror | https://technextmarketing.github.io/technext-drip-studio/ | Automatic, in this browser only | No |
+| This folder | `Open Drip Studio.bat` → http://localhost:8807 | Automatic, in this browser; "Write drips.js" saves to the file | No |
 
-1. Double-click **`Open Drip Studio.bat`**. It runs `python tools/serve.py` and opens
-   http://localhost:8807. Keep that window open while you work.
-2. Pick a category on the left, click a drip to edit it, or press **New drip**.
-3. **Download PNG** renders the drip with headless Chrome. The file downloads and is also
-   saved to `exports/<category>/<id>.png`. **PNG 2x** makes a 2160 px file.
-4. **Save library** writes your drips back into `drips.js`. The old copy goes to `backups/`.
+The hub is private until you share it from its Share menu. People need Contributor access or above to edit.
 
-Edits are also kept in this browser between visits. "Discard edits" drops them and reloads `drips.js`.
+## Editing on the canvas
 
-Opening `index.html` directly (without the .bat) still lets you edit, but PNG export and saving need the server
-(or use the live URL).
+- **Click** to select, **drag** to move. Layers snap to the centre line and the 64 px margins (pink guides); hold Alt to move freely.
+- **Corner handle** resizes; **top dot** rotates (Shift snaps to 15°).
+- **Double-click text** (pills, chips, notes, bubbles, record fields, website mockup text) to type straight on the canvas. Enter saves, Esc cancels.
+- **Double-click the headline**, or anything with lists (checklists, record rows, code), to open a small editor next to it.
+- The dark **toolbar** over the selection: Edit text, Replace image / Swap Nexi for a photo, Nexi pose, Forward, Backward, Duplicate, Delete.
+- **Keyboard:** arrows nudge (Shift = 10 px), Delete removes, Ctrl+D duplicates, `]` / `[` forward / backward, Ctrl+Z / Ctrl+Shift+Z undo / redo, Esc deselects.
+- **Drop an image** on the canvas to add a person or product cut-out. A selected photo, screenshot or Nexi gets replaced by it.
+- **Add elements** from the left panel (or the "Add" picker under Layers on small screens).
+- Headline markup: `*blue*`, `~yellow brush~`, `==marker==`, `[[white on blue]]`, `{odoo}purple{/odoo}`, `|` = line break. It shrinks itself to stay within 2 lines.
+- **4:5 portrait:** layers below the copy move down 150 px automatically; drag in 4:5 to set a portrait-only position.
+- Every drip has a **Post caption** and hashtags, with a Copy button.
 
-To publish changes: save the library, then `git add -A && git commit -m "..." && git push` in this folder.
-GitHub Pages redeploys in about a minute.
+## Generate with Claude
 
-Batch export without the studio: `python tools/render.py` (all drips), `python tools/render.py <id> --scale 2`,
-or `--format 4:5` for 1080 × 1350 portrait.
+"Generate" asks Claude for 3, 6 or 9 posts for one category. Claude only gets technext.asia content
+for that category (industry workflow, before/after table, Odoo 20 changes, rollout phases, dashboard,
+service pages, app catalogue, portfolio sites) plus the brand rules, picks a different angle for each post,
+and writes the headline, subline, caption, hashtags and the facts each layout shows. The studio then
+draws each post with one of 13 fixed layouts, so the design never drifts. Posts arrive as **drafts**:
+Keep, Edit or Discard them. Nothing is lost if you close the page; drafts are saved too.
 
-## Editing a drip
+**Token use per generation** (estimates: the page cannot read exact counts; about 4 characters per token):
 
-- **Drag** any layer on the canvas. Arrow keys nudge 1 px (Shift = 10 px). Ctrl+Z undoes.
-- **Drop an image** on the canvas to add a person or product cut-out (transparent PNG works best).
-  If a person, screenshot or image layer is selected, the drop replaces its image.
-  Dropped images are embedded in the library. For big photos, save them in `assets/people/`
-  and type the path (for example `assets/people/shocked-woman.png`) in the layer's image field.
-- **Headline markup**: `*blue words*`, `~yellow brush underline~`, `==yellow marker==`,
-  `[[white on blue]]`, `{odoo}Odoo purple{/odoo}`, and `|` for a line break.
-  The headline shrinks itself to stay within 2 lines (change "Max headline lines" to allow 3).
-- **4:5**: toggle it in the editor bar. Layers below the copy move down 150 px automatically;
-  drag a layer in 4:5 to give it its own portrait position (`y45`).
-- **Layer JSON** (bottom of the layer panel) shows every field, including the rows of a record card.
+| Category | 3 posts | 6 posts | 9 posts |
+|---|---|---|---|
+| Industry (F&B, Retail, Manufacturing…) | ~3,400 | ~4,350 | ~5,350 |
+| Meet Odoo 20 | ~4,350 | ~5,350 | ~6,300 |
+| Odoo apps | ~3,900 | ~4,900 | ~5,900 |
+| AI in Odoo | ~2,900 | ~3,900 | ~4,900 |
+| Websites & marketing | ~2,450 | ~3,450 | ~4,400 |
 
-## Layer types
+The prompt (input) is about 1,450–3,350 tokens depending on the category; each post adds about 330 output tokens.
+The Balanced and Best models also think before answering, which is billed on the plan but not reported; Fast does not.
+It runs on the viewer's own Claude plan (claude.ai usage limits), not on an API bill. Every run is logged under **Claude usage**.
 
-| Layer | What it is |
+## Layouts (recipes)
+
+Industry workflow · Before / after · Odoo record + Nexi · Phone screen · Industry dashboard · Checklist ·
+Rollout phases · How a record moves · App orbit · Nexi reaction · Website we built · Web design craft · Found on Google.
+"New drip" builds any of them without Claude, filled from the website content.
+
+## Elements
+
+| Group | Elements |
 |---|---|
-| `nexi` | Nexi, the TechNext robot. Poses: wave, point, present, celebrate, cheer, surprise, love, think, clap |
-| `person` | Your cut-out photo (exaggerated people), with optional white sticker outline or bottom fade |
-| `shot` | A screenshot, bare or in a browser, laptop or tablet frame |
-| `phone` | Phone mockup. Built-in screen `offline-receipt`, or any screenshot as `src` |
-| `record` | An Odoo record card: app icon, status, rows (`[label, value, "ai" or "ok"]`), AI note, button |
-| `flow` | A workflow from the website: `from: "industry:fnb"` pulls that industry's six steps and Odoo apps |
-| `apps` | Grid of official Odoo app icons: `"module:Label"` entries |
-| `pill`, `chip`, `note`, `bubble`, `text` | Handwritten pills, step chips, Caveat notes (`red strike` for the old way), speech bubbles, free text |
-| `icon`, `odoo` | A TechNext duotone icon, or one official Odoo app icon |
-| `burst`, `glow`, `sphere`, `halftone`, `scan`, `sparkles`, `storm`, `speed`, `confetti`, `arrow`, `nosignal` | Effects |
-
-## Templates (New drip)
-
-- **Industry workflow**: the six-step flow for any of the 8 industries on the site, with a before/after line when a short one exists.
-- **Before / after**: three old habits struck out, and what Odoo does instead (from the industry page table).
-- **Odoo 20 feature**: pick any feature from the site's Odoo 20 summary; headline and subline are filled in.
-- **Nexi explains**, **Person + callouts**, **Odoo app cloud**, **Blank**.
+| Nexi | wave, point, present, celebrate, cheer, surprise, love, think, clap |
+| Photos | person cut-out, screenshot (bare, browser, laptop, tablet), image |
+| Odoo | record card, phone screen, app icon, app cloud, app orbit, how a record moves (50 apps), checklist |
+| From technext.asia | industry workflow, before / after, rollout phases, industry dashboard (all 8 industries) |
+| Website design | laptop + phone with real TechNext-built sites (technext.asia, Move with Ease, TRE Singapore, Immaculate Connections), website mockup, code window, colour palette, wireframe, Google result, score gauge, cursor |
+| Callouts | handwritten pill, step chip, handwritten note (red strike for the old way), speech bubble, free text, hand-drawn arrow, TechNext icon |
+| Effects | burst, glow, sparkles, sphere, confetti, storm cloud, speed lines, halftone, AI scan beam, no-signal badge |
 
 ## Files
 
 | Path | Role |
 |---|---|
-| `drips.js` | The library: categories and every drip (data only) |
-| `content.js` | Website content: industry flows, before/after tables, app record flows, Odoo 20 features, icons. Refresh with `python tools/export_content.py` |
-| `drip.css`, `drip-render.js` | The drip design system and renderer (shared by the studio and the exporter) |
+| `drips.js` | Starter library (the hub was seeded from it; the hub's database is the live copy) |
+| `content.js` | technext.asia content. Refresh: `python tools/export_content.py` |
+| `drip.css`, `drip-render.js` | The drip design system and renderer |
+| `recipes.js` | The 13 layouts Claude's content is poured into |
+| `ai.js` | Prompt builder, Claude call, token estimates |
+| `store.js` | Saving: hub database / asset store / downloads, or this browser |
 | `index.html`, `studio.css`, `studio.js` | The studio |
-| `render.html` | Renders one drip at full size for export |
-| `assets/` | Logos, Odoo wordmark + badge, 52 official Odoo app icons, Nexi cut-outs, self-hosted fonts; put your photos in `assets/people/` |
-| `tools/serve.py`, `tools/render.py` | Local server with PNG export and library saving; batch exporter |
+| `hub.html` | The Artifact page, built by `python tools/build_hub.py` |
+| `render.html`, `tools/render.py`, `tools/serve.py` | Full-size render, batch PNG export, local server |
+| `assets/` | Logos, Odoo marks, 52 official app icons, Nexi cut-outs, portfolio screenshots (`sites/`), fonts |
+
+**Publishing changes:** GitHub: commit and push (Pages rebuilds in a minute). Hub: run `python tools/build_hub.py`,
+then republish `hub.html` with the files in `hub-files.json` to the same Artifact URL.
 
 ## Content rules (from technext.asia)
 
-- Say "Odoo Partner"; never "Certified". The badge image is the official Odoo Ready Partner mark.
-- Only the approved figures: 10+ countries, 11+ enterprise clients, 4 AI disciplines.
-- Marketing (websites, social) is its own TechNext service; don't tie it to Odoo.
-- Odoo 20 claims come from the site's Odoo 20 article. AI features in Odoo 20 use paid IAP credits.
-- Record cards and phone screens use sample data (for example "Sample Supplier Pte Ltd", "Harbourline Supplies" from the site's AI page), never a real client's data.
-
-## Nexi renders
-
-The Nexi cut-outs in `assets/nexi/` were rendered from the 3D Nexi chatbot
-(`Pictures/technext-nexi-chatbot`) with a transparent background. To add a pose, render it the
-same way and save it as `assets/nexi/nexi-<pose>.png`, then add the pose name to `POSES` in `studio.js`.
+- Say "Odoo Partner"; never "Certified". Only the approved figures: 10+ countries, 11+ enterprise clients, 4 AI disciplines.
+- Marketing (websites, social) is its own TechNext service; never tie it to Odoo.
+- Odoo 20 claims come from the site's Odoo 20 article; AI features in Odoo 20 use paid credits.
+- Record cards, phones and dashboards use sample data (the dashboard is labelled "Sample data"), never a real client's.

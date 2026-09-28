@@ -96,18 +96,20 @@
   }
 
   /* ---------- phone screens ---------- */
+  function odooScreen(L, offline) {
+    var lines = L.lines || (offline ? [['Cement, 40 kg bags', '20 / 20', 1], ['Rebar, 12 mm', '150 / 150', 1], ['Tile adhesive, 25 kg', '18 / 35', 0]] : [['Item one', '1 / 1', 1], ['Item two', '2 / 2', 1], ['Item three', '0 / 3', 0]]);
+    var fields = L.fields || [[L.partnerLabel || (offline ? 'Receive from' : 'Customer'), L.partner || 'Sample Supplier Pte Ltd']];
+    return '<div class="ph-status"><span>9:41</span><span class="sig"><span class="bars"><i></i><i></i><i></i><i></i></span>' + (offline ? '<span class="x">\u2715</span>' : '') + '</span></div>' +
+      '<div class="ph-top">' + oi(L.app || 'stock') + '<div><b data-e="title">' + esc(L.title || (offline ? 'Receipt WH/IN/00042' : 'Record')) + '</b><small data-e="crumb">' + esc(L.crumb || (offline ? 'Inventory · Receipts' : 'Odoo')) + '</small></div></div>' +
+      (offline || L.banner ? '<div class="ph-offline' + (offline ? '' : ' info') + '">' + (offline ? SVG.cloudOff : SVG.spark) + '<span data-e="banner">' + esc(L.banner || "You're offline. Changes are saved on this phone.") + '</span></div>' : '') +
+      '<div class="ph-body">' + fields.map(function (f) { return '<div class="ph-field"><small>' + esc(f[0]) + '</small><span>' + esc(f[1]) + '</span></div>'; }).join('') +
+      lines.map(function (l) { return '<div class="ph-line"><span class="ck' + (l[2] ? '' : ' todo') + '">' + (l[2] ? SVG.check : '') + '</span>' + esc(l[0]) + '<span class="q">' + esc(l[1]) + '</span></div>'; }).join('') +
+      '</div><div class="ph-btn" data-e="btn">' + esc(L.btn || 'Validate') + '</div>' +
+      (L.toast ? '<div class="ph-toast">' + SVG.sync + '<span data-e="toast">' + esc(L.toast) + '</span></div>' : '');
+  }
   var SCREENS = {
-    'offline-receipt': function (L) {
-      var lines = L.lines || [['Cement, 40 kg bags', '20 / 20', 1], ['Rebar, 12 mm', '150 / 150', 1], ['Tile adhesive, 25 kg', '18 / 35', 0]];
-      return '<div class="ph-status"><span>9:41</span><span class="sig"><span class="bars"><i></i><i></i><i></i><i></i></span><span class="x">✕</span></span></div>' +
-        '<div class="ph-top">' + oi(L.app || 'stock') + '<div><b>' + esc(L.title || 'Receipt WH/IN/00042') + '</b><small>' + esc(L.crumb || 'Inventory · Receipts') + '</small></div></div>' +
-        '<div class="ph-offline">' + SVG.cloudOff + '<span>' + esc(L.banner || "You're offline. Changes are saved on this phone.") + '</span></div>' +
-        '<div class="ph-body">' +
-        '<div class="ph-field"><small>Receive from</small><span>' + esc(L.partner || 'Sample Supplier Pte Ltd') + '</span></div>' +
-        lines.map(function (l) { return '<div class="ph-line"><span class="ck' + (l[2] ? '' : ' todo') + '">' + (l[2] ? SVG.check : '') + '</span>' + esc(l[0]) + '<span class="q">' + esc(l[1]) + '</span></div>'; }).join('') +
-        '</div><div class="ph-btn">' + esc(L.btn || 'Validate') + '</div>' +
-        (L.toast ? '<div class="ph-toast">' + SVG.sync + '<span>' + esc(L.toast) + '</span></div>' : '');
-    }
+    'offline-receipt': function (L) { return odooScreen(L, true); },
+    odoo: function (L) { return odooScreen(L, false); }
   };
 
   /* ---------- layers ---------- */
@@ -152,10 +154,10 @@
       return '<div class="rec-row' + (mode === 'ai' ? ' ai' : '') + '"><span class="k">' + esc(r[0]) + '</span><span class="v">' + esc(r[1]) + '</span>' +
         (mode === 'ok' ? '<span class="flag">' + SVG.check + (r[3] ? esc(r[3]) : '') + '</span>' : mode === 'ai' ? '<span class="spark">' + SVG.spark + '</span>' : '') + '</div>';
     }).join('');
-    return '<div class="rec"><div class="rec-top">' + oi(L.app || 'accountant') + '<div><b>' + esc(L.title || '') + '</b><small>' + esc(L.crumb || '') + '</small></div>' +
-      (L.status ? '<span class="st' + (L.statusOk ? ' ok' : '') + '">' + esc(L.status) + '</span>' : '') + '</div>' +
+    return '<div class="rec"><div class="rec-top">' + oi(L.app || 'accountant') + '<div><b data-e="title">' + esc(L.title || '') + '</b><small data-e="crumb">' + esc(L.crumb || '') + '</small></div>' +
+      (L.status ? '<span class="st' + (L.statusOk ? ' ok' : '') + '" data-e="status">' + esc(L.status) + '</span>' : '') + '</div>' +
       '<div class="rec-rows">' + rows + '</div>' +
-      '<div class="rec-foot">' + (L.ai ? '<span class="ai">' + SVG.spark + esc(L.ai) + '</span>' : '') + (L.btn ? '<span class="btn">' + esc(L.btn) + '</span>' : '') + '</div></div>';
+      '<div class="rec-foot">' + (L.ai ? '<span class="ai">' + SVG.spark + '<span data-e="ai">' + esc(L.ai) + '</span></span>' : '') + (L.btn ? '<span class="btn" data-e="btn">' + esc(L.btn) + '</span>' : '') + '</div></div>';
   }
   function frameShot(L) {
     var img = '<img src="' + asset(L.src) + '" alt="">';
@@ -175,7 +177,7 @@
     },
     img: function (L) { return L.src ? '<img src="' + asset(L.src) + '" alt="" style="border-radius:' + (L.radius || 0) + 'px">' : ''; },
     shot: function (L, edit) { return L.src ? frameShot(L) : (edit ? '<div class="placeholder" style="aspect-ratio:16/10">Drop a screenshot here</div>' : ''); },
-    phone: function (L) { var sc = L.src ? '<img src="' + asset(L.src) + '" alt="">' : (SCREENS[L.screen || 'offline-receipt'] || SCREENS['offline-receipt'])(L); return '<div class="phone"><div class="scr">' + sc + '</div></div>'; },
+    phone: function (L) { var sc = L.src ? '<img src="' + asset(L.src) + '" alt="">' : (SCREENS[L.screen || 'odoo'] || SCREENS.odoo)(L); return '<div class="phone"><div class="scr">' + sc + '</div></div>'; },
     record: record,
     flow: flow,
     apps: function (L) {
@@ -184,10 +186,10 @@
         var p = a.split(':'); return '<span class="a">' + oi(p[0]) + (L.labels === false ? '' : esc(p[1] || '')) + '</span>';
       }).join('') + '</div>';
     },
-    pill: function (L) { return '<span class="pill ' + esc(L.variant || '') + '">' + (L.icon ? kit(L.icon) : '') + esc(L.text) + '</span>'; },
-    chip: function (L) { return '<span class="chip"><span class="ico ' + esc(L.tone || '') + '">' + kit(L.icon || 'check') + '</span><span>' + esc(L.text) + (L.small ? '<small>' + esc(L.small) + '</small>' : '') + '</span></span>'; },
-    note: function (L) { return '<span class="note ' + esc(L.variant || '') + '" style="' + (L.size ? 'font-size:' + L.size + 'px;' : '') + (L.color ? 'color:' + L.color : '') + '"><span>' + esc(L.text) + '</span>' + (L.small ? '<span class="small">' + esc(L.small) + '</span>' : '') + '</span>'; },
-    bubble: function (L) { return '<span class="bubble">' + esc(L.text) + '</span>'; },
+    pill: function (L) { return '<span class="pill ' + esc(L.variant || '') + '">' + (L.icon ? kit(L.icon) : '') + '<span data-e="text">' + esc(L.text) + '</span></span>'; },
+    chip: function (L) { return '<span class="chip"><span class="ico ' + esc(L.tone || '') + '">' + kit(L.icon || 'check') + '</span><span><span data-e="text">' + esc(L.text) + '</span>' + (L.small ? '<small data-e="small">' + esc(L.small) + '</small>' : '') + '</span></span>'; },
+    note: function (L) { return '<span class="note ' + esc(L.variant || '') + '" style="' + (L.size ? 'font-size:' + L.size + 'px;' : '') + (L.color ? 'color:' + L.color : '') + '"><span data-e="text">' + esc(L.text) + '</span>' + (L.small ? '<span class="small" data-e="small">' + esc(L.small) + '</span>' : '') + '</span>'; },
+    bubble: function (L) { return '<span class="bubble" data-e="text">' + esc(L.text) + '</span>'; },
     text: function (L) {
       var f = { hand: 'var(--font-hand)', display: 'var(--font-display)', body: 'var(--font-body)' }[L.font || 'display'];
       return '<div style="font-family:' + f + ';font-size:' + (L.size || 40) + 'px;font-weight:' + (L.weight || 700) + ';line-height:' + (L.lh || 1.15) + ';color:' + (L.color || 'var(--ink)') + ';text-align:' + (L.align || 'left') + ';letter-spacing:' + (L.ls || '-.01em') + '">' + rich(L.text) + '</div>';
@@ -200,6 +202,101 @@
     nosignal: function () { return '<span style="display:grid;place-items:center;aspect-ratio:1;border-radius:50%;background:#fff;color:#D93A30;padding:22%;box-shadow:0 20px 40px -18px rgba(19,47,102,.6),0 0 0 8px rgba(217,58,48,.12)">' + SVG.wifiOff + '</span>'; },
     burst: function () { return ''; }, glow: function () { return ''; }, sphere: function () { return ''; }, halftone: function () { return ''; }, scan: function () { return ''; }
   };
+  /* ---------- website design elements ---------- */
+  var SITES = C.sites || {}, APPS = C.apps || {};
+  function appName(m) { return (APPS[m] && APPS[m].name) || String(m || '').replace(/_/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); }); }
+  function fromInd(L, key) { var m = /^industry:(.+)$/.exec(L.from || ''); return m && C.industries && C.industries[m[1]] ? C.industries[m[1]][key] : null; }
+  function hlCode(line) {
+    return esc(line).replace(/(&lt;\/?)([a-z0-9-]+)/g, '$1<span class="tg">$2</span>')
+      .replace(/([a-z-]+)=(&quot;.*?&quot;)/g, '<span class="at">$1</span>=<span class="st">$2</span>');
+  }
+  LAYERS.site = function (L) {
+    return '<div class="web" style="--acc:' + esc(L.accent || '#3167CA') + '">' +
+      '<div class="web-bar"><i></i><i></i><i></i><span data-e="url">' + esc(L.url || 'yourbrand.com') + '</span></div>' +
+      '<div class="web-nav"><b><span class="dot"></span><span data-e="brand">' + esc(L.brand || 'Your Brand') + '</span></b><span>Home</span><span>Services</span><span>About</span><em>' + esc(L.navCta || 'Contact') + '</em></div>' +
+      '<div class="web-hero"><div class="web-copy"><h4>' + rich(L.head || 'A website that *works as hard as you do.*') + '</h4>' +
+      '<p data-e="sub">' + esc(L.sub || 'Clear pages, fast on every phone, and every inquiry sent to the right person.') + '</p>' +
+      '<div class="web-btns"><span class="b1" data-e="cta">' + esc(L.cta || 'Book a call') + '</span><span class="b2">' + esc(L.cta2 || 'See our work') + '</span></div></div>' +
+      '<div class="web-img">' + (L.src ? '<img src="' + asset(L.src) + '" alt="">' : '<span class="s1"></span><span class="s2"></span><span class="s3"></span>') + '</div></div>' +
+      '<div class="web-cards"><span><i></i><b></b><b class="s"></b></span><span><i></i><b></b><b class="s"></b></span><span><i></i><b></b><b class="s"></b></span></div></div>';
+  };
+  LAYERS.devices = function (L) {
+    var k = L.site || 'technext', d = L.desk || 'assets/sites/' + k + '-desktop.jpg', m = L.mob || 'assets/sites/' + k + '-phone.jpg';
+    return '<div class="devs"><div class="lap"><div class="lid"><img src="' + asset(d) + '" alt=""></div><div class="base"></div></div>' +
+      (L.phone === false ? '' : '<div class="phone mini"><div class="scr"><img src="' + asset(m) + '" alt=""></div></div>') +
+      (L.label === false ? '' : '<span class="devs-tag" data-e="label">' + esc(L.label || (SITES[k] ? SITES[k].url : '')) + '</span>') + '</div>';
+  };
+  LAYERS.cursor = function (L) {
+    return '<svg viewBox="0 0 100 120" aria-hidden="true">' + (L.click === false ? '' : '<g fill="none" stroke="#3167CA" stroke-width="4"><circle cx="18" cy="16" r="20" opacity=".7"/><circle cx="18" cy="16" r="34" opacity=".35"/></g>') +
+      '<path d="M18 16 18 96 38 78 52 110 66 104 52 72 80 72Z" fill="#fff" stroke="#1F1F3D" stroke-width="6" stroke-linejoin="round"/></svg>';
+  };
+  LAYERS.code = function (L) {
+    var lines = L.lines || ['<section class="hero">', '  <h1>Run your business', '      on one system.</h1>', '  <a class="btn" href="/quote">', '    Get a quotation</a>', '</section>'];
+    return '<div class="code"><div class="code-bar"><i></i><i></i><i></i><span data-e="file">' + esc(L.file || 'index.html') + '</span></div><div class="code-body">' +
+      lines.map(function (l, i) { return '<div class="cl"><span class="ln">' + (i + 1) + '</span><span class="cx">' + hlCode(l) + '</span></div>'; }).join('') + '</div></div>';
+  };
+  LAYERS.palette = function (L) {
+    var cs = L.colors || ['#3167CA', '#1E4691', '#1F1F3D', '#FFC83D', '#F5F6FA'];
+    return '<div class="pal">' + cs.map(function (c) { return '<span><i style="background:' + esc(c) + '"></i><b>' + esc(String(c).toUpperCase()) + '</b></span>'; }).join('') + '</div>';
+  };
+  LAYERS.wireframe = function () {
+    return '<div class="wf"><div class="wf-nav"><i></i><b></b><b></b><b></b><em></em></div><div class="wf-hero"><div><b class="l"></b><b class="l s"></b><b class="m"></b><span></span></div><i></i></div><div class="wf-cols"><i></i><i></i><i></i></div></div>';
+  };
+  LAYERS.gauge = function (L) {
+    var v = L.value, pct = typeof v === 'number' ? Math.max(0, Math.min(100, v)) : 100, r = 54, c = 2 * Math.PI * r;
+    return '<div class="gauge"><div class="gauge-ring"><svg viewBox="0 0 140 140" aria-hidden="true"><circle cx="70" cy="70" r="' + r + '" fill="none" stroke="#E4E7EF" stroke-width="14"/>' +
+      '<circle cx="70" cy="70" r="' + r + '" fill="none" stroke="' + esc(L.color || '#137A4A') + '" stroke-width="14" stroke-linecap="round" stroke-dasharray="' + (c * pct / 100).toFixed(1) + ' ' + c.toFixed(1) + '" transform="rotate(-90 70 70)"/></svg>' +
+      '<span class="gv" style="color:' + esc(L.color || '#137A4A') + '">' + (v == null || v === '' ? SVG.check : esc(v)) + '</span></div><b data-e="label">' + esc(L.label || 'Mobile-first') + '</b></div>';
+  };
+  LAYERS.serp = function (L) {
+    var sv = (C.services || {})['solutions/odoo-erp'] || {};
+    return '<div class="serp"><div class="serp-q"><b class="g">G</b><span data-e="query">' + esc(L.query || 'odoo partner singapore') + '</span>' + SVG.search + '</div>' +
+      '<div class="serp-r"><div class="serp-site"><i><img src="' + asset('assets/brand/logo-plane.png') + '" alt=""></i><span><b data-e="site">' + esc(L.site || 'TechNext') + '</b><small data-e="url">' + esc(L.url || 'https://technext.asia') + '</small></span></div>' +
+      '<h5 data-e="title">' + esc(L.title || sv.title || 'TechNext') + '</h5><p data-e="desc">' + esc(L.desc || sv.desc || '') + '</p></div></div>';
+  };
+
+  /* ---------- workflows and panels copied from technext.asia ---------- */
+  LAYERS.appflow = function (L) {
+    var app = L.app || 'sale', f = (C.appFlows || {})[app]; if (!f) return '';
+    var st = {}; f.states.forEach(function (s) { st[s[0]] = s; });
+    var path = (f.path || f.states.map(function (s) { return s[0]; })).slice(0, L.max || 5), hand = (f.handoffs || []).slice(0, L.handoffs == null ? 2 : L.handoffs);
+    return '<div class="aflow"><div class="af-top">' + oi(app) + '<div><b data-e="title">' + esc(L.title || ('How ' + (f.article || 'a') + ' ' + f.record + ' moves')) + '</b><small>Odoo ' + esc(appName(app)) + '</small></div></div>' +
+      '<div class="af-rail" style="grid-template-columns:repeat(' + path.length + ',1fr)">' + path.map(function (k, i) { var s = st[k] || [k, k, '']; return '<div class="af-st' + (L.hot === i ? ' hot' : '') + '"><span class="af-dot">' + (i + 1) + '</span><b>' + esc(s[1]) + '</b><small>' + esc(s[2]) + '</small></div>'; }).join('') + '</div>' +
+      (hand.length ? '<div class="af-hand">' + hand.map(function (h) { return '<span>' + oi(h[1]) + '<em>' + esc(appName(h[1])) + '</em>' + esc(h[2]) + '</span>'; }).join('') + '</div>' : '') + '</div>';
+  };
+  LAYERS.orbit = function (L) {
+    var apps = L.apps || ['accountant', 'sale', 'crm', 'stock', 'purchase', 'mrp', 'point_of_sale', 'website', 'project', 'hr'], n = apps.length, h = '';
+    apps.forEach(function (a, i) { var ang = (i / n) * 2 * Math.PI - Math.PI / 2; h += '<span class="ob-app" style="left:' + (50 + 42 * Math.cos(ang)).toFixed(2) + '%;top:' + (50 + 42 * Math.sin(ang)).toFixed(2) + '%">' + oi(a) + '</span>'; });
+    return '<div class="orbit"><i class="ring r1"></i><i class="ring r2"></i><span class="ob-core">' +
+      (L.core === 'odoo' ? '<img src="' + asset('assets/brand/odoo-wordmark.png') + '" alt="Odoo" style="width:62%">' : '<img src="' + asset('assets/brand/logo-plane.png') + '" alt="TechNext" style="width:40%">') +
+      '<small data-e="label">' + esc(L.label || 'One database') + '</small></span>' + h + '</div>';
+  };
+  LAYERS.chart = function (L) {
+    var ch = L.data || fromInd(L, 'chart'); if (!ch || !ch.views) return '';
+    var view = ch.views[L.view || 0], max = Math.max.apply(null, view.bars.map(function (b) { return b[1]; }));
+    return '<div class="dash"><div class="dash-top"><b>' + esc(ch.title) + '</b><span class="dash-tag">Sample data</span></div>' +
+      '<div class="dash-kpis">' + ch.kpis.slice(0, 3).map(function (k) { return '<span><small>' + esc(k[0]) + '</small><b>' + esc(k[1]) + '</b></span>'; }).join('') + '</div>' +
+      '<div class="dash-bars">' + view.bars.map(function (b) { return '<span><i style="height:' + (b[1] / max * 100).toFixed(1) + '%"></i><small>' + esc(b[0]) + '</small></span>'; }).join('') + '</div></div>';
+  };
+  LAYERS.checklist = function (L) {
+    var items = L.items || fromInd(L, 'new20') || [];
+    return '<div class="clist">' + (L.title ? '<div class="cl-top">' + (L.app ? oi(L.app) : '') + '<b data-e="title">' + esc(L.title) + '</b>' + (L.tag ? '<span class="cl-tag">' + esc(L.tag) + '</span>' : '') + '</div>' : '') +
+      '<ul>' + items.slice(0, L.max || 5).map(function (t) { return '<li><span class="ck">' + SVG.check + '</span><span>' + esc(t) + '</span></li>'; }).join('') + '</ul>' +
+      (L.apps && L.apps.length ? '<div class="cl-apps">' + L.apps.map(function (a) { return oi(a); }).join('') + '</div>' : '') + '</div>';
+  };
+  LAYERS.phases = function (L) {
+    var ph = L.data || fromInd(L, 'phases') || [];
+    return '<div class="phs">' + ph.slice(0, 3).map(function (p, i) {
+      return '<div class="ph"><span class="ph-n">Phase ' + (i + 1) + '</span><b>' + esc(p.h) + '</b><div class="ph-apps">' + (p.apps || []).map(function (a) { return oi(a); }).join('') + '</div>' +
+        '<ul>' + (p.items || []).slice(0, 3).map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>';
+    }).join('') + '</div>';
+  };
+  LAYERS.ba = function (L) {
+    var rows = L.rows || (fromInd(L, 'ba') || []).slice(0, L.n || 3);
+    return '<div class="bat"><div class="bat-h"><span></span><span>' + esc(L.oldLabel || 'The old way') + '</span><span>' + esc(L.newLabel || 'With Odoo') + '</span></div>' +
+      rows.map(function (r) { return '<div class="bat-r"><b>' + esc(r[0]) + '</b><span class="o">' + esc(r[1]) + '</span><span class="n"><span class="ck">' + SVG.check + '</span>' + esc(r[2]) + '</span></div>'; }).join('') + '</div>';
+  };
+
   var FX = { burst: 1, glow: 1, sphere: 1, halftone: 1, scan: 1, sparkles: 1, storm: 1, speed: 1, confetti: 1, arrow: 1 };
 
   function layerHTML(L, i, edit, tall) {
@@ -232,7 +329,7 @@
     if (ground) h += '<div class="d-ground">' + (ground === 'wave' ? wave() : ground.indexOf('blobs') === 0 ? blobs(ground) : '') + '</div>';
     h += '<img class="d-logo" src="' + asset('assets/brand/logo-horizontal.png') + '" alt="TechNext">' + badge(d.badge);
     var c = d.copy || {};
-    h += '<div class="d-copy' + (c.align === 'left' ? ' left' : '') + '" style="top:' + ((c.top != null ? c.top : 148) + (d.format === '4:5' ? 40 : 0)) + 'px">' +
+    h += '<div class="d-copy' + (c.align === 'left' ? ' left' : '') + '" data-i="copy" style="top:' + ((c.top != null ? c.top : 148) + (d.format === '4:5' ? 40 : 0)) + 'px">' +
       (c.quote ? '<span class="d-quote">“</span>' : '') +
       (c.kicker ? '<span class="d-kicker">' + esc(c.kicker) + '</span>' : '') +
       '<h2 class="d-head' + (c.size ? ' s-' + c.size : '') + '"' + (c.lines ? ' data-lines="' + (+c.lines) + '"' : '') + '>' + rich(c.head || '') + '</h2>' +
@@ -257,5 +354,5 @@
     });
   }
 
-  window.TNDrip = { render: render, fit: fit, rich: rich, esc: esc, asset: asset, LAYERS: LAYERS, SCREENS: SCREENS, flowSteps: flowSteps };
+  window.TNDrip = { render: render, fit: fit, appName: appName, rich: rich, esc: esc, asset: asset, LAYERS: LAYERS, SCREENS: SCREENS, flowSteps: flowSteps };
 })();

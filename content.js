@@ -1,6 +1,308 @@
 /* Content library for the TechNext Drip Studio, exported from the live technext.asia source
    (_src/industries.py, _src/app_flows.py, assets/js/demo-o20.js, _src/sitedata.py). Re-export with tools/export_content.py. */
 window.TN_CONTENT = {
+"apps": {
+"accountant": {
+"name": "Accounting",
+"desc": "Journals, bank sync, tax reports and closing.",
+"cat": "Finance",
+"focus": true
+},
+"account": {
+"name": "Invoicing",
+"desc": "Send invoices and collect payments online.",
+"cat": "Finance",
+"focus": true
+},
+"hr_expense": {
+"name": "Expenses",
+"desc": "Capture receipts and approve claims.",
+"cat": "Finance",
+"focus": false
+},
+"spreadsheet_dashboard": {
+"name": "Spreadsheet (BI)",
+"desc": "Live pivots and dashboards on Odoo data.",
+"cat": "Finance",
+"focus": false
+},
+"documents": {
+"name": "Documents",
+"desc": "File storage with workflows and OCR.",
+"cat": "Finance",
+"focus": false
+},
+"sign": {
+"name": "Sign",
+"desc": "Legally binding e-signatures.",
+"cat": "Finance",
+"focus": false
+},
+"crm": {
+"name": "CRM",
+"desc": "Leads, pipeline and activities.",
+"cat": "Sales",
+"focus": true
+},
+"sale": {
+"name": "Sales",
+"desc": "Quotations, orders and upsells.",
+"cat": "Sales",
+"focus": true
+},
+"point_of_sale": {
+"name": "Point of Sale — Shop",
+"desc": "Offline-ready retail checkout.",
+"cat": "Sales",
+"focus": false
+},
+"pos_restaurant": {
+"name": "Point of Sale — Restaurant",
+"desc": "Tables, kitchen printing, bills.",
+"cat": "Sales",
+"focus": false
+},
+"sale_subscription": {
+"name": "Subscriptions",
+"desc": "Recurring billing and renewals.",
+"cat": "Sales",
+"focus": false
+},
+"sale_renting": {
+"name": "Rental",
+"desc": "Book, pick up and return assets.",
+"cat": "Sales",
+"focus": false
+},
+"website": {
+"name": "Website Builder",
+"desc": "Drag-and-drop pages with SEO tools.",
+"cat": "Websites",
+"focus": false
+},
+"website_sale": {
+"name": "eCommerce",
+"desc": "Online store tied to stock and accounting.",
+"cat": "Websites",
+"focus": false
+},
+"website_blog": {
+"name": "Blog",
+"desc": "Articles with scheduling and SEO.",
+"cat": "Websites",
+"focus": false
+},
+"website_forum": {
+"name": "Forum",
+"desc": "Community Q&A.",
+"cat": "Websites",
+"focus": false
+},
+"im_livechat": {
+"name": "Live Chat",
+"desc": "Chat with visitors from Discuss.",
+"cat": "Websites",
+"focus": false
+},
+"website_slides": {
+"name": "eLearning",
+"desc": "Courses, quizzes and certifications.",
+"cat": "Websites",
+"focus": false
+},
+"stock": {
+"name": "Inventory",
+"desc": "Multi-warehouse stock, barcodes, replenishment.",
+"cat": "Supply Chain",
+"focus": true
+},
+"mrp": {
+"name": "Manufacturing",
+"desc": "Bills of materials and work orders.",
+"cat": "Supply Chain",
+"focus": false
+},
+"mrp_plm": {
+"name": "PLM",
+"desc": "Engineering changes and versions.",
+"cat": "Supply Chain",
+"focus": false
+},
+"purchase": {
+"name": "Purchase",
+"desc": "RFQs, vendor pricelists, receipts.",
+"cat": "Supply Chain",
+"focus": true
+},
+"maintenance": {
+"name": "Maintenance",
+"desc": "Preventive and corrective requests.",
+"cat": "Supply Chain",
+"focus": false
+},
+"quality_control": {
+"name": "Quality",
+"desc": "Control points and quality alerts.",
+"cat": "Supply Chain",
+"focus": false
+},
+"hr": {
+"name": "Employees",
+"desc": "Directory, contracts and org chart.",
+"cat": "Human Resources",
+"focus": false
+},
+"hr_recruitment": {
+"name": "Recruitment",
+"desc": "Job posts, applicants and interviews.",
+"cat": "Human Resources",
+"focus": false
+},
+"hr_holidays": {
+"name": "Time Off",
+"desc": "Leave requests and allocations.",
+"cat": "Human Resources",
+"focus": false
+},
+"hr_appraisal": {
+"name": "Appraisals",
+"desc": "Reviews and goals.",
+"cat": "Human Resources",
+"focus": false
+},
+"hr_referral": {
+"name": "Referrals",
+"desc": "Employee referral programme.",
+"cat": "Human Resources",
+"focus": false
+},
+"fleet": {
+"name": "Fleet",
+"desc": "Vehicles, contracts and costs.",
+"cat": "Human Resources",
+"focus": false
+},
+"hr_payroll": {
+"name": "Payroll",
+"desc": "Salary rules and payslips.",
+"cat": "Human Resources",
+"focus": false
+},
+"social": {
+"name": "Social Marketing",
+"desc": "Schedule and track posts.",
+"cat": "Marketing",
+"focus": false
+},
+"mass_mailing": {
+"name": "Email Marketing",
+"desc": "Campaigns, lists and A/B tests.",
+"cat": "Marketing",
+"focus": false
+},
+"mass_mailing_sms": {
+"name": "SMS Marketing",
+"desc": "Text campaigns with tracking.",
+"cat": "Marketing",
+"focus": false
+},
+"event": {
+"name": "Events",
+"desc": "Registrations, tickets and badges.",
+"cat": "Marketing",
+"focus": false
+},
+"marketing_automation": {
+"name": "Marketing Automation",
+"desc": "Multi-step flows on triggers.",
+"cat": "Marketing",
+"focus": false
+},
+"survey": {
+"name": "Surveys",
+"desc": "Forms, quizzes and feedback.",
+"cat": "Marketing",
+"focus": false
+},
+"project": {
+"name": "Project",
+"desc": "Tasks, stages and milestones.",
+"cat": "Services",
+"focus": false
+},
+"hr_timesheet": {
+"name": "Timesheets",
+"desc": "Time tracking billed to projects.",
+"cat": "Services",
+"focus": false
+},
+"industry_fsm": {
+"name": "Field Service",
+"desc": "On-site jobs with worksheets.",
+"cat": "Services",
+"focus": false
+},
+"helpdesk": {
+"name": "Helpdesk",
+"desc": "Tickets, SLAs and knowledge base.",
+"cat": "Services",
+"focus": false
+},
+"planning": {
+"name": "Planning",
+"desc": "Shift and resource scheduling.",
+"cat": "Services",
+"focus": false
+},
+"appointment": {
+"name": "Appointments",
+"desc": "Online booking calendars.",
+"cat": "Services",
+"focus": false
+},
+"mail": {
+"name": "Discuss",
+"desc": "Chat, channels and notifications.",
+"cat": "Productivity",
+"focus": false
+},
+"approvals": {
+"name": "Approvals",
+"desc": "Request and approve anything.",
+"cat": "Productivity",
+"focus": false
+},
+"iot": {
+"name": "IoT",
+"desc": "Connect scales, printers and devices.",
+"cat": "Productivity",
+"focus": false
+},
+"voip": {
+"name": "VoIP",
+"desc": "Calls from inside Odoo.",
+"cat": "Productivity",
+"focus": false
+},
+"knowledge": {
+"name": "Knowledge",
+"desc": "Wiki pages linked to records.",
+"cat": "Productivity",
+"focus": false
+},
+"whatsapp": {
+"name": "WhatsApp",
+"desc": "Templates and conversations.",
+"cat": "Productivity",
+"focus": false
+},
+"ai_app": {
+"name": "AI",
+"desc": "Assistants and agents inside Odoo.",
+"cat": "Productivity",
+"focus": false
+}
+},
 "industries": {
 "retail": {
 "name": "Retail",
@@ -165,6 +467,73 @@ window.TN_CONTENT = {
 "Take several currencies at checkout in the same point of sale",
 "Suggested minimum and maximum stock levels for reordering rules, from demand history",
 "A stock aging report, and loyalty points that can expire"
+],
+"phases": [
+{
+"h": "One store live",
+"apps": [
+"point_of_sale",
+"stock",
+"accountant"
+],
+"items": [
+"Products, barcodes and prices loaded",
+"POS, payment terminals and receipts set up",
+"Sessions closing to Accounting"
+]
+},
+{
+"h": "Purchasing and more stores",
+"apps": [
+"purchase",
+"stock",
+"point_of_sale"
+],
+"items": [
+"Reordering rules and vendor pricelists",
+"Transfers and cycle counts between stores",
+"Next stores rolled out on the same setup"
+]
+},
+{
+"h": "Online and loyalty",
+"apps": [
+"website_sale",
+"mass_mailing",
+"spreadsheet_dashboard"
+],
+"items": [
+"Online store on the same stock, with store pickup",
+"Loyalty, gift cards and promotions everywhere",
+"Dashboards by store, category and hour"
+]
+}
+],
+"integrations": [
+[
+"cart",
+"Card terminals supported by Odoo POS"
+],
+[
+"bank",
+"Bank feeds for card settlements"
+],
+[
+"receipt",
+"Receipt printers and barcode scanners"
+],
+[
+"globe",
+"eCommerce on the same stock"
+],
+[
+"heart",
+"Loyalty, gift cards and eWallets"
+],
+[
+"layers",
+"Multi-store and multi-company"
+]
 ]
 },
 "fnb": {
@@ -362,6 +731,73 @@ window.TN_CONTENT = {
 "Print an order-specific QR code so guests can order, then pay after the meal",
 "Self-ordering notes show on the kitchen display, and optional products appear on mobile and kiosk",
 "Print one preparation ticket per product with Split per product"
+],
+"phases": [
+{
+"h": "One outlet live",
+"apps": [
+"pos_restaurant",
+"stock",
+"accountant"
+],
+"items": [
+"Menu, floor plan, printers and kitchen display",
+"Payment terminals and sessions closing to Accounting",
+"Staff trained on orders, splits and refunds"
+]
+},
+{
+"h": "Recipes and purchasing",
+"apps": [
+"mrp",
+"purchase",
+"stock"
+],
+"items": [
+"Recipes (bills of materials) for dishes and prep items",
+"Par levels and supplier pricelists per outlet",
+"Central kitchen batches and transfers"
+]
+},
+{
+"h": "More outlets and channels",
+"apps": [
+"pos_restaurant",
+"website",
+"spreadsheet_dashboard"
+],
+"items": [
+"Self-ordering by kiosk or QR code",
+"Delivery platform orders into the POS where supported",
+"Outlet roll-out with a consolidated P&L"
+]
+}
+],
+"integrations": [
+[
+"utensils",
+"GrabFood orders and menu sync (SG, PH, VN)"
+],
+[
+"receipt",
+"Kitchen printers and displays"
+],
+[
+"cart",
+"Card terminals supported by Odoo POS"
+],
+[
+"bank",
+"Bank feeds for settlements"
+],
+[
+"whatsapp",
+"Self-order receipts by WhatsApp or SMS"
+],
+[
+"calendar",
+"Online table bookings"
+]
 ]
 },
 "manufacturing": {
@@ -535,6 +971,73 @@ window.TN_CONTENT = {
 "Split an ongoing manufacturing order and produce the remaining amount later",
 "Compare bills of materials to see what changed, in PLM",
 "Scan a work center's barcode to select it on the shop floor, and see each vendor's quality rate"
+],
+"phases": [
+{
+"h": "Materials and production",
+"apps": [
+"mrp",
+"stock",
+"purchase"
+],
+"items": [
+"Bills of materials, operations and work centers",
+"Reordering rules and vendor lead times",
+"Opening stock counted in, with lots or serials"
+]
+},
+{
+"h": "Shop floor and quality",
+"apps": [
+"mrp",
+"quality_control",
+"maintenance"
+],
+"items": [
+"Shop Floor tablets at each work center",
+"Quality control points and worksheets",
+"Preventive maintenance for key equipment"
+]
+},
+{
+"h": "Costing and planning",
+"apps": [
+"accountant",
+"spreadsheet_dashboard",
+"mrp_plm"
+],
+"items": [
+"Actual costing and stock valuation in Accounting",
+"Master Production Schedule from forecasts",
+"Engineering changes managed in PLM"
+]
+}
+],
+"integrations": [
+[
+"gear",
+"Barcode scanners and shop floor tablets"
+],
+[
+"cpu",
+"IoT devices: scales, measuring tools, printers"
+],
+[
+"truck",
+"Subcontractors through subcontracting routes"
+],
+[
+"file",
+"Drawings and specifications in PLM and Documents"
+],
+[
+"bank",
+"Bank feeds"
+],
+[
+"layers",
+"Multi-company for group entities"
+]
 ]
 },
 "construction": {
@@ -716,6 +1219,73 @@ window.TN_CONTENT = {
 "Offline mode: create and edit records on site without a connection",
 "Project roles, and customer access to a project in the portal without adding them as followers",
 "Automated signature requests, and billing targets versus billable time in the Timesheets dashboard"
+],
+"phases": [
+{
+"h": "Jobs and job costing",
+"apps": [
+"project",
+"purchase",
+"accountant"
+],
+"items": [
+"A project template for your jobs, with stages and budget",
+"Purchases and bills coded to each job",
+"Job P&L in the project overview"
+]
+},
+{
+"h": "Site and billing",
+"apps": [
+"planning",
+"hr_timesheet",
+"sale"
+],
+"items": [
+"Crew planning and site timesheets on phones",
+"Milestone and progress invoicing from the contract",
+"Photos and site notes on tasks"
+]
+},
+{
+"h": "Documents and portfolio",
+"apps": [
+"documents",
+"sign",
+"spreadsheet_dashboard"
+],
+"items": [
+"Drawings, variations and contracts in Documents",
+"Subcontracts and variations signed in Sign",
+"A portfolio dashboard across all jobs"
+]
+}
+],
+"integrations": [
+[
+"bank",
+"Bank feeds"
+],
+[
+"file",
+"Documents and e-signatures"
+],
+[
+"pin",
+"Map view of crews and sites"
+],
+[
+"camera",
+"Site photos on tasks"
+],
+[
+"clock",
+"Mobile timesheets"
+],
+[
+"layers",
+"Multi-company for group entities"
+]
 ]
 },
 "medical": {
@@ -897,6 +1467,73 @@ window.TN_CONTENT = {
 "Choosing a doctor or resource now happens on the same page as picking the date",
 "Bill line prediction pre-fills supplier bills from their history",
 "Customer invoice reminders, sent manually or automatically"
+],
+"phases": [
+{
+"h": "Bookings and billing",
+"apps": [
+"appointment",
+"account",
+"accountant"
+],
+"items": [
+"Online booking pages per service and branch",
+"Invoice templates and payment links",
+"Bank feeds and reconciliation"
+]
+},
+{
+"h": "Stock and purchasing",
+"apps": [
+"stock",
+"purchase",
+"point_of_sale"
+],
+"items": [
+"Medicines and consumables with lots and expiry",
+"Reordering rules and approved suppliers",
+"Counter sales through Point of Sale"
+]
+},
+{
+"h": "Staff and branches",
+"apps": [
+"planning",
+"sign",
+"spreadsheet_dashboard"
+],
+"items": [
+"Rosters linked to bookable slots",
+"Consent and onboarding forms in Sign",
+"Branch dashboards and consolidated reporting"
+]
+}
+],
+"integrations": [
+[
+"calendar",
+"Google and Outlook calendar sync"
+],
+[
+"mail",
+"Email and SMS reminders"
+],
+[
+"bank",
+"Bank feeds"
+],
+[
+"plug",
+"Your medical record system, by API where available"
+],
+[
+"shield",
+"Role-based access rights"
+],
+[
+"file",
+"Documents and e-signatures"
+]
 ]
 },
 "travel": {
@@ -1069,6 +1706,73 @@ window.TN_CONTENT = {
 "AI agents can create records from an uploaded PDF, such as a supplier confirmation",
 "Pay supplier bills individually or in batches with one signature",
 "Customer invoice reminders, and bill line prediction for supplier bills"
+],
+"phases": [
+{
+"h": "Enquiry to invoice",
+"apps": [
+"crm",
+"sale",
+"account"
+],
+"items": [
+"A CRM pipeline for enquiries, with travel dates",
+"Quotation templates, deposits and payment links",
+"Invoices in the client's currency"
+]
+},
+{
+"h": "Suppliers and margin",
+"apps": [
+"purchase",
+"accountant",
+"spreadsheet_dashboard"
+],
+"items": [
+"Supplier services as products with costs",
+"Purchase orders and bills per trip",
+"Margin reporting by product and destination"
+]
+},
+{
+"h": "Online and groups",
+"apps": [
+"website",
+"event",
+"sign"
+],
+"items": [
+"Tour pages and enquiry forms on the website",
+"Fixed departures and group events with tickets",
+"Booking forms and waivers signed online"
+]
+}
+],
+"integrations": [
+[
+"whatsapp",
+"WhatsApp conversations in Odoo"
+],
+[
+"globe",
+"Website enquiry forms"
+],
+[
+"bank",
+"Bank feeds in several currencies"
+],
+[
+"receipt",
+"Online payment providers"
+],
+[
+"mail",
+"Email templates for confirmations"
+],
+[
+"file",
+"E-signatures for booking forms"
+]
 ]
 },
 "ecommerce": {
@@ -1233,6 +1937,73 @@ window.TN_CONTENT = {
 "A simpler returns process, with the return wizard removed",
 "Loyalty progress bars in the cart, and a minimum order quantity per product",
 "The AI Website Assistant, with structured data on by default and AI-assisted SEO"
+],
+"phases": [
+{
+"h": "Store, stock and payments",
+"apps": [
+"website_sale",
+"stock",
+"accountant"
+],
+"items": [
+"Catalogue, variants and pricelists",
+"Payment providers and reconciliation",
+"Pick, pack and ship with carrier labels"
+]
+},
+{
+"h": "Marketplaces",
+"apps": [
+"sale",
+"stock",
+"purchase"
+],
+"items": [
+"Lazada and TikTok marketplace connectors",
+"One stock level across every channel",
+"Reordering from demand history"
+]
+},
+{
+"h": "Service and growth",
+"apps": [
+"helpdesk",
+"mass_mailing",
+"spreadsheet_dashboard"
+],
+"items": [
+"Helpdesk for support and returns",
+"Email campaigns and abandoned-cart follow-up",
+"Margin by channel and product"
+]
+}
+],
+"integrations": [
+[
+"cart",
+"Lazada and TikTok marketplace connectors"
+],
+[
+"truck",
+"Carrier integrations for labels and tracking"
+],
+[
+"bank",
+"Payment providers and bank feeds"
+],
+[
+"mail",
+"Email marketing"
+],
+[
+"chat",
+"Live chat on the store"
+],
+[
+"globe",
+"Several websites and languages"
+]
 ]
 },
 "health-wellness": {
@@ -1421,7 +2192,193 @@ window.TN_CONTENT = {
 "Request feedback from clients after their appointments",
 "A default party size and a maximum capacity override for group bookings",
 "Expiry dates for loyalty points"
+],
+"phases": [
+{
+"h": "Bookings and memberships",
+"apps": [
+"appointment",
+"sale_subscription",
+"account"
+],
+"items": [
+"Booking pages for classes and treatments",
+"Memberships and packs as subscriptions",
+"Payment links and automatic renewals"
 ]
+},
+{
+"h": "Front desk and retail",
+"apps": [
+"point_of_sale",
+"stock",
+"accountant"
+],
+"items": [
+"Point of Sale for retail, gift cards and packages",
+"Stock for retail products",
+"Daily takings posted to Accounting"
+]
+},
+{
+"h": "Staff and marketing",
+"apps": [
+"planning",
+"mass_mailing",
+"spreadsheet_dashboard"
+],
+"items": [
+"Staff rosters linked to bookable slots",
+"Email and SMS campaigns to members",
+"Recurring revenue and churn dashboards"
+]
+}
+],
+"integrations": [
+[
+"calendar",
+"Google and Outlook calendar sync"
+],
+[
+"mail",
+"Email and SMS reminders"
+],
+[
+"bank",
+"Online payments and bank feeds"
+],
+[
+"heart",
+"Loyalty, gift cards and eWallets"
+],
+[
+"whatsapp",
+"WhatsApp conversations"
+],
+[
+"usercheck",
+"Front desk check-in"
+]
+]
+}
+},
+"services": {
+"solutions/ai-automation": {
+"title": "AI Workflow Automation in Singapore — AI agents",
+"desc": "AI workflow automation by TechNext: agents that read, classify, prepare and hand over across email, Odoo and your tools, with approval where money moves.",
+"para": "AI workflow automation lets an agent run the multi-step work between your systems: classify an email, pull the record, prepare the document, route it and follow up. TechNext builds these agents across email, Odoo and your other tools, with a person approving before anything irreversible happens and every step logged. watch an agent run AI workflow automation for vendor bills, from inbox to payment run. A TechNext agent reads each bill, checks it against the purchase order and receipt in Odoo, and routes it by how sure it is: sure bills go to a one-click batch approval, the rest to a person who checks the fields. Nothing posts or pays without a person. Drag the confidence threshold and watch the split between the fast track and review change, switch the day, and click any bill in the trace to follow it."
+},
+"solutions/ai-chatbots": {
+"title": "AI Chatbot Development in Singapore — web & WhatsApp",
+"desc": "AI chatbots by TechNext for websites, WhatsApp and Odoo: answers from your content, lead qualification, order lookups and a clean hand-off to your team.",
+"para": "An AI chatbot from TechNext answers customers and staff from your own content, on your website, on WhatsApp or inside your apps. It can look up orders, bookings and invoices, qualify leads, and pass the conversation to a person with the full context when a question needs one. one inbox, three channels An AI chatbot on WhatsApp, web chat and email, in one inbox. Watch a TechNext chatbot work a shared inbox: it reads each message, routes it by intent, answers from Odoo records such as the sales order, and hands the conversation to a person, with everything attached, when it should. Filter by channel, start a conversation from any intent, or make the customer ask for a human."
+},
+"solutions/ai-knowledge": {
+"title": "Enterprise RAG Knowledge Assistants in Singapore",
+"desc": "Enterprise RAG knowledge assistants by TechNext: ask in plain language and get answers from your policies, manuals, contracts and records, with sources cited.",
+"para": "An enterprise RAG (retrieval-augmented generation) knowledge assistant reads your policies, manuals, contracts, tickets and ERP records and answers questions from them in plain language, citing the source of each answer. TechNext builds these assistants to stay inside your approved documents and respect each user's permissions, so nothing is invented. same question, different access Enterprise RAG that respects who is asking. A TechNext knowledge assistant embeds the question, searches your SOPs, policies, product specs and Odoo records, ranks the closest passages, then drops every passage the person asking may not see, before a word of the answer is written. Pick a question and a role to watch the answer change, and move the relevance bar to see when it refuses to guess."
+},
+"solutions/ai": {
+"title": "Enterprise AI Solutions in Singapore",
+"desc": "TechNext AI solutions: RAG knowledge assistants, AI inside Odoo, workflow automation agents and customer chatbots, with human approval where it matters.",
+"para": "TechNext builds four kinds of enterprise AI system: knowledge assistants that answer from your own documents with sources, AI working inside Odoo, agents that run multi-step workflows, and chatbots for customers. Each one is grounded in your data, and a person approves anything that moves money or makes a commitment. where ai pays back first Enterprise AI use cases, mapped by value and effort. TechNext scores each candidate use case on business value, the effort to build and run it, and how many items it handles a month, then sequences them: quick wins first, then the shared data and knowledge they build on, then scale. Filter by department, switch to the roadmap, or open a bubble to see how it runs in Odoo, from trigger to human checkpoint to write-back."
+},
+"solutions/brand-assets": {
+"title": "Graphic Design & Brand Assets in Singapore",
+"desc": "Graphic and brand assets by TechNext: logo refresh, guidelines, sales decks, brochures, social and document templates, delivered as editable files you own.",
+"para": "TechNext designs the brand assets a company uses every day: a logo refresh and guidelines, sales decks, brochures, and social and document templates. Everything is built as editable PowerPoint, Canva, Figma or InDesign files your team can use without a designer, and handed over completely with files, fonts and rights. one change, every asset Graphic design and brand assets, built as one system. TechNext designs your brand as tokens first: colours, a type pair, logo lock-ups, spacing and corner radius. Components are built from the tokens and every asset from the components, so one decision updates the business card, the social post, the email signature, the slide and the signage together. Switch between three sample directions for a fictional client and watch the change travel through, while each channel's export checklist ticks off. Brand system pipeline Lintel & Co."
+},
+"solutions/enterprise": {
+"title": "Odoo Multi-Company ERP for Groups & Consolidation",
+"desc": "Odoo for groups: multi-company consolidation, inter-company flows, country localisations, governance and a phased rollout by TechNext, Odoo Partner.",
+"para": "Odoo for groups runs several companies, countries and currencies on one Odoo database. Inter-company transactions post automatically, each entity keeps its own books and local tax rules, and the board sees one consolidated set of numbers in the group currency. TechNext rolls it out in phases: one company first, then country by country. close the month Odoo multi-company consolidation, from local books to one group P&L. A sample group on one Odoo database: a Singapore holding with companies in the Philippines, Vietnam and Malaysia, each keeping its own books and currency. An intercompany invoice creates the mirror bill in the other company, a group loan accrues interest, and at month-end the figures are translated into SGD and the intercompany lines are eliminated."
+},
+"solutions/marketing": {
+"title": "Website & Social Media Marketing in Singapore",
+"desc": "TechNext marketing services: websites and social media management run as a monthly service — strategy, design, production and a one-page report.",
+"para": "TechNext runs websites and social media for companies as a monthly service: strategy, design, production and a one-page report. Take one part or all three (website, social media and brand assets) and the branding stays consistent across everything, while your team stays on its own work. credit where it's due Website and social media marketing, measured from first visit to won deal. TechNext's monthly report ties each channel to results, not just to clicks. This sample funnel follows visits from Search, Social, Email, Referral and Events through leads, MQLs and SQLs to won deals in the CRM (Odoo CRM in this example). Move the budget and conversion sliders, then switch the attribution model to see how credit for the same deals moves between channels."
+},
+"solutions/odoo-erp": {
+"title": "Odoo ERP Implementation in Singapore",
+"desc": "Odoo ERP implementation by TechNext, an Odoo Partner in Singapore. Accounting, Sales and Inventory first — configured, migrated, trained and supported.",
+"para": "An Odoo ERP implementation with TechNext covers discovery, configuration on a staging copy of your database, data migration, training, integrations and support after go-live. Most companies start with Accounting, Sales and Inventory, then add apps on the same database. Scope and price come in a written quotation after discovery. see it run Odoo ERP: five end-to-end processes on one database. Order to cash, procure to pay, plan to produce, record to report and hire to reimburse all run on the same customers, vendors, products, employees and chart of accounts. Every step posts to one ledger that always balances. Pick a process, run all five, or hover a master record to see every document that uses it."
+},
+"solutions/social-media": {
+"title": "Social Media Management in Singapore",
+"desc": "TechNext runs your LinkedIn, Facebook and Instagram on a monthly plan — content, scheduling, replies and a one-page report — while you run the business.",
+"para": "TechNext's social media management runs your LinkedIn, Facebook and Instagram on a monthly plan agreed with you: content produced and scheduled, comments and messages handled, and a one-page report each month. Strategy, design, short video and copy are included, and posts go out only after you approve them. a month, start to finish Social media management, from content calendar to qualified leads. Each month TechNext plans the calendar with you, produces every post and sends it for your approval before it is scheduled. Run the sample month to watch posts move from draft to published, engagement build week by week, and enquiries arrive in Odoo CRM as leads. Drag a post to a new day, or select it to approve it, ask for changes or move it."
+},
+"solutions/website": {
+"title": "Web Design & Development in Singapore",
+"desc": "TechNext builds fast, clear company websites, landing pages and online stores, designed, built and handed over with forms that reach your team.",
+"para": "TechNext designs and builds company websites, campaign landing pages and online stores: short copy, real information and fast, mobile-first pages. Every site includes SEO basics, analytics and accessibility, is built to be edited without us, and is wired so each inquiry reaches the right person on your team. build it live Web design and development, from sitemap to CRM lead. A TechNext website build starts with the sitemap, assembles each page from sections, checks speed and SEO before launch, then wires the contact form into your CRM (Odoo CRM in this example). Add or remove pages and change the build choices: the wireframe, the Core Web Vitals and the SEO checks react. Then follow an enquiry from its UTM source to a salesperson's follow-up call."
+},
+"odoo/ai-integration": {
+"title": "Odoo + AI integrations — AI inside your ERP",
+"desc": "AI inside Odoo by TechNext: document capture, drafting, lookups and assistants connected to your ERP data — built by a team that also implements Odoo.",
+"para": "Odoo AI integration from TechNext puts AI inside the Odoo records your team already uses: vendor bills read and matched to purchase orders, customer replies drafted, and questions answered from your own data. Anything that posts, pays or commits waits for a person to approve it, and every step is logged on the record. try it on a record Odoo AI integration, one record at a time. Pick a record and run its AI actions in order. Each one lights up the fields it reads and writes its result. Anything that posts, sends or commits stops at a gate until a person approves, and every step is logged on the record. This is how TechNext builds AI inside the Odoo we implement."
+},
+"odoo/apps": {
+"title": "Odoo Apps List — every module, by category",
+"desc": "The full Odoo app catalogue by category — Finance, Sales, Websites, Supply Chain, HR, Marketing, Services and Productivity — with our focus apps marked.",
+"para": "Odoo is a suite of business apps that share one database: accounting, sales, inventory, manufacturing, HR, websites and more. TechNext, an Odoo Ready Partner in Singapore, implements the apps you need, usually starting with Accounting, Sales and Inventory and adding others as the business grows. follow the data How the Odoo apps share data on one database. Every line in this map is a native link between two Odoo apps: no connector and no re-keying. Select an app to light up what it talks to and read the data that moves on each link, drag apps to untangle a corner, or filter by category. TechNext switches apps on in phases, so each new app plugs into the records you already have."
+},
+"odoo/crm-development": {
+"title": "Odoo CRM Customization — pipelines & lead routing",
+"desc": "Odoo CRM tailored by TechNext: pipelines, lead routing, scoring, quotation hand-off and reporting built around how your sales team actually sells.",
+"para": "Odoo CRM customization by TechNext adapts the pipeline stages, lead routing, scoring and hand-offs in Odoo CRM to the way your sales team actually sells. Leads arrive from the web, email, WhatsApp and social channels, and a won deal becomes a quotation in Odoo Sales without anyone re-typing it. watch the pipeline Odoo CRM customisation, live: lead routing, the pipeline and the forecast. Leads arrive from five channels. The scoring and assignment rules TechNext configures in Odoo CRM route each one to a team and a salesperson; the pipeline moves them from New to Won, schedules the next activity and flags anything going stale; a won deal opens its quotation in Sales. Switch rules off, change the team view, or add a lead from any channel."
+},
+"odoo/discovery": {
+"title": "Odoo Consultation & Discovery in Singapore",
+"desc": "Odoo discovery with TechNext: we map how orders, stock and money move today, match each step to an Odoo app, and hand you a written scope.",
+"para": "Odoo discovery is the first step of a TechNext implementation. We sit with finance, sales and the warehouse, map how an order, a stock movement and a payment travel through the company today, match each step to an Odoo app and hand you a written scope, so the project follows the problem rather than a demo. before and after Odoo discovery as a process map: one order today, and in Odoo. Discovery is business process mapping done with the people who do the work. TechNext maps how an order really moves today, through WhatsApp, spreadsheets, paper delivery orders and re-typing, then how the same order runs on one Odoo database. Switch between the two, hover a numbered pain point to see its fix, or play the walk-through of the method."
+},
+"odoo/erp-system": {
+"title": "Odoo Customization in Singapore — upgrade-safe modules",
+"desc": "Odoo customisation by TechNext: tailored modules, workflows, reports and approvals built the upgrade-safe way, custom only where it earns its place.",
+"para": "Odoo customization at TechNext starts from standard Odoo: one database across every department, with apps switched on as you need them. Where your process genuinely differs, we build the module, workflow, report or approval you need, in a way that survives version upgrades and that another developer could maintain. standard first Upgrade-safe Odoo customisation: start at standard, climb only when you must. Every change TechNext makes to Odoo lives on the lowest layer that can carry it: standard features, then configuration, then Studio, and only then a custom module on Odoo.sh or an integration. Drag a requirement onto a layer, or press Suggest to run the decision tree, and watch the upgrade risk, effort and maintenance move."
+},
+"odoo/integration": {
+"title": "Odoo Integration — banks, payments, stores",
+"desc": "Odoo integrations by TechNext: bank feeds, payment gateways, e-commerce platforms, marketplaces, carriers and the tools you keep — connected, not replaced.",
+"para": "Odoo integration connects the systems you keep to your Odoo database: banks, payment gateways, online stores such as Shopify and WooCommerce, marketplaces, carriers and specialist tools. TechNext uses standard connectors or the Odoo API, so orders, stock levels and payouts flow across without anyone re-typing them between systems. under the hood Odoo integration you can watch: webhooks, scheduled jobs, retries and a dead-letter queue. A TechNext Odoo integration is more than a connector. Webhooks push events in seconds, scheduled jobs sync in batches, every message carries an idempotency key so nothing is booked twice, and failures retry with exponential backoff before a person is alerted. Take a connector down and watch the retries, the backlog and the recovery."
+},
+"odoo/philippines": {
+"title": "Odoo Partner in the Philippines — Taguig City",
+"desc": "TechNext is an Odoo Ready Partner with an office in Taguig City, Metro Manila: Odoo implementation with BIR localisation, payroll, training and support.",
+"para": "TechNext is an Odoo Ready Partner with an office in Taguig City, Metro Manila. We implement Odoo for Philippine companies with the BIR localisation set up and checked against your filings: CAS-compliant invoices, BIR 2306 and 2307 certificates, 2551Q and 1600-VT reports, and payroll with the 1601-C, 2316 and 1604-C. a year of BIR filings BIR compliance in Odoo for Philippine companies, month by month. How often each BIR form comes round, and where Odoo produces it: 2307 and 2306 certificates from vendor bills, the 1600-VT report, the monthly 1601-C payroll items, the 2551Q for non-VAT companies each quarter, and the yearly 2316 and 1604-C with its Alphalist DAT file. Switch the company type, drag through the months, and follow each document from the bill or payroll run to the form. TechNext's Taguig team sets this up and checks it against your last filings."
+},
+"odoo/support": {
+"title": "Odoo Support in Singapore — fixes & upgrades",
+"desc": "Odoo support by TechNext after go-live: fixes, month-end help, version upgrades and small changes on a plan that fits your team.",
+"para": "Odoo support from TechNext continues after go-live with the same people who configured your system: fixes, month-end help, version upgrades and the small changes a growing business keeps needing. Requests run through one tracked channel, with response targets agreed in your support plan. watch the queue Every Odoo support ticket, tracked from new to closed. Bugs, how-to questions, change requests and upgrade tasks each take their own path through TechNext's support desk: triage, a fix on a staging copy, your test, then a batched release to production on Odoo.sh or your own hosting. Timers run against an example plan's response targets and pause while a ticket waits on you. Filter by priority, or report an urgent issue and watch it jump the queue."
+},
+"odoo/training": {
+"title": "Odoo Training in Singapore — on your data",
+"desc": "Role-based Odoo training by TechNext: finance, sales and warehouse teams learn their own screens on your data, with written guides for hand-over.",
+"para": "Odoo training from TechNext is role-based: each team learns its own screens on a copy of your own data. Finance learns bank reconciliation and month-end, sales learns quotations and confirmations, and the warehouse learns receipts, picking and counts, with written guides left behind for hand-over. build a plan A role-based Odoo training plan, session by session. Pick the roles going live. TechNext assembles the Odoo modules each role needs, a sandbox exercise for each one on a staging copy of your data, and a sign-off check that proves it. Key users go first, end users next, then train-the-trainer and UAT. Run the plan, drag the timeline, or open a module to see what gets practised."
+}
+},
+"sites": {
+"technext": {
+"name": "TechNext",
+"url": "technext.asia",
+"what": "TechNext's own site: Odoo, AI and marketing"
+},
+"movewithease": {
+"name": "Move with Ease",
+"url": "technextmarketing.github.io/movewithease-v2",
+"what": "Therapy practice in Kent, UK: bookings, events and gift vouchers"
+},
+"tre": {
+"name": "TRE Singapore",
+"url": "technextmarketing.github.io/tre-singapore",
+"what": "Wellbeing education: courses, certified providers and events"
+},
+"immaculate": {
+"name": "Immaculate Connections",
+"url": "technextmarketing.github.io/immaculateconnectionsph",
+"what": "Cebu tour operator: tour packages and quotation requests"
 }
 },
 "appFlows": {

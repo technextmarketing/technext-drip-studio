@@ -23,13 +23,51 @@ def clean(o):
     return o
 
 
-keep = ("name", "noun", "intro", "flow_title", "flow_lead", "flow", "ba", "new20", "chart")
+keep = ("name", "noun", "intro", "flow_title", "flow_lead", "flow", "ba", "new20", "chart", "phases", "integrations")
 ind = {k: clean({kk: vv for kk, vv in v.items() if kk in keep}) for k, v in I.IND.items()}
 js = open(os.path.join(SITE, "assets/js/demo-o20.js"), encoding="utf-8").read()
 m = re.search(r"var AREAS = (\[.*?\n  \]);", js, re.S)
 areas = ast.literal_eval(m.group(1)) if m else []
+def page_summary(path):
+    src = open(path, encoding="utf-8").read()
+    meta = re.search(r"<!--meta\s*(\{.*?\})\s*-->", src, re.S)
+    m = json.loads(meta.group(1)) if meta else {}
+    t = re.sub(r"<script.*?</script>|<style.*?</style>", "", src, flags=re.S)
+    t = html.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", t)))
+    t = re.sub(r"\{\{[^}]*\}\}", "", t)
+    i = t.find("In one paragraph ")
+    para = ""
+    if i > -1:
+        para = t[i + 17:i + 17 + 900]
+        para = para[:para.rfind(". ") + 1] if ". " in para else para
+    return {"title": m.get("title", ""), "desc": m.get("desc", ""), "para": para.strip()}
+
+
+services = {}
+for sub in ("solutions", "odoo"):
+    folder = os.path.join(SITE, "_src/pages", sub)
+    for fn in sorted(os.listdir(folder)):
+        if fn.endswith(".html"):
+            services[sub + "/" + fn[:-5]] = page_summary(os.path.join(folder, fn))
+
+# TechNext-built sites shown by the website elements (screenshots live in assets/sites/)
+sites = {
+    "technext": {"name": "TechNext", "url": "technext.asia", "what": "TechNext's own site: Odoo, AI and marketing"},
+    "movewithease": {"name": "Move with Ease", "url": "technextmarketing.github.io/movewithease-v2", "what": "Therapy practice in Kent, UK: bookings, events and gift vouchers"},
+    "tre": {"name": "TRE Singapore", "url": "technextmarketing.github.io/tre-singapore", "what": "Wellbeing education: courses, certified providers and events"},
+    "immaculate": {"name": "Immaculate Connections", "url": "technextmarketing.github.io/immaculateconnectionsph", "what": "Cebu tour operator: tour packages and quotation requests"},
+}
+
+apps = {}
+for c in S.APP_CATEGORIES:
+    for a in c["apps"]:
+        apps[a["mod"]] = {"name": a["name"], "desc": a.get("desc", ""), "cat": c["title"], "focus": bool(a.get("focus"))}
+
 data = {
+    "apps": apps,
     "industries": ind,
+    "services": services,
+    "sites": sites,
     "appFlows": clean(A.FLOWS),
     "appLayout": A.LAYOUT,
     "odoo20": areas,
