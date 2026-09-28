@@ -102,13 +102,14 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "dots",
-  "look": "navy",
+  "look": "stack",
   "tilt": "flat",
+  "style": "editorial",
   "badge": "o20",
   "copy": {
    "head": "No signal? *Keep working.*",
    "sub": "Odoo 20 lets on-site teams create and edit records offline. Everything syncs when you are back online.",
-   "decor": "marker"
+   "decor": "box"
   },
   "layers": [
    {
@@ -283,15 +284,15 @@ window.DRIPS = [
    ],
    "mirror": false,
    "variant": 0,
-   "look": "navy",
-   "accent": "yellow",
-   "decor": "marker",
+   "look": "stack",
+   "style": "editorial",
+   "accent": "navy",
+   "decor": "box",
    "heroSize": "normal",
    "tilt": "flat",
    "background": "dots"
   },
-  "accent": "yellow",
-  "panelY": 331
+  "accent": "navy"
  },
  {
   "id": "fnb-supplier-to-books",
@@ -304,14 +305,15 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "hex",
-  "look": "band",
+  "look": "spotlight",
   "heroSize": "big",
   "tilt": "strong",
+  "style": "bold",
   "badge": "ready",
   "copy": {
    "head": "From supplier to table|to the books, *in one Odoo.*",
    "sub": "Six steps every restaurant runs, and the Odoo app behind each one.",
-   "decor": "circle"
+   "decor": "marker"
   },
   "layers": [
    {
@@ -456,13 +458,16 @@ window.DRIPS = [
    ],
    "mirror": false,
    "variant": 0,
-   "look": "band",
-   "accent": "blue",
-   "decor": "circle",
+   "look": "spotlight",
+   "style": "bold",
+   "accent": "yellow",
+   "decor": "marker",
    "heroSize": "big",
    "tilt": "strong",
    "background": "hex"
   },
+  "accent": "yellow",
+  "watermark": "plate",
   "panelY": 411
  },
  {
@@ -475,13 +480,15 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "rings",
-  "look": "stack",
+  "tint": "sand",
+  "look": "paper",
   "heroSize": "small",
+  "style": "playful",
   "badge": "ready",
   "copy": {
    "head": "AI prepares the bill.|*You approve it.*",
    "sub": "TechNext builds AI inside your Odoo. It reads the vendor bill, matches the purchase order and waits for your OK.",
-   "decor": "underline"
+   "decor": "strokes"
   },
   "layers": [
    {
@@ -528,7 +535,6 @@ window.DRIPS = [
     "z": 12,
     "x": 464,
     "y": 433,
-    "stack": 2,
     "s": 0.9
    },
    {
@@ -643,14 +649,15 @@ window.DRIPS = [
    ],
    "mirror": false,
    "variant": 0,
-   "look": "stack",
-   "accent": "purple",
-   "decor": "underline",
+   "look": "paper",
+   "style": "playful",
+   "accent": "coral",
+   "decor": "strokes",
    "heroSize": "small",
    "tilt": "soft",
    "background": "rings"
   },
-  "accent": "purple"
+  "accent": "coral"
  },
  {
   "id": "fnb-food-cost-per-outlet",
@@ -663,13 +670,13 @@ window.DRIPS = [
   "mirror": true,
   "ground": "haze",
   "pattern": "diagonal",
-  "look": "outline",
   "tilt": "flat",
+  "style": "geometric",
   "badge": "ready",
   "copy": {
    "head": "Food cost per outlet,|*every single day.*",
    "sub": "Every dish sold deducts its recipe, so Odoo shows which outlet runs over target before month end.",
-   "decor": "strokes"
+   "decor": "underline"
   },
   "layers": [
    {
@@ -704,7 +711,7 @@ window.DRIPS = [
     "highlight": 2,
     "unit": "%",
     "x": 408,
-    "y": 462
+    "y": 511
    },
    {
     "type": "stat",
@@ -714,7 +721,7 @@ window.DRIPS = [
     "value": "30.8%",
     "label": "Food cost today · -1.2%",
     "x": 64,
-    "y": 476
+    "y": 525
    },
    {
     "type": "chip",
@@ -724,7 +731,7 @@ window.DRIPS = [
     "z": 18,
     "rot": 0,
     "x": 76,
-    "y": 621
+    "y": 670
    },
    {
     "type": "nexi",
@@ -732,23 +739,14 @@ window.DRIPS = [
     "w": 217,
     "z": 16,
     "x": 46,
-    "y": 752
+    "y": 801
    },
    {
     "type": "sparkles",
     "w": 92,
     "z": 21,
     "x": 372,
-    "y": 422
-   },
-   {
-    "type": "prop",
-    "name": "bell",
-    "w": 150,
-    "rot": 0,
-    "z": 17,
-    "x": 648,
-    "y": 852
+    "y": 471
    }
   ],
   "caption": "Most restaurant groups see food cost once a month, after the stock count. In Odoo every dish sold deducts its recipe, so each outlet's food cost is there every day, while there is still time to act. How often do you see yours?",
@@ -815,14 +813,15 @@ window.DRIPS = [
    ],
    "mirror": true,
    "variant": 0,
-   "look": "outline",
-   "accent": "navy",
-   "decor": "strokes",
+   "look": "clean",
+   "style": "geometric",
+   "accent": "teal",
+   "decor": "underline",
    "heroSize": "normal",
    "tilt": "flat",
    "background": "diagonal"
   },
-  "accent": "navy"
+  "accent": "teal"
  },
  {
   "id": "crm-one-pipeline",
@@ -834,14 +833,15 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "waves",
-  "look": "spotlight",
+  "look": "stack",
   "heroSize": "big",
   "tilt": "strong",
+  "style": "doodle",
   "badge": "ready",
   "copy": {
    "head": "Every lead,|*one pipeline.*",
    "sub": "Odoo CRM shows every opportunity by stage, so nobody chases the same deal twice.",
-   "decor": "box"
+   "decor": "circle"
   },
   "layers": [
    {
@@ -916,6 +916,7 @@ window.DRIPS = [
     "w": 920,
     "x": 80,
     "y": 469,
+    "stack": 2,
     "s": 1.1
    },
    {
@@ -1042,16 +1043,14 @@ window.DRIPS = [
    ],
    "mirror": false,
    "variant": 0,
-   "look": "spotlight",
-   "accent": "coral",
-   "decor": "box",
+   "look": "stack",
+   "style": "doodle",
+   "accent": "blue",
+   "decor": "circle",
    "heroSize": "big",
    "tilt": "strong",
    "background": "waves"
-  },
-  "accent": "coral",
-  "watermark": "rocket",
-  "panelY": 411
+  }
  },
  {
   "id": "retail-whatsapp-orders",
@@ -1064,9 +1063,9 @@ window.DRIPS = [
   "mirror": true,
   "ground": "haze",
   "pattern": "spots",
-  "tint": "sand",
-  "look": "paper",
+  "look": "spotlight",
   "heroSize": "small",
+  "style": "spacious",
   "badge": "ready",
   "copy": {
    "head": "WhatsApp orders|*land in Odoo.*",
@@ -1239,14 +1238,17 @@ window.DRIPS = [
    ],
    "mirror": true,
    "variant": 0,
-   "look": "paper",
-   "accent": "coral",
+   "look": "spotlight",
+   "style": "spacious",
+   "accent": "purple",
    "decor": "none",
    "heroSize": "small",
    "tilt": "soft",
    "background": "spots"
   },
-  "accent": "coral"
+  "accent": "purple",
+  "watermark": "bag",
+  "panelY": 411
  },
  {
   "id": "web-best-salesperson",
@@ -1258,13 +1260,15 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "fine",
-  "look": "corner",
+  "tint": "sand",
+  "look": "paper",
   "tilt": "flat",
+  "style": "storytelling",
   "badge": "",
   "copy": {
    "head": "Your website,|*your best salesperson.*",
    "sub": "TechNext builds fast, mobile-first sites where every inquiry reaches the right person.",
-   "decor": "circle"
+   "decor": "marker"
   },
   "layers": [
    {
@@ -1356,13 +1360,15 @@ window.DRIPS = [
    ],
    "mirror": false,
    "variant": 0,
-   "look": "corner",
-   "accent": "blue",
-   "decor": "circle",
+   "look": "paper",
+   "style": "storytelling",
+   "accent": "coral",
+   "decor": "marker",
    "heroSize": "normal",
    "tilt": "flat",
    "background": "fine"
-  }
+  },
+  "accent": "coral"
  },
  {
   "id": "kitchen-quote-signed",
@@ -1377,11 +1383,12 @@ window.DRIPS = [
   "pattern": "plus",
   "heroSize": "big",
   "tilt": "strong",
+  "style": "perspective",
   "badge": "ready",
   "copy": {
    "head": "The kitchen quote,|*signed the same day.*",
    "sub": "Equipment, fabrication and installation on one Odoo quotation that the owner signs online.",
-   "decor": "strokes"
+   "decor": "underline"
   },
   "layers": [
    {
@@ -1546,13 +1553,14 @@ window.DRIPS = [
    "mirror": true,
    "variant": 0,
    "look": "clean",
-   "accent": "teal",
-   "decor": "strokes",
+   "style": "perspective",
+   "accent": "navy",
+   "decor": "underline",
    "heroSize": "big",
    "tilt": "strong",
    "background": "plus"
   },
-  "accent": "teal"
+  "accent": "navy"
  },
  {
   "id": "kitchen-growth-pyramid",
@@ -1565,8 +1573,9 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "grid",
-  "look": "navy",
+  "look": "stack",
   "heroSize": "small",
+  "style": "bold",
   "badge": "ready",
   "copy": {
    "head": "The business growth|*pyramid.*",
@@ -1602,6 +1611,7 @@ window.DRIPS = [
     "hot": 4,
     "x": 220,
     "y": 417,
+    "stack": 2,
     "s": 0.9
    },
    {
@@ -1633,7 +1643,6 @@ window.DRIPS = [
     "type": "prop",
     "name": "chefhat",
     "w": 150,
-    "tile": true,
     "rot": -6,
     "z": 17,
     "x": 458,
@@ -1688,14 +1697,14 @@ window.DRIPS = [
    ],
    "mirror": false,
    "variant": 0,
-   "look": "navy",
-   "accent": "yellow",
+   "look": "stack",
+   "style": "bold",
+   "accent": "teal",
    "decor": "none",
    "heroSize": "small",
    "tilt": "soft"
   },
-  "accent": "yellow",
-  "panelY": 411
+  "accent": "teal"
  },
  {
   "id": "kitchen-happy-head-chef",
@@ -1708,14 +1717,15 @@ window.DRIPS = [
   "mirror": true,
   "ground": "haze",
   "pattern": "floor",
-  "look": "band",
+  "look": "spotlight",
   "tilt": "flat",
+  "style": "geometric",
   "badge": "ready",
   "copy": {
    "head": "Happy head chef,|*happy kitchen.*",
    "sub": "Equipment, parts and service visits in one Odoo, so the kitchen team gets what it needs on time.",
    "kicker": "Reasons your customer",
-   "decor": "circle"
+   "decor": "marker"
   },
   "layers": [
    {
@@ -1810,12 +1820,15 @@ window.DRIPS = [
    ],
    "mirror": true,
    "variant": 0,
-   "look": "band",
-   "accent": "blue",
-   "decor": "circle",
+   "look": "spotlight",
+   "style": "geometric",
+   "accent": "purple",
+   "decor": "marker",
    "heroSize": "normal",
    "tilt": "flat"
   },
+  "accent": "purple",
+  "watermark": "chefhat",
   "panelY": 481
  },
  {
@@ -1829,14 +1842,16 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "dots",
-  "look": "stack",
+  "tint": "sand",
+  "look": "paper",
   "heroSize": "big",
   "tilt": "strong",
+  "style": "spacious",
   "badge": "ready",
   "copy": {
    "head": "Every IT issue,|*tracked to solved.*",
    "sub": "Requests from email or WhatsApp become tickets with an SLA, and the customer rates the fix.",
-   "decor": "strokes"
+   "decor": "underline"
   },
   "layers": [
    {
@@ -1858,7 +1873,6 @@ window.DRIPS = [
     ],
     "x": 35,
     "y": 455,
-    "stack": 2,
     "s": 1.1
    },
    {
@@ -1880,7 +1894,6 @@ window.DRIPS = [
     ],
     "x": 499,
     "y": 578,
-    "stack": 2,
     "s": 1.1
    },
    {
@@ -1969,12 +1982,14 @@ window.DRIPS = [
    ],
    "mirror": false,
    "variant": 0,
-   "look": "stack",
-   "accent": "blue",
-   "decor": "strokes",
+   "look": "paper",
+   "style": "spacious",
+   "accent": "coral",
+   "decor": "underline",
    "heroSize": "big",
    "tilt": "strong"
-  }
+  },
+  "accent": "coral"
  },
  {
   "id": "retail-shop-open-all-night",
@@ -1987,8 +2002,8 @@ window.DRIPS = [
   "mirror": true,
   "ground": "haze",
   "pattern": "hex",
-  "look": "outline",
   "heroSize": "small",
+  "style": "perspective",
   "badge": "ready",
   "copy": {
    "head": "Your shop|*open all night.*",
@@ -2110,7 +2125,8 @@ window.DRIPS = [
    ],
    "mirror": true,
    "variant": 0,
-   "look": "outline",
+   "look": "clean",
+   "style": "perspective",
    "accent": "navy",
    "decor": "none",
    "heroSize": "small",
@@ -2128,13 +2144,14 @@ window.DRIPS = [
   "mirror": false,
   "ground": "haze",
   "pattern": "rings",
-  "look": "spotlight",
+  "look": "stack",
   "tilt": "flat",
+  "style": "bold",
   "badge": "ready",
   "copy": {
    "head": "Quote, order, invoice:|*one record, handed on.*",
    "sub": "The sales order carries the customer and the lines from the quote to the invoice, so nothing is typed twice.",
-   "decor": "circle"
+   "decor": "marker"
   },
   "layers": [
    {
@@ -2152,7 +2169,8 @@ window.DRIPS = [
     "rot": 0,
     "z": 11,
     "x": 34,
-    "y": 529
+    "y": 529,
+    "stack": 2
    },
    {
     "type": "doc",
@@ -2169,7 +2187,8 @@ window.DRIPS = [
     "rot": 0,
     "z": 13,
     "x": 372,
-    "y": 481
+    "y": 481,
+    "stack": 2
    },
    {
     "type": "doc",
@@ -2187,7 +2206,8 @@ window.DRIPS = [
     "rot": 0,
     "z": 12,
     "x": 710,
-    "y": 529
+    "y": 529,
+    "stack": 2
    },
    {
     "type": "arrow",
@@ -2277,14 +2297,13 @@ window.DRIPS = [
    ],
    "mirror": false,
    "variant": 0,
-   "look": "spotlight",
-   "accent": "purple",
-   "decor": "circle",
+   "look": "stack",
+   "style": "bold",
+   "accent": "teal",
+   "decor": "marker",
    "heroSize": "normal",
    "tilt": "flat"
   },
-  "accent": "purple",
-  "watermark": "rocket",
-  "panelY": 411
+  "accent": "teal"
  }
 ];

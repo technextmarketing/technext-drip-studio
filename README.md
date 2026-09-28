@@ -12,10 +12,9 @@ optional.
 
 - the visuals: Odoo documents and screens, a phone, Nexi (the TechNext robot), handwritten pills,
   step chips and sparkles;
-- a **look**, the whole design direction: Clean (white cards on a light floor), Blue panel, Navy panel,
-  Blue corner, Outline (printed-sticker look with hard shadows), Paper (cream cards, coral handwriting),
-  Spotlight (a warm glow and a huge faded industry illustration) or Desk stack (paper sheets behind
-  tilted cards);
+- a **look**, all of them clean: Clean (white cards on a light floor), Paper (cream cards, coral
+  handwriting), Spotlight (a warm glow and a huge faded industry illustration) or Desk stack (paper
+  sheets behind tilted cards);
 - an **accent colour** for pills, handwriting, chip icons and sparkles: blue, navy, teal, coral, purple
   or yellow;
 - a **headline accent** on the blue words: a coral circle, a yellow brush underline, a marker, strokes
@@ -26,10 +25,21 @@ optional.
   diagonal, rings, plus, hexagons, waves, light spots, floor grid). The patterns fade out behind the
   headline.
 
-**Fresh design, every time.** Posts in one set never share a look, an accent, a headline accent, a size
-or a pattern, and a new set never repeats a visual + look pair already in that category's library. The
-same applies when you generate again for the same industry: the studio passes what the library already
-has to Claude and checks the answer.
+**Claude lays every post out itself.** When you generate, Claude does not fill a template: it picks a
+style direction (bold, editorial, doodle, spacious, geometric, storytelling, playful, perspective), a
+composition pattern (hero bleed, big number, diagonal cascade, split, strip, collage, orbit, grid,
+annotated screen, story, prop poster, typographic, fan, testimonial, before-and-after) or invents one,
+and places every element with coordinates, sizes, rotations and layers. The studio then checks the
+placement (safe zone, overlaps, nothing above the subline, bleeds only where intended) and draws it.
+`simple.js` keeps the 35 preset visuals for the starters and for older posts.
+
+**Fresh content and fresh design, every time.** Every run gets a new creative brief: a different hook,
+point of view and moment for each post, drawn at random from a pool (a question at 7 am, a contrast, a
+tiny story, a quote from a sample persona, a myth and the fact… the owner, the head chef, the finance
+manager… month-end, the festive rush, a supplier delivery…). Everyday situations may come from Claude's
+knowledge of the trade; claims about Odoo and TechNext still come only from technext.asia. The prompt
+lists every headline and composition already in the library so nothing is reused, and within a set no
+two posts share a hook, persona, moment, pattern, style, accent, headline accent or background.
 
 ## Where it runs
 
@@ -107,13 +117,16 @@ phases, dashboard, app record flows, service pages, portfolio sites). For every 
 - the headline, subline, caption and hashtags;
 - which visual to use (a different one for every post);
 - every word inside the visual, tied to the headline, using sample data only;
-- the **design knobs**, so each post looks like its own poster:
-  - the look, the accent colour, the headline accent, the card size and tilt;
-  - arrangement (a or b), background pattern, tint and a kicker bar;
-  - 1-2 industry props;
-  - up to two accents: sticker, stamp, sticky note, avatars, toggle, timer, progress ring, search bar,
-    map pin, barcode, button or scribble.
+- the composition: 3-7 elements from the catalogue (documents, cards, boards, phone, charts, Nexi,
+  props, pills, chips, stickers, stamps, notes, handwriting…), each with its place, size, rotation and
+  layer, following the design principles in the prompt (one focal point, safe zone, breathing room,
+  alignment, one accent colour from the industry's mood, no clutter);
+- the look, the accent colour, the headline accent, the background pattern, a tint and a kicker.
 - Nexi appears in at most one post out of three.
+
+**Generation runs in the background.** After you press Generate the dialog closes, a progress pill sits
+in the top bar (with Stop), and you can keep editing. When the drafts are ready a banner appears with a
+Review button, a short chime plays, and a browser notification is sent if you allowed notifications.
 
 `simple.js` lays each post out. Posts arrive as **drafts**: Keep, Edit or Discard. Drafts are saved too.
 
@@ -121,15 +134,15 @@ phases, dashboard, app record flows, service pages, portfolio sites). For every 
 
 | Category | 3 posts | 6 posts | 9 posts |
 |---|---|---|---|
-| Industry (F&B, Kitchen, Retail…) | ~8,000 | ~9,400 | ~10,800 |
-| Meet Odoo 20 | ~7,900 | ~9,300 | ~10,700 |
-| Meet Odoo 20 + an industry focus | ~9,200 | ~10,600 | ~12,000 |
-| Odoo apps | ~9,300 | ~10,700 | ~12,100 |
-| AI in Odoo | ~8,100 | ~9,500 | ~10,900 |
-| Websites & marketing | ~4,900 | ~6,300 | ~7,700 |
+| Industry (F&B, Kitchen, Retail…) | ~9,300 | ~11,200 | ~13,000 |
+| Meet Odoo 20 | ~9,200 | ~11,100 | ~12,900 |
+| Meet Odoo 20 + an industry focus | ~10,500 | ~12,300 | ~14,200 |
+| Odoo apps | ~10,600 | ~12,500 | ~14,300 |
+| AI in Odoo | ~9,400 | ~11,300 | ~13,100 |
+| Websites & marketing | ~6,200 | ~8,000 | ~9,900 |
 
-The prompt (input) is about 3,500-8,000 tokens. Each post adds about 470 output tokens (the post, its
-visual's data and its design knobs). The Balanced and Best models also think before answering; that is
+The prompt (input) is about 4,300-8,900 tokens. Each post adds about 620 output tokens (the post and
+its layout). The Balanced and Best models also think before answering; that is
 billed on the plan but not reported. Fast does not think first. Everything runs on the viewer's own
 Claude plan, not an API bill. **Claude usage** logs every run.
 
@@ -137,7 +150,10 @@ Claude plan, not an API bill. **Claude usage** logs every run.
 
 - **Select:** click; **Shift-click** or **drag a box** on empty canvas to select several; Ctrl+A selects all.
 - **Move:** drag. Smart guides snap to the canvas centre, the margins and other elements' edges and centres (Alt = free).
-- **Resize:** corner handle. **Rotate:** top dot (Shift = 15° steps).
+- **Resize:** the corner handle scales the element as a whole and keeps its top-left corner in place;
+  the side handle on cards changes the width (the text reflows). **Rotate:** top dot (Shift = 15° steps).
+  Smart guides snap only to the canvas guides and the three nearest elements, and never while you move
+  fast (Alt = no snapping). The element you drag is lifted above the others.
 - **Text:** double-click text on the canvas to type in place (Enter saves, Esc cancels). Double-click a
   card, chart or list to edit its data in a small panel. The headline toolbar changes its size (A− A+)
   and colour. The headline stays in the standard position; if you drag it, "Reset position" puts it back.
@@ -149,7 +165,7 @@ Claude plan, not an API bill. **Claude usage** logs every run.
 - **Design panel:**
   - Background: Clean, Soft blue floor, or Blue shapes (the old blobs); Pattern; Tint.
   - Look, Accent colour and Headline accent (they restyle the post without moving anything).
-  - Card size and Tilt (they rebuild the layout).
+  - Card size and Tilt for the preset visuals (they rebuild the layout).
   - **Fresh design**: a look, colour, headline accent, pattern, size and tilt the post does not have yet.
   - Layout: **Mirror**, **Other arrangement** and **Reset layout**, which rebuilds the visual from its
     content and keeps the headline you edited.
@@ -199,9 +215,9 @@ Claude plan, not an API bill. **Claude usage** logs every run.
 | `drip.css`, `drip-render.js` | The drip design system: looks, accents, headline decorations, patterns, tints, logo, badge and renderer |
 | `odoo-ui.js`, `cards.js` | Inside-Odoo screens and cards (documents, product, work order, ticket, calendar…), charts, poster elements |
 | `props.js` | The industry props |
-| `simple.js` | The layout engine: one post → a drip, accents in free space, looks and the variety across a set (`diversify`, `fresh`) |
+| `simple.js` | The layout engine: Claude's free compositions (`VIS.free`, the safety net), the 35 preset visuals, looks, and the variety across a set (`diversify`, `fresh`) |
 | `starters.js` | The 30 starters for "New drip" (built from the website content; some follow the chosen industry) |
-| `ai.js` | The prompt (visuals, design knobs, props), industry detection, the Claude call and token estimates |
+| `ai.js` | The prompt (design principles, style directions, composition patterns, the element catalogue, the creative brief), industry detection, the Claude call and token estimates |
 | `store.js` | Saving: hub database / asset store / downloads, or this browser |
 | `index.html`, `studio.css`, `studio.js` | The studio |
 | `hub.html` | The Artifact page, built by `python tools/build_hub.py` |

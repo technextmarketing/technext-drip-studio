@@ -304,12 +304,19 @@
     $$('#box .hdl').forEach(function (n) { n.remove(); });
     var els = selEls(); if (!els.length) { $('#tools').hidden = true; return; }
     els.forEach(function (n) { n.classList.add('sel'); });
-    if (!st.multi.length || st.multi.length === 1) {
-      var n = els[0], L = st.sel === 'copy' ? null : cur().layers[st.sel];
-      if (st.sel === 'copy') n.insertAdjacentHTML('beforeend', '<span class="hdl hdl-se" data-h="cw" title="Width"></span>');
-      else if (L && L.type !== 'link' && !L.lock) { n.style.setProperty('--ls', L.s || 1); n.insertAdjacentHTML('beforeend', '<span class="hdl hdl-rot" data-h="rot" title="Rotate (Shift snaps to 15°)"></span><span class="hdl hdl-se" data-h="se" title="Resize"></span>'); }
-    }
     placeTools();
+  }
+  function placeHandles() {
+    var wrap = $('#wrap'); if (!wrap) return;
+    var h = $('#hdls'); if (!h) { h = document.createElement('div'); h.id = 'hdls'; h.className = 'hdls'; wrap.appendChild(h); }
+    h.innerHTML = '';
+    var d = cur(); if (!d || !S.canWrite || editing || st.multi.length > 1 || st.sel === -1) return;
+    var n = selEls()[0], L = st.sel === 'copy' ? null : d.layers[st.sel]; if (!n || (L && (L.type === 'link' || L.lock))) return;
+    var r = n.getBoundingClientRect(), w = wrap.getBoundingClientRect(), x = r.left - w.left, y = r.top - w.top;
+    if (st.sel === 'copy') { h.innerHTML = '<span class="hdl hdl-cw" data-h="cw" style="left:' + (x + r.width - 10) + 'px;top:' + (y + r.height / 2 - 10) + 'px" title="Width"></span>'; return; }
+    h.innerHTML = '<span class="hdl hdl-rot" data-h="rot" style="left:' + (x + r.width / 2 - 10) + 'px;top:' + (y - 46) + 'px" title="Rotate (Shift snaps to 15°)"></span>' +
+      '<span class="hdl hdl-se" data-h="se" style="left:' + (x + r.width - 10) + 'px;top:' + (y + r.height - 10) + 'px" title="Resize (keeps the proportions)"></span>' +
+      (L.w != null && !AUTO[L.type] ? '<span class="hdl hdl-e" data-h="e" style="left:' + (x + r.width - 7) + 'px;top:' + (y + r.height / 2 - 17) + 'px" title="Width (the text reflows)"></span>' : '');
   }
   var TEXTY = { pill: 1, chip: 1, note: 1, bubble: 1, text: 1, record: 1, phone: 1, checklist: 1, code: 1, site: 1, serp: 1, gauge: 1, ba: 1, orbit: 1, apps: 1, palette: 1, devices: 1, appflow: 1,
     appcard: 1, qr: 1, doc: 1, product: 1, workorder: 1, ticket: 1, calendar: 1, employee: 1, email: 1, shop: 1, reconcile: 1, approval: 1, sheet: 1, docs: 1, rating: 1, kcard: 1, pyramid: 1, groups: 1, stamp: 1, sticker: 1, ring: 1, avatars: 1, sticky: 1, toggle: 1, button: 1, search: 1, barcode: 1, pin: 1, timer: 1, scanner: 1, prop: 1, window: 1, ophone: 1, graph: 1, kpis: 1, timeline: 1, steps: 1, chat: 1, receipt: 1, notif: 1, stat: 1, route: 1, link: 1 };
@@ -317,6 +324,7 @@
   var ALIGN_SVG = { l: 'M4 3v18M8 7h12M8 13h8', c: 'M12 3v18M6 7h12M8 13h8', r: 'M20 3v18M4 7h12M8 13h8', t: 'M3 4h18M7 8v12M13 8v8', m: 'M3 12h18M7 6v12M13 8v8', b: 'M3 20h18M7 4v12M13 8v8' };
   function ico(p) { return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">' + '<path d="' + p + '"/></svg>'; }
   function placeTools() {
+    placeHandles();
     var t = $('#tools'), els = selEls(), wrap = $('#wrap'); if (!t || !els.length || editing || !S.canWrite) { if (t) t.hidden = true; return; }
     var h = '';
     if (st.multi.length > 1) {
@@ -337,7 +345,7 @@
     }
     t.innerHTML = h; t.hidden = false;
     var r = unionRect(els), w = wrap.getBoundingClientRect();
-    var top = r.top - w.top - 48; if (top < 6) top = r.bottom - w.top + 10;
+    var top = r.top - w.top - 86; if (top < 6) top = r.bottom - w.top + 26;
     var left = Math.max(6, Math.min(r.left - w.left + r.width / 2 - t.offsetWidth / 2, w.width - t.offsetWidth - 6));
     t.style.top = top + 'px'; t.style.left = left + 'px';
   }
@@ -362,8 +370,11 @@
     if (!st.id || !S.canWrite || e.button !== 0) return;
     if (editing && e.target.closest('[contenteditable]')) return;
     if (editing && editing.commit) editing.commit();
-    var box = e.target.closest && e.target.closest('#box'); if (!box) return;
-    var hdl = e.target.closest('.hdl'), n = e.target.closest('.L:not(.locked), .d-copy');
+    var hdl = e.target.closest && e.target.closest('.hdl'), box = e.target.closest && e.target.closest('#box'); if (!box && !hdl) { if (!e.target.closest || !e.target.closest('#wrap')) return; }
+    if (!box && !hdl) return;
+    var n = hdl ? (st.sel === 'copy' ? $('#box .d-copy') : $('#box .L[data-i="' + st.sel + '"]')) : e.target.closest('.L:not(.locked), .d-copy');
+    if (hdl && !n) return;
+    box = box || $('#box');
     var d = cur(), s = +box.dataset.s, H = $('#box .drip').offsetHeight;
     if (!n) {
       e.preventDefault();
@@ -384,16 +395,17 @@
     } else {
       ids.forEach(function (k) { var L = d.layers[k], ln = $('#box .L[data-i="' + k + '"]'); drag.start[k] = { x: L.x || 0, y: drag.tall ? parseFloat(ln.style.top) || 0 : L.y || 0, b: L.b, x1: L.x1, y1: L.y1, x2: L.x2, y2: L.y2, n: ln }; });
       var L0 = d.layers[i]; drag.n = selEls().filter(function (x) { return +x.dataset.i === i; })[0] || n;
-      drag.w0 = L0.w || drag.n.offsetWidth; drag.s0 = L0.s || 1; drag.box0 = unionBox(ids);
+      drag.w0 = L0.w || drag.n.offsetWidth; drag.h0 = drag.n.offsetHeight; drag.s0 = L0.s || 1; drag.box0 = unionBox(ids);
+      ids.forEach(function (k) { if (drag.start[k].n) drag.start[k].n.classList.add('lift'); });
       var r = drag.n.getBoundingClientRect(); drag.cx = r.left + r.width / 2; drag.cy = r.top + r.height / 2;
     }
     drag.others = $$('#box .L').filter(function (x) { return ids.indexOf(+x.dataset.i) < 0 && !x.classList.contains('L-glow') && !x.classList.contains('L-link') && !x.classList.contains('fx'); }).map(boxOf);
     if (i !== 'copy') drag.others.push(boxOf($('#box .d-copy')));
     $('#box').classList.add('dragging'); $('#tools').hidden = true;
-    try { n.setPointerCapture(e.pointerId); } catch (err) {}
+    try { (hdl || n).setPointerCapture(e.pointerId); } catch (err) {}
   });
   function unionBox(ids) { var a = null; ids.forEach(function (k) { var n = $('#box .L[data-i="' + k + '"]'); if (!n) return; var b = boxOf(n); a = a ? { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), x1: Math.max(a.x + a.w, b.x + b.w), y1: Math.max(a.y + a.h, b.y + b.h) } : { x: b.x, y: b.y, x1: b.x + b.w, y1: b.y + b.h }; if (a) { a.w = a.x1 - a.x; a.h = a.y1 - a.y; } }); return a || { x: 0, y: 0, w: 1, h: 1 }; }
-  document.addEventListener('pointermove', function (e) {
+  function onMove(e) {
     if (!drag) return;
     if (drag.mode === 'marq') {
       if (!drag.moved && Math.abs(e.clientX - drag.cx0) + Math.abs(e.clientY - drag.cy0) < 4) return;
@@ -405,17 +417,18 @@
     var dx = (e.clientX - drag.x0) / drag.s, dy = (e.clientY - drag.y0) / drag.s;
     if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 2) return;
     if (!drag.moved) { snapshot(); drag.moved = true; }
+    var fast = drag.lx != null && Math.hypot(e.clientX - drag.lx, e.clientY - drag.ly) / drag.s > 16; drag.lx = e.clientX; drag.ly = e.clientY;
     var d = cur();
     if (drag.i === 'copy') {
       d.copy = d.copy || {};
       if (drag.mode === 'cw') { d.copy.x = drag.copy0.x; d.copy.y = drag.copy0.y; d.copy.w = Math.max(160, Math.round(drag.copy0.w + dx)); if (!d.copy.align) d.copy.align = 'center'; drag.n.style.width = d.copy.w + 'px'; return; }
-      var g = snap(drag.box0, dx, dy, drag.H, drag.others, e.altKey); showGuides(g.lines);
+      var g = snap(drag.box0, dx, dy, drag.H, drag.others, e.altKey || fast); showGuides(g.lines);
       d.copy.x = Math.round(drag.copy0.x + g.dx); d.copy.y = Math.round(drag.copy0.y + g.dy); d.copy.w = drag.copy0.w; if (!d.copy.align) d.copy.align = 'center';
       drag.n.style.left = d.copy.x + 'px'; drag.n.style.right = 'auto'; drag.n.style.width = d.copy.w + 'px'; drag.n.style.top = (d.copy.y + (drag.tall ? 40 : 0)) + 'px'; return;
     }
     var L = d.layers[drag.i];
     if (drag.mode === 'move') {
-      var g2 = snap(drag.box0, dx, dy, drag.H, drag.others, e.altKey); dx = g2.dx; dy = g2.dy; showGuides(g2.lines);
+      var g2 = snap(drag.box0, dx, dy, drag.H, drag.others, e.altKey || fast); dx = g2.dx; dy = g2.dy; showGuides(g2.lines);
       drag.ids.forEach(function (k) {
         var M = d.layers[k], s0 = drag.start[k];
         if (M.type === 'link') { M.x1 = Math.round(s0.x1 + dx); M.x2 = Math.round(s0.x2 + dx); M.y1 = Math.round(s0.y1 + dy); M.y2 = Math.round(s0.y2 + dy); s0.n.style.transform = 'translate(' + dx + 'px,' + dy + 'px)'; return; }
@@ -424,17 +437,26 @@
         else { var ny = Math.round(s0.y + dy); if (drag.tall) M.y45 = ny; else M.y = ny; s0.n.style.top = ny + 'px'; }
       });
     } else if (drag.mode === 'se') {
-      var a = (L.rot || 0) * Math.PI / 180, along = dx * Math.cos(a) + dy * Math.sin(a);
-      if (L.w || !AUTO[L.type]) { L.w = Math.max(24, Math.round(drag.w0 + along)); drag.n.style.width = L.w + 'px'; }
-      else { L.s = Math.max(.25, Math.round(drag.s0 * (1 + along / (drag.w0 * drag.s0)) * 100) / 100); drag.n.style.transform = tf(L); drag.n.style.setProperty('--ls', L.s); }
+      /* the corner scales the element as a whole and keeps its top-left corner in place */
+      var a = (L.rot || 0) * Math.PI / 180, along = dx * Math.cos(a) + dy * Math.sin(a), st0 = drag.start[drag.i];
+      var s1 = Math.max(.2, Math.min(4, Math.round((drag.w0 * drag.s0 + along) / drag.w0 * 1000) / 1000));
+      L.s = s1 === 1 ? undefined : s1;
+      L.x = Math.round(st0.x + drag.w0 * (s1 - drag.s0) / 2); drag.n.style.left = L.x + 'px';
+      if (st0.b == null) { var ny2 = Math.round(st0.y + drag.h0 * (s1 - drag.s0) / 2); if (drag.tall) L.y45 = ny2; else L.y = ny2; drag.n.style.top = ny2 + 'px'; }
+      drag.n.style.transform = tf(L); drag.n.style.setProperty('--ls', s1);
+    } else if (drag.mode === 'e') {
+      /* the side handle changes the width; the text inside reflows */
+      var a2 = (L.rot || 0) * Math.PI / 180, along2 = dx * Math.cos(a2) + dy * Math.sin(a2), st1 = drag.start[drag.i], w1 = Math.max(40, Math.round(drag.w0 + along2 / drag.s0));
+      L.w = w1; L.x = Math.round(st1.x + (drag.w0 - w1) * (1 - drag.s0) / 2); drag.n.style.width = w1 + 'px'; drag.n.style.left = L.x + 'px';
     } else if (drag.mode === 'rot') {
       var ang = Math.atan2(e.clientY - drag.cy, e.clientX - drag.cx) * 180 / Math.PI + 90;
       if (ang > 180) ang -= 360;
       ang = e.shiftKey ? Math.round(ang / 15) * 15 : Math.abs(ang) < 3 ? 0 : Math.round(ang * 2) / 2;
       L.rot = ang || undefined; drag.n.style.transform = tf(L);
     }
-    syncXY();
-  });
+    syncXY(); placeHandles();
+  }
+  document.addEventListener('pointermove', function (e) { if (!drag) return; drag.ev = e; if (drag.raf) return; drag.raf = requestAnimationFrame(function () { var dr = drag; if (!dr) return; dr.raf = 0; onMove(dr.ev); }); });
   document.addEventListener('pointerup', function () {
     if (!drag) return;
     $('#box').classList.remove('dragging'); showGuides([]);
@@ -448,13 +470,16 @@
       }
       return;
     }
+    $$('#box .lift').forEach(function (n) { n.classList.remove('lift'); });
     if (dd.moved) { queueSave(cur()); drawCanvas(); renderInspector(); } else placeTools();
   });
-  var AUTO = { pill: 1, chip: 1, note: 1, bubble: 1 };
+  var AUTO = { pill: 1, chip: 1, note: 1, bubble: 1, stamp: 1, avatars: 1, toggle: 1, button: 1, timer: 1, pin: 1 };
   function snap(b, dx, dy, H, others, off) {
-    var lines = [], th = 6; if (off) return { dx: dx, dy: dy, lines: lines };
-    var xs = [64, 540, 1016], ys = [H / 2, 64, H - 64];
-    (others || []).forEach(function (o) { xs.push(o.x, o.x + o.w / 2, o.x + o.w); ys.push(o.y, o.y + o.h / 2, o.y + o.h); });
+    var lines = [], th = 5; if (off) return { dx: dx, dy: dy, lines: lines };
+    var xs = [64, 540, 1016], ys = [H / 2, 64, H - 64], cx = b.x + dx + b.w / 2, cy = b.y + dy + b.h / 2;
+    /* only the three nearest neighbours, so the element does not jump between dozens of lines */
+    (others || []).map(function (o) { return { o: o, d: Math.hypot(o.x + o.w / 2 - cx, o.y + o.h / 2 - cy) }; }).sort(function (p, q) { return p.d - q.d; }).slice(0, 3)
+      .forEach(function (p) { var o = p.o; xs.push(o.x, o.x + o.w / 2, o.x + o.w); ys.push(o.y, o.y + o.h / 2, o.y + o.h); });
     function best(vals, cands) { var bd = null; cands.forEach(function (l) { vals.forEach(function (v) { var d2 = l - v; if (Math.abs(d2) < th && (bd == null || Math.abs(d2) < Math.abs(bd))) bd = d2; }); }); return bd; }
     var bx = best([b.x + dx, b.x + dx + b.w / 2, b.x + dx + b.w], xs); if (bx != null) { dx += bx; lines.push(['v', xs.filter(function (l) { return [b.x + dx, b.x + dx + b.w / 2, b.x + dx + b.w].some(function (v) { return Math.abs(v - l) < .6; }); })]); }
     var by = best([b.y + dy, b.y + dy + b.h / 2, b.y + dy + b.h], ys); if (by != null) { dy += by; lines.push(['h', ys.filter(function (l) { return [b.y + dy, b.y + dy + b.h / 2, b.y + dy + b.h].some(function (v) { return Math.abs(v - l) < .6; }); })]); }
@@ -788,7 +813,7 @@
       '<div class="f"><span>Look</span><div class="chips">' + SP.LOOKS.map(function (x) { return '<button data-look="' + x + '"' + ((d.look || 'clean') === x ? ' class="on"' : '') + ' title="' + esc(SP.LOOK_ABOUT[x]) + '">' + LOOKLAB[x] + '</button>'; }).join('') + '</div></div>' +
       '<div class="f"><span>Accent colour' + (SP.LOOK_ACC[d.look] ? ' · set by the look' : '') + '</span><div class="chips accs">' + SP.ACCENTS.map(function (x) { return '<button class="acc-sw' + ((d.accent || 'blue') === x ? ' on' : '') + '" data-acc="' + x + '" title="' + x + '" style="--c:' + ACCC[x] + '"></button>'; }).join('') + '</div></div>' +
       '<div class="f"><span>Headline accent</span><div class="chips">' + SP.DECORS.map(function (x) { return '<button data-decor="' + x + '"' + (((d.copy && d.copy.decor) || 'none') === x ? ' class="on"' : '') + '>' + DECLAB[x] + '</button>'; }).join('') + '</div></div>' +
-      (V ? '<div class="row"><div class="f"><span>Card size</span><div class="chips">' + SP.HERO.map(function (x) { return '<button data-hero="' + x + '"' + ((d.heroSize || 'normal') === x ? ' class="on"' : '') + '>' + x + '</button>'; }).join('') + '</div></div>' +
+      (V && d.visual !== 'free' ? '<div class="row"><div class="f"><span>Card size</span><div class="chips">' + SP.HERO.map(function (x) { return '<button data-hero="' + x + '"' + ((d.heroSize || 'normal') === x ? ' class="on"' : '') + '>' + x + '</button>'; }).join('') + '</div></div>' +
         '<div class="f"><span>Tilt</span><div class="chips">' + SP.TILTS.map(function (x) { return '<button data-tilt="' + x + '"' + ((d.tilt || 'soft') === x ? ' class="on"' : '') + '>' + x + '</button>'; }).join('') + '</div></div></div>' +
         '<div class="f"><button class="btn sm primary" data-fresh="1" type="button">' + sparkIcon() + 'Fresh design</button><p class="help" style="margin:6px 0 0">A look, colour, headline accent, pattern, size and tilt this post does not have yet.</p></div>' : '') +
       (V ? '<div class="f"><span>Layout · ' + esc(V.label) + '</span><div class="chips">' + (SP.canMirror(d.visual) ? '<button data-mirror="1"' + (d.mirror ? ' class="on"' : '') + '>Mirror</button>' : '') + (SP.hasVariants(d.visual) ? '<button data-variant="1">Other arrangement</button>' : '') +
@@ -913,6 +938,9 @@
     if (ds.open) { openDrip(ds.open); return; }
     if (ds.new) { openStarters(); return; }
     if (ds.gen) { openGenerate(); return; }
+    if (ds.genstop) { if (genCtl) genCtl.abort(); return; }
+    if (ds.review) { var gb = $('#genbanner'); if (gb) gb.remove(); st.cat = ds.review; showGallery(); return; }
+    if (ds.dismiss) { var gb2 = $('#genbanner'); if (gb2) gb2.remove(); return; }
     if (ds.keep) { var k = lib.filter(function (x) { return x.id === ds.keep; })[0]; if (k) { delete k.draft; saveNow(k); toast('Kept in ' + catName(k.cat)); if (st.id) { drawCanvas(); renderInspector(); } else showGallery(); } return; }
     if (ds.keepall) { lib.forEach(function (x) { if (x.draft && (st.cat === 'all' || st.cat === 'drafts' || x.cat === st.cat)) { delete x.draft; saveNow(x); } }); toast('All drafts kept'); showGallery(); return; }
     if (ds.discard) { var g = lib.filter(function (x) { return x.id === ds.discard; })[0]; if (g) { removeDrip(g); toast('Discarded'); showGallery(); } return; }
@@ -986,7 +1014,7 @@
 
   /* ---------- dialogs ---------- */
   function openDlg(html, wide) { var d = $('#dlg'); d.innerHTML = '<div class="dlg-card' + (wide ? ' wide' : '') + '" role="dialog" aria-modal="true">' + html + '</div>'; d.hidden = false; var f = $('button,select,input,textarea', d); if (f) f.focus(); }
-  function closeDlg() { if (genCtl) return; $('#dlg').hidden = true; $('#dlg').innerHTML = ''; }
+  function closeDlg() { $('#dlg').hidden = true; $('#dlg').innerHTML = ''; }
   $('#dlg').addEventListener('click', function (e) { if (e.target.id === 'dlg') closeDlg(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (!$('#dlg').hidden) closeDlg(); closeMenu(); } });
 
@@ -1025,7 +1053,7 @@
   var genCtl = null;
   function openGenerate() {
     var c = catObj(st.cat) || catObj('fnb') || cats[0], catIds = cats.map(function (x) { return x.id; });
-    openDlg('<h2>' + sparkIcon() + ' Generate with Claude</h2><p>Claude reads the technext.asia content for the category and writes a set of posts. Each one gets its own story and the one visual that shows it (a phone, a record with Nexi, a chart, an Odoo board, a chat…), filled with words that match the headline. The frame and the clean background stay the same. They arrive as drafts.</p>' +
+    openDlg('<h2>' + sparkIcon() + ' Generate with Claude</h2><p>Claude reads the technext.asia content for the category, writes a set of posts and lays each one out itself: its own story, hook and moment, its own composition, style, colour and elements. Only the frame stays. You can keep working while Claude designs; a banner and a chime tell you when the drafts are ready.</p>' +
       '<div class="row"><label class="f"><span>Category</span><select id="g-cat">' + opts(catIds, c.id, cats.map(function (x) { return x.name; })) + '</select></label>' +
       '<label class="f"><span>Industry focus</span><select id="g-ind">' + opts([''].concat(INDUSTRIES), c.industry || '', ['Any / none'].concat(INDUSTRIES.map(indName))) + '</select></label></div>' +
       '<div class="row"><label class="f"><span>How many posts</span><select id="g-n">' + opts(['3', '6', '9'], '6') + '</select></label>' +
@@ -1056,21 +1084,20 @@
     var cat = $('#g-cat').value, ind = $('#g-ind').value || (catObj(cat) || {}).industry || AI.detectIndustry($('#g-brief').value) || '';
     return { cat: cat, catName: catName(cat), industry: ind || null, count: +$('#g-n').value, tier: $('#g-tier').value, brief: $('#g-brief').value.trim(),
       angles: $$('[data-angle]').filter(function (b) { return b.checked; }).map(function (b) { return b.dataset.angle; }),
-      existingDesigns: lib.filter(function (d) { return d.cat === cat && d.visual; }).map(function (d) { return d.visual + ' + ' + (d.look || 'clean'); }).filter(function (v, i, a) { return a.indexOf(v) === i; }),
-      existing: lib.filter(function (d) { return d.cat === cat; }).map(function (d) { return String(d.copy && d.copy.head || '').replace(/[*~|=]/g, ' ').replace(/\s+/g, ' ').trim(); }) };
+      existingDesigns: lib.filter(function (d) { return d.composition || d.visual; }).map(function (d) { return (d.style ? d.style + ': ' : '') + (d.composition || d.visual + (d.look ? ' + ' + d.look : '')); }).filter(function (v, i, a) { return a.indexOf(v) === i; }),
+      existing: lib.slice().sort(function (a, b) { return (a.cat === cat ? 0 : 1) - (b.cat === cat ? 0 : 1); }).map(function (d) { return String(d.copy && d.copy.head || '').replace(/[*~|=]/g, ' ').replace(/\s+/g, ' ').trim(); }).filter(Boolean) };
   }
   function runGenerate() {
     var o = genOpts();
     if (!o.angles.length) { toast('Pick at least one angle'); return; }
-    genCtl = new AbortController();
-    var card = $('.dlg-card');
-    card.innerHTML = '<h2>' + sparkIcon() + ' Claude is designing ' + o.count + ' posts</h2><p id="g-stage">Thinking… (the Balanced and Best models think for 10-60 seconds before writing)</p>' +
-      '<div class="gbar"><i id="g-bar" style="width:4%"></i></div><div class="dlg-foot"><button class="btn" id="g-stop" type="button">Stop</button></div>';
-    $('#g-stop').addEventListener('click', function () { if (genCtl) genCtl.abort(); });
-    AI.generate(o, function (n) { $('#g-stage').textContent = 'Designing post ' + Math.min(n, o.count) + ' of ' + o.count + '…'; $('#g-bar').style.width = Math.max(8, Math.min(96, n / o.count * 96)) + '%'; }, genCtl.signal)
+    if (genCtl) { toast('Claude is still designing the previous set'); return; }
+    genCtl = new AbortController(); o.seed = Date.now() % 1e9;
+    askNotify(); closeDlg();
+    genPill('Claude is thinking… keep working, the drafts arrive in the background', 4);
+    AI.generate(o, function (n) { genPill('Designing post ' + Math.min(n, o.count) + ' of ' + o.count + '…', Math.max(8, Math.min(96, n / o.count * 96))); }, genCtl.signal)
       .then(function (r) {
-        genCtl = null;
-        var gid = 'g' + Date.now().toString(36), made = [], posts = SP.diversify(r.concepts.slice(0, o.count), Date.now() % 1e6, lib.filter(function (x) { return x.cat === o.cat; }));
+        genCtl = null; genPill(null);
+        var gid = 'g' + Date.now().toString(36), made = [], posts = SP.diversify(r.concepts.slice(0, o.count), o.seed, lib.filter(function (x) { return x.cat === o.cat; }));
         posts.forEach(function (sc, i) {
           var d = SP.compose(sc, { cat: o.cat, industry: o.industry, index: i, source: 'Claude · ' + o.catName + (o.industry ? ' · ' + indName(o.industry) : '') + ' · ' + new Date().toISOString().slice(0, 10) });
           d.id = uid(d.name); d.draft = true; d.gen = gid; d.createdAt = new Date().toISOString(); d.order = lib.length + i;
@@ -1078,22 +1105,43 @@
         });
         var entry = { at: new Date().toISOString(), cat: o.cat, industry: o.industry, asked: o.count, made: made.length, tier: r.tier, input: r.input, output: r.output, ms: r.ms };
         usage.push(entry); S.logUsage(usage);
-        $('.dlg-card').innerHTML = '<h2>' + made.length + ' drafts added to ' + esc(o.catName) + '</h2><p>Each post has its own visual and its own design. Open any of them to change a word or move things, or keep the ones you like.</p>' +
-          '<div class="est"><b>This run:</b> about ' + nf(r.input) + ' tokens in + ' + nf(r.output) + ' out = <b>' + nf(r.input + r.output) + ' tokens</b> (estimate, ' + esc(tierName(r.tier)) + ' model, ' + Math.round(r.ms / 1000) + ' s).</div>' +
-          '<div class="dlg-foot"><button class="btn" id="dlg-close" type="button">Close</button><button class="btn primary" id="g-review" type="button">Review drafts</button></div>';
-        $('#g-review').addEventListener('click', function () { closeDlg(); st.cat = o.cat; showGallery(); });
+        var msg = made.length + ' new draft' + (made.length === 1 ? '' : 's') + ' for ' + o.catName + (o.industry && (catObj(o.cat) || {}).industry !== o.industry ? ' · ' + indName(o.industry) : '') + ' are ready (about ' + nf(r.input + r.output) + ' tokens)';
+        genBanner(msg, o.cat, false); chime(); notifyBrowser('Drafts ready', msg);
         if (!st.id) showGallery();
       })
       .catch(function (e) {
-        genCtl = null;
+        genCtl = null; genPill(null);
         var code = e && e.code, msg = {
           cancelled: 'Stopped. Nothing was added.', not_granted: 'Claude was not allowed for this page. Allow it when asked, then try again.', rate_limited: 'Claude is busy or your usage limit is reached. Try again in a few minutes.',
           invalid_json: 'Claude\'s answer could not be read as posts. Try again, or ask for fewer posts.', prompt_too_large: 'The request was too long. Remove the brief or pick fewer angles.',
           unavailable: 'Claude is only available inside the TechNext hub on claude.ai.', sampling_disabled: 'Claude is turned off for this account.', refused: 'Claude declined this request. Change the brief and try again.'
         }[code] || ('Something went wrong (' + (code || (e && e.message) || 'error') + '). Try again.');
-        $('.dlg-card').innerHTML = '<h2>No drafts this time</h2><p>' + esc(msg) + '</p><div class="dlg-foot"><button class="btn" id="dlg-close" type="button">Close</button><button class="btn primary" id="g-again" type="button">Try again</button></div>';
-        $('#g-again').addEventListener('click', openGenerate);
+        genBanner('No drafts this time: ' + msg, null, true);
       });
+  }
+  function genPill(text, pct) {
+    var p = $('#genpill'); if (!text) { if (p) p.remove(); return; }
+    if (!p) { p = document.createElement('span'); p.id = 'genpill'; p.className = 'genpill'; p.innerHTML = '<i></i><span></span><button type="button" data-genstop="1">Stop</button>'; $('#topacts').insertBefore(p, $('#topacts').firstChild); }
+    $('span', p).textContent = text; $('i', p).style.width = pct + '%';
+  }
+  function genBanner(msg, cat, isErr) {
+    var b = $('#genbanner'); if (b) b.remove();
+    b = document.createElement('div'); b.id = 'genbanner'; b.className = 'genbanner' + (isErr ? ' err' : ''); b.setAttribute('role', 'status');
+    b.innerHTML = '<span>' + sparkIcon() + esc(msg) + '</span>' + (cat ? '<button class="btn sm primary" data-review="' + esc(cat) + '" type="button">Review drafts</button>' : '') + '<button class="btn sm ghost" data-dismiss="1" type="button" aria-label="Dismiss">✕</button>';
+    document.body.appendChild(b);
+  }
+  function askNotify() { try { if (window.Notification && Notification.permission === 'default') Notification.requestPermission().catch(function () {}); } catch (e) {} }
+  function notifyBrowser(title, body) { try { if (window.Notification && Notification.permission === 'granted') new Notification(title, { body: body }); } catch (e) {} }
+  function chime() {
+    try {
+      var A = window.AudioContext || window.webkitAudioContext; if (!A) return;
+      var c = chime.c || (chime.c = new A()); if (c.state === 'suspended') c.resume();
+      [[880, 0], [1175, .16]].forEach(function (n) {
+        var o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.value = n[0];
+        g.gain.setValueAtTime(.0001, c.currentTime + n[1]); g.gain.exponentialRampToValueAtTime(.18, c.currentTime + n[1] + .02); g.gain.exponentialRampToValueAtTime(.0001, c.currentTime + n[1] + .38);
+        o.connect(g); g.connect(c.destination); o.start(c.currentTime + n[1]); o.stop(c.currentTime + n[1] + .4);
+      });
+    } catch (e) {}
   }
   function tierName(t) { var x = AI.TIERS.filter(function (y) { return y[0] === t; })[0]; return x ? x[1] : t; }
   function openUsage() {

@@ -1,8 +1,9 @@
-/* TechNext Drip Studio — content generation with Claude (v4, the simple style).
-   Claude writes the headline, subline and caption of every post, picks the one visual that shows the
-   headline (phone, record + Nexi, chart, Odoo board, chat…) and writes every word inside it. simple.js lays
-   it out in the standard frame. The prompt carries only technext.asia content, so Claude has nothing else
-   to draw facts from. */
+/* TechNext Drip Studio — content generation with Claude (v7).
+   Claude is copywriter and art director: for every post it writes the headline, subline and caption, picks
+   a style direction and a composition pattern (or invents one) and places every element itself, from the
+   element catalogue, following poster design principles. A creative brief (hooks, personas, moments) changes
+   on every run, and the library's existing headlines and compositions are excluded, so every run is fresh.
+   simple.js checks the placement (safe zone, overlaps, bleed) and draws it. */
 (function () {
   'use strict';
   var C = window.TN_CONTENT || {};
@@ -110,19 +111,6 @@
     scan: 'scan: a handheld scanner reading a barcode into Odoo. {"scan":{"title","text":"≤22"},"product":{"item" and the other product fields} OR "doc":{the document fields},"chip":{…},"pills":["0-1"]}',
     proof: 'proof: the three approved company figures (10+ countries, 11+ enterprise clients, 4 AI disciplines) as big numbers. {"pills":["0-2 ≤20"],"nexi":' + POSE + '}'
   };
-  var KNOBS = [
-    'DESIGN KNOBS (per post), so every post is its own poster; the layout engine places everything cleanly:',
-    '- "look": the whole design direction. clean = white cards on a light floor | band = a blue panel across the lower half, white cards and white pills on it | navy = a navy panel, white cards, yellow pills | corner = a big blue rounded shape in the lower-right corner behind the visual | outline = printed-sticker look, navy outlines and hard shadows on every card | paper = cream cards and coral handwriting on a sand background | spotlight = a warm glow and a huge faded industry illustration behind the visual | stack = cards on a desk, paper sheets behind each, tilted.',
-    '- "accent": blue | navy | teal | coral | purple | yellow: the colour of pills, handwriting, chip icons and sparkles (the navy, outline and paper looks set their own).',
-    '- "decor": none | circle | underline | marker | strokes | box: a hand-drawn touch on the blue words of the headline (a coral circle, a yellow brush underline, a yellow marker, yellow strokes, or white on blue).',
-    '- "heroSize": normal | big | small, and "tilt": flat | soft | strong: how large the cards are and how much they lean.',
-    '- "arrangement": "a" or "b" (visuals marked "b =" have a second arrangement).',
-    '- "background": dots | grid | fine | diagonal | rings | plus | hex | waves | spots | floor | none: a light pattern under the visual. Every post in a set gets a different one.',
-    '- "tint": sky | mint | lilac | sand: a light colour wash, for at most one post in three.',
-    '- "kicker": a short blue bar above the headline, max 26 chars (for example "Reasons your customer" or "New in Odoo 20").',
-    '- "props": 1-2 illustrations from PROPS, placed around the visual. Use them to show the industry.',
-    '- "accents": up to 2 of {"type":"sticker","text":"≤12","small":"≤18","tone":"yellow|blue|white"}, {"type":"stamp","text":"PAID|APPROVED|SIGNED|MATCHED…","tone":"green|blue|red"} (lands on the main card), {"type":"sticky","text":"≤36"}, {"type":"avatars","names":[…],"label"}, {"type":"toggle","text","on"}, {"type":"timer","time","label"}, {"type":"ring","value":0-100,"label"}, {"type":"search","query","filters":[…]}, {"type":"pin","label"}, {"type":"barcode","code","label"}, {"type":"button","text"}, {"type":"scribble","kind":"circle|underline|arrow|check"}.'
-  ].join('\n');
   function propsLine(o) {
     var P = window.TNProps; if (!P) return '';
     var ind = o.industry && P.BY_IND[o.industry], name = o.industry && C.industries[o.industry] ? C.industries[o.industry].name : '';
@@ -144,58 +132,120 @@
     ['it', /\b(IT services?|IT support|IT companies|cctv|networking|servers?|voip|cyber\w*|system integrators?|managed services?)\b/i]
   ];
   function detectIndustry(text) { text = String(text || ''); for (var i = 0; i < IND_WORDS.length; i++) if (C.industries && C.industries[IND_WORDS[i][0]] && IND_WORDS[i][1].test(text)) return IND_WORDS[i][0]; return null; }
-  function visualsFor(o) { return (window.TNSimple ? window.TNSimple.forCat(o.cat, o.industry) : Object.keys(VSPEC)).filter(function (v) { return VSPEC[v]; }); }
 
-  var EXAMPLE = JSON.stringify({ name: 'AI vendor bill', angle: 'ai', head: 'AI prepares the bill.|*You approve it.*', sub: 'TechNext builds AI inside your Odoo. It reads the vendor bill, matches the purchase order and waits for your OK.',
-    caption: 'Supplier bills still typed by hand? With AI inside Odoo, the bill is read, filled and matched to the purchase order. Finance only approves. Book a call at technext.asia.', hashtags: ['#Odoo', '#AI', '#Accounting'],
-    visual: 'record', app: 'accountant', title: 'Vendor bill', crumb: 'Accounting · Draft', status: 'Draft', rows: [['Vendor', 'Harbourline Supplies', 'ai'], ['Bill date', '12 Sep 2026', 'ai'], ['Total', 'S$ 1,284.00', 'ai'], ['PO match', 'PO00123', 'ok']],
-    note: 'Prepared by AI · a person approves', btn: 'Approve', steps: ['AI read the bill', 'Matched to PO00123', 'Approved by Finance'], bubble: 'PO matched!', nexi: 'point',
-    look: 'corner', accent: 'blue', decor: 'circle', heroSize: 'big', tilt: 'soft', background: 'hex', props: ['invoice'], accents: [{ type: 'stamp', text: 'MATCHED', tone: 'blue' }] });
+  /* ---------- v7: Claude composes every post itself, from the element catalogue ---------- */
+  var ELEMENTS_DOC = [
+    'ELEMENTS you can place (all drawn flat in white cards with the brand fonts; the sizes and words are yours):',
+    'Odoo records: doc {kind:quote|order|invoice|bill|po|delivery|receipt, number, partner, fields:[[label,value]x0-2], lines:[[product,qty,amount]x2-4], total, stage, ribbon:"PAID", note, compact:true = a small card} · record {app, title, crumb, status, rows:[[label,value,"ai"|"ok"|""]x3-4], note, btn} · product {item, ref, icon:box|shirt|cup|bag|bowl|bottle|tool|pill|chair|plant, price, stock:[[label,value]x2], level:0-100, tags, badge} · phone {app, title, crumb, banner, field:[label,value], lines:[[item,qty,true|false]x3-4], btn, offline:true} · board {view:kanban|list|planning|kds|pos|dashboard, app, title, crumb, tag; kanban "stages":[[name,[[title,subtitle,amount,initials]x1-2]]x3-4],"highlight":["2.0"]; list "cols":[3-4],"rows":[[…]x3-5],"highlight":row; planning "days":[5],"rows":[[person,[[startDay,days,label]x1-2]]x3-4]; kds "tickets":[[table,[[item,qty]x2-3],"cooking|ready|late",minutes]x2-3]; pos "table","products":[[name,price]x6],"order":[[item,qty,unit,subtotal]x2-3],"total","btn"; dashboard "kpis":[[label,value,change]x3],"chart":{kind,title,data}} · workorder {title, crumb, status, timer, timerLabel, steps:[[step,done|now|todo,detail]x3-4], progress:0-100, progressLabel, btn} · ticket {title, crumb, stage, priority:0-3, sla, channel, text, assignee, tags} · calendar {app, title, crumb, tag, days:[5], from, to, today, events:[[day,startHour,hours,label,highlight]x4-7]} · employee {person, job, dept, rows:[[label,value,status]x2-4]} · email {subject, from, headline, cta, stats:[[value,label]x3]} · shop {brand, url, product, category, icon, price, rating, reviews, stock, options, cart, btn} · reconcile {title, crumb, status, bank:[date,payer,amount], match:[number,customer,amount], label, btn, note} · approval {title, crumb, status, fields:[[label,value]x2-3], approvers:[[name,Approved|Waiting]x2], btns} · sheet {title, tag, formula, cols:[4], rows:[[4]x3-5], highlight:[row,col], totalRow} · docs {title, crumb, tag, files:[[name,pdf|xls|doc|img,tag,highlight]x4-6]} · rating {stars, text, who, meta} · kcard {title, crumb, tags, priority, amount, owner, activity} · receipt {vendor, doc, lines:[[item,amount]x2-4], total, stamp} · notif {app, title, text, time}',
+    'Numbers & flows: chart {kind:bar|line|area|donut|funnel|progress, title, tag, data:[[label,number]x4-7], highlight, unit} · kpis {items:[[label,value,delta,module]x2-4]} · stat {value ≤8 chars, label} · timeline {title, items:[[time,event,module,detail]x3-5], hot} · steps {dir:h|v, items:[[module,step,detail]x3-5], hot} · flow {steps:[{app,t,h}x3-6], hot} (leave steps out for the industry workflow) · pyramid {levels:[[title,sub] top to bottom x3-5], hot, note} · groups {groups:[{title, apps:[[module,label]x2-6]}x2-3], base} · checklist {title, tag, items x3-4, apps, old:true = the old way with red crosses} · chat {channel:whatsapp|web|odoo, title, status, msgs:[[in|out|bot,text]x2-4]} · appflow {app, hot} · orbit {apps:[6-10 modules], label} · phases {} (the industry rollout) · devices {site:technext|movewithease|tre|immaculate} · site {brand, head, cta} · serp {query, title, desc} · code {file, lines}',
+    'Nexi & props: nexi {pose:' + POSE + '} · prop {name from PROPS, tile:true for a white tile, label}',
+    'Callouts: pill {text ≤20, handwritten} · chip {text ≤26, small, icon:check|spark|search|sync|cloudOk|bell|clock|chart} · note {text ≤22 handwritten, strike:true} · bubble {text ≤18} · text {text ≤70, font:hand|display|body, size:28-130, align} · sticker {text ≤12, small, tone:yellow|blue|white|mint|pink} · stamp {text, tone:green|blue|red} · sticky {text ≤36, tone:yellow|blue|mint|pink} · avatars {names, more, label} · toggle {text, on} · timer {time, label} · ring {value:0-100, label} · button {text, tone:odoo|blue|white|green} · search {query, filters} · pin {label} · barcode {code, label} · scribble {kind:circle|underline|arrow|check|star|zigzag|cross} · scanner {title, text} · qr {title, text} · arrow {kind:right|left|down|up|loop} · sparkles {} · glow {}',
+    'PLACEMENT, on every element: "x","y" = the top-left corner (x in % of the canvas width, y in % of the visual area: 0 is right under the subline, 100 the bottom edge) or "cx","cy" for the centre; "w" = width in % of the canvas width (records 45-70, a phone 28-34, a prop 14-40; chips, pills, stamps, notes and bubbles need no w); "rot" in degrees (-12 to 12); "z" 1-9 (9 = front); "role": hero|support|accent; "bleed": true lets the hero run off the bottom or a side edge (never the top); "over": true when it must sit on another element (a stamp on a document, a sticker on a card); "stack": 1-2 paper sheets behind a card.'
+  ].join('\n');
+  var PRINCIPLES = [
+    'DESIGN PRINCIPLES (from banner and poster practice):',
+    '- One focal point: the hero is at least twice the size of anything else; everything else supports it. Scale contrast makes a poster.',
+    '- Safe zone: text and key content stay within the central 80% of the canvas; only a decorative edge of the hero may bleed off.',
+    '- Breathing room: 3 to 6 elements (a collage up to 7). Leave empty space on purpose; never fill every corner.',
+    '- Alignment and rhythm: align to thirds of the canvas; keep gaps consistent; rotate at most two elements, by 3 to 8 degrees, with intent.',
+    '- Hierarchy: headline (fixed) > card title > body > callouts. The typefaces are fixed: Plus Jakarta Sans for titles, Inter for text, Caveat for handwriting.',
+    '- Colour: brand blue plus ONE accent per post, from the industry mood: F&B and kitchens warm (coral, yellow); construction and field service safety yellow; IT, ERP and finance blue or navy; clinics and wellness teal; travel blue; retail and fashion purple or coral; marketing bold (coral, purple).',
+    '- Anti-patterns: text on text, clipped words, cluttered corners, more than one call-to-action, decoration that says nothing, an element touching the headline, the same layout twice in one set, Nexi in every post.'
+  ].join('\n');
+  var STYLE_DOC = 'STYLE DIRECTIONS (one per post, all different in a set): bold = one huge hero, few elements, a big number or a big stamp · editorial = a neat grid, two columns, numbered steps, no rotation · doodle = handwritten notes, scribbles, stickers, sticky notes, imperfect rotations · spacious = one element and a lot of empty space · geometric = tiles and rows, aligned, props on white tiles · storytelling = a sequence: a timeline, steps, or three documents handed on with arrows · playful = Nexi, a sticker, a speech bubble, sparkles, confident tilts · perspective = stacked paper sheets, overlaps, depth.';
+  var PATTERNS_DOC = [
+    'COMPOSITION PATTERNS (pick one per post or invent your own; describe it in one line in "composition"):',
+    '1 Hero bleed: one element at 62-76% width, cut by the bottom or right edge (bleed:true), two callouts in the empty space.',
+    '2 Big number: a stat at 34% width on one side, a chart at 52% on the other, one chip under the stat.',
+    '3 Diagonal cascade: three cards at 38-42% width stepping from top-left to bottom-right, overlapping 12%, rotations -4/0/4.',
+    '4 Split: the old way (checklist old:true) at 42% left, the Odoo answer at 48% right, an arrow between.',
+    '5 Strip: one wide element (timeline, steps, flow, groups) at 84-92% width starting at y 14, a pill at y 0 above it, a chip below it, a small prop in a corner.',
+    '6 Collage: five to seven small elements (chips, stickers, a sticky note, a pin, a prop, a phone at 28%) scattered with small rotations, no hero: for "many small wins".',
+    '7 Orbit: a centre element (a prop on a tile, a stat or a ring at 30%) with four to six chips or props around it.',
+    '8 Grid: four cards at 44% in two rows and two columns, aligned, no rotation.',
+    '9 Annotated screen: one board or doc at 70% centred, two or three chips beside it, scribble arrows pointing at the detail.',
+    '10 Story: a vertical timeline at 50% on one side, Nexi or a prop on the other, a notification at the end.',
+    '11 Prop poster: a big industry prop at 36-42% as the hero, three handwritten pills around it, one small doc or chip below.',
+    '12 Typographic: no cards; one big handwritten text (text, font:hand, size 90-120, 2-5 words) plus a sticker and a scribble.',
+    '13 Fan: three documents (compact:true, 32% each) with rotations -6/0/6 and stack:1, a stamp over the last one.',
+    '14 Testimonial: a rating card at 58% (a sample persona, never a real client), Nexi love or clap beside it, avatars under.',
+    '15 Before and after: a phone (offline:true) on the left, an arrow, a notif on the right, the result chip below.'
+  ].join('\n');
+  var LOOK_DOC = 'LOOK (the background feel, all clean): clean = white cards on a soft blue floor · paper = cream cards and coral handwriting on a sand tint · spotlight = a warm glow and a huge faded industry illustration behind the visual · stack = every card on paper sheets, a floor grid. "accent": blue|navy|teal|coral|purple|yellow. "decor" on the blue words of the headline: none|circle|underline|marker|strokes|box. "background": dots|grid|fine|diagonal|rings|plus|hex|waves|spots|floor|none. "tint": sky|mint|lilac|sand (at most one post in three). "kicker": a short blue bar above the headline, max 26 chars (optional).';
+  var HOOKS = ['a question the owner asks at 7 am', 'a contrast: "X, not Y"', 'a tiny story in one line: what happened, then what Odoo did', 'a quote from a persona (a sample name, never a client)', 'a myth and the fact', '"three signs you need…"', 'a promise with a time ("by lunch", "before the shift ends")', 'the moment something goes wrong, and the fix', 'a checklist of what changes', 'a bold one-liner with one word highlighted', 'a "what if" scenario', 'what happens when… (no numbers)', 'an honest confession ("we used to…")', 'a before-and-after in one breath'];
+  var PERSONAS = ['the owner', 'the head chef', 'the finance manager', 'the floor staff', 'the warehouse lead', 'the technician on site', 'the receptionist', 'the sales rep', 'the store manager', 'the operations manager', 'the new hire on day one', 'the accountant at month-end', 'the procurement officer', 'the night-shift supervisor'];
+  var MOMENTS = ['Monday 7 am prep', 'month-end close', 'the GST quarter', 'payday', 'the festive rush', 'a supplier delivery', 'a customer complaint', 'opening a second outlet', 'onboarding new staff', 'the yearly audit', 'the year-end stock count', 'a rainy Sunday with a full house', 'a no-show appointment', 'a rush order at 5 pm', 'the first day back from holiday', 'a price change from a supplier', 'a public holiday weekend', 'the last hour before closing'];
+  function shuffled(list, r) { var a = list.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)), t2 = a[i]; a[i] = a[j]; a[j] = t2; } return a; }
+  function creativeBrief(o) {
+    var r = (window.TNDrip && window.TNDrip.rng ? window.TNDrip.rng(o.seed || Date.now() % 1e9) : Math.random), n = o.count || 6;
+    return { hooks: shuffled(HOOKS, r).slice(0, n), personas: shuffled(PERSONAS, r).slice(0, n), moments: shuffled(MOMENTS, r).slice(0, n) };
+  }
+
+  var EXAMPLE = JSON.stringify({ name: 'Kitchen display, not paper', angle: 'pain', head: 'Paper tickets fall.|*Screens do not.*', sub: 'Orders go from the POS to the kitchen display with the guest\'s notes, so nothing is lost on a busy Friday.',
+    caption: 'Friday, 7.30 pm, and a ticket is on the floor. With Odoo POS the order is on the kitchen display the second it is placed, notes included. How many tickets does your kitchen lose a week?', hashtags: ['#Odoo', '#FandB', '#Restaurant'],
+    visual: 'free', composition: 'hero bleed: the kitchen display cut by the bottom edge, callouts on the left, a service bell in the corner', style: 'playful', look: 'clean', accent: 'coral', decor: 'underline', background: 'dots',
+    elements: [
+      { type: 'board', view: 'kds', app: 'pos_restaurant', title: 'Kitchen display', crumb: 'POS · Main kitchen', tag: '3 tables', tickets: [['Table 12', [['Laksa', '2'], ['Chicken rice', '1']], 'cooking', '2 min'], ['Table 7', [['Satay (10)', '1']], 'ready', '6 min']], x: 30, y: 8, w: 74, rot: -3, role: 'hero', bleed: true },
+      { type: 'pill', text: 'No paper tickets', x: 4, y: 12, rot: -5 },
+      { type: 'chip', text: 'Guest notes carried over', small: 'No peanuts · Table 12', icon: 'check', x: 3, y: 40 },
+      { type: 'prop', name: 'bell', x: 6, y: 66, w: 16, rot: 8 },
+      { type: 'sparkles', x: 24, y: 2 }
+    ] });
+  var EXAMPLE2 = JSON.stringify({ name: 'Signed before lunch', angle: 'feature', head: 'Sent at nine.|*Signed before lunch.*', sub: 'The Odoo quotation goes out with an e-signature link, and the order is confirmed the moment the customer signs.',
+    caption: 'No printing, no scanning, no chasing. The quotation carries its own signature link, and the sales order confirms itself. Book a call at technext.asia.', hashtags: ['#Odoo', '#Sales', '#eSign'],
+    visual: 'free', composition: 'typographic: one big handwritten line, a sticker and a scribble, a small quotation with a stamp below', style: 'doodle', look: 'paper', accent: 'coral', decor: 'circle', background: 'waves',
+    elements: [
+      { type: 'text', text: 'Signed before lunch.', font: 'hand', size: 104, x: 6, y: 4, w: 88, rot: -3, role: 'hero' },
+      { type: 'scribble', kind: 'underline', x: 12, y: 28, w: 42 },
+      { type: 'sticker', text: 'eSign', small: 'inside Odoo', tone: 'yellow', x: 74, y: 34, w: 17, rot: 8 },
+      { type: 'doc', kind: 'quote', compact: true, number: 'S00118', partner: 'Sample Trading Pte Ltd', total: 'S$ 4,665.20', stage: 'Quotation Sent', x: 18, y: 52, w: 42, rot: 2, stack: 1 },
+      { type: 'stamp', text: 'SIGNED', tone: 'blue', x: 44, y: 74, over: true }
+    ] });
 
   function buildPrompt(o) {
-    var angles = ANGLES.filter(function (a) { return o.angles.indexOf(a[0]) > -1; }), vis = visualsFor(o);
-    var who = o.industry ? C.industries[o.industry].name + ' businesses in Singapore and Southeast Asia' : 'small and mid-sized companies in Singapore and Southeast Asia';
+    var angles = ANGLES.filter(function (a) { return o.angles.indexOf(a[0]) > -1; }), cb = creativeBrief(o);
+    var ind = o.industry && C.industries[o.industry], who = ind ? ind.name + ' businesses in Singapore and Southeast Asia' : 'small and mid-sized companies in Singapore and Southeast Asia';
     return [
-      'You are the copywriter AND designer for TechNext (technext.asia), an Odoo Partner headquartered in Singapore that implements Odoo, builds AI inside Odoo, and separately designs websites and runs social media.',
-      'Write ' + o.count + ' social media posts ("drips", 1080x1080) for ' + who + ', for the "' + o.catName + '" series.' + (o.brief ? ' Brief from the marketing team: ' + trim(o.brief, 600) : ''),
+      'You are the copywriter AND art director for TechNext (technext.asia), an Odoo Partner headquartered in Singapore that implements Odoo, builds AI inside Odoo, and separately designs websites and runs social media.',
+      'Design ' + o.count + ' social media posts ("drips", 1080x1080) for ' + who + ', for the "' + o.catName + '" series.' + (o.brief ? ' Brief from the marketing team: ' + trim(o.brief, 600) : ''),
       '',
-      'THE LOOK IS FIXED',
-      'Every post has the same frame: the TechNext logo top left, the Odoo badge top right, the headline and subline centred on top. Under the subline sits ONE simple visual in a clean, flat style: white cards, a phone, Nexi (the TechNext robot), blue handwritten pills, step chips and sparkles, on a plain light background. You choose the visual and write every word in it; the layout is done for you.',
+      'THE FRAME IS FIXED: TechNext logo top left, Odoo badge top right, headline and subline centred on top. Everything below the subline is yours: you place every element yourself, like a designer laying out a poster. Nothing else is templated.',
       '',
-      'HOW TO WRITE EACH POST',
-      '1. Pick one concrete moment from SOURCE and write the headline about it.',
-      '2. Pick the VISUAL that shows that moment best. A reader must get the headline from the picture alone: a post about food cost shows food cost numbers; a post about WhatsApp orders shows the chat and the order it created.',
-      '3. Write every word in the visual for THIS headline: screen titles, field values, list lines, chart bars, pills and chips. Never generic filler such as "Item one" or "Step 2".',
-      '4. When the post is about Odoo, show Odoo from the inside: the right app (module), its menu, realistic record names (S00231, BILL/2026/0311, WH/IN/00042) and sample data.',
-      '5. Make it look like a poster: mix the visuals, arrangements, backgrounds, props and accents (see DESIGN KNOBS) so no two posts look alike.' + (o.industry ? ' Every post should show ' + C.industries[o.industry].noun + ': their records, their products, their props.' : ''),
+      PRINCIPLES,
       '',
-      'FRESH DESIGN, EVERY TIME',
-      '- Use a different visual for every post; repeat one only when there are more posts than visuals, and then with different content and callouts.',
-      '- No two posts in this set share a look, an accent, a headline decor, a hero size or a background pattern. Mix them so the set reads as eight different posters, not one template.',
-      '- Never repeat a visual + look pair already in the library' + ((o.existingDesigns || []).length ? ': ' + o.existingDesigns.slice(0, 40).join(', ') : '') + '.',
-      '- Vary the weight: one post with a big hero and nothing else, one busy with props and accents, one carried by a single number or a single sticker.',
-      '- Nexi appears in at most one post out of three; the others use props, stickers or nothing.',
-      '- Match the look to the story: a colour panel for a bold hook, paper for documents and bills, outline for checklists and steps, spotlight for an industry poster, stack for a desk full of paperwork.',
-      '- Each post takes a different angle, from: ' + angles.map(function (a) { return a[1]; }).join('; ') + '.',
-      '- No two headlines start with the same word.' + ((o.existing || []).length ? ' Do not repeat these existing headlines: ' + o.existing.slice(0, 25).join(' / ') : ''),
+      STYLE_DOC,
       '',
-      'RULES',
-      '- Facts only from SOURCE. Never invent client names, results, awards, prices or dates as claims. Company figures allowed: 10+ countries, 11+ enterprise clients, 4 AI disciplines.',
-      '- Visuals use sample data only: generic names ("Sample Trading Pte Ltd", "Mei Ling T."), realistic S$ amounts, dates in Sep-Oct 2026. Chart numbers are demo data.',
-      '- Say "Odoo Partner", never "Certified". Never say websites or social media are part of Odoo. Odoo 20 claims only from the Odoo 20 list; AI features use paid credits.',
-      '- head: max 9 words, two parts split by | ; wrap 1-3 key words of the second part in *asterisks* (blue); optionally one ~word~ (yellow underline). sub: one sentence, max 22 words.',
-      '- caption: 2-4 short sentences for LinkedIn/Facebook, ending with a question or "Book a call at technext.asia". hashtags: 3-5.',
-      '- Voice: plain and specific. No hype words (revolutionary, seamless, unlock, leverage, game-changer), no emoji.',
+      PATTERNS_DOC,
       '',
-      'VISUALS (pick one per post; stay within the character limits):',
-      vis.map(function (v) { return '- ' + VSPEC[v]; }).join('\n'),
+      LOOK_DOC,
       '',
-      KNOBS,
+      ELEMENTS_DOC,
       propsLine(o),
       '',
-      'OUTPUT: only a JSON array of ' + o.count + ' post objects, no other text. Every post: {"name","angle","head","sub","caption","hashtags","visual"} plus the fields of its visual. A complete example:',
+      'CREATIVE BRIEF FOR THIS RUN (it changes every run)',
+      '- One hook per post, all different: ' + cb.hooks.join(' · ') + '.',
+      '- One point of view per post: ' + cb.personas.join(', ') + '.',
+      '- One moment per post: ' + cb.moments.join(', ') + '.',
+      '- Everyday situations, habits and frustrations of ' + (ind ? ind.noun : 'these companies') + ' may come from your own knowledge of the trade. Claims about what Odoo, Odoo 20 or TechNext does must come from SOURCE.',
+      '',
+      'FRESH CONTENT AND FRESH DESIGN, EVERY TIME',
+      '- Every post: a different hook, persona, moment, angle (' + angles.map(function (a) { return a[1]; }).join('; ') + '), pattern, style, accent, decor and background. No two posts in the set may look alike or say the same thing.',
+      '- Vary the weight: one post with a huge hero and nothing else, one busy collage, one carried by handwriting or a single number. Nexi in at most one post out of three.',
+      '- No two headlines start with the same word.' + ((o.existing || []).length ? ' Existing posts, whose moment, idea and headline you must not reuse: ' + o.existing.slice(0, 60).join(' / ') : ''),
+      ((o.existingDesigns || []).length ? '- Compositions already in the library, not to repeat: ' + o.existingDesigns.slice(0, 40).join(' · ') : ''),
+      '',
+      'RULES',
+      '- Never invent client names, results, awards, prices or dates as claims. Company figures allowed: 10+ countries, 11+ enterprise clients, 4 AI disciplines.',
+      '- Inside elements use sample data only: generic names ("Sample Trading Pte Ltd", "Mei Ling T."), realistic S$ amounts, dates in Sep-Oct 2026. Chart numbers are demo data.',
+      '- Say "Odoo Partner", never "Certified". Never say websites or social media are part of Odoo. Odoo 20 claims only from the Odoo 20 list; AI features use paid credits.',
+      '- head: max 9 words, two parts split by | ; wrap 1-3 key words of the second part in *asterisks* (blue). sub: one sentence, max 22 words.',
+      '- caption: 2-4 short sentences for LinkedIn/Facebook, ending with a question or "Book a call at technext.asia". hashtags: 3-5.',
+      '- Voice: plain and specific. No hype words (revolutionary, seamless, unlock, leverage, game-changer), no emoji.',
+      '- Module names must be keys from the ODOO APPS or APP RECORD FLOWS lists.',
+      '',
+      'OUTPUT: only a JSON array of ' + o.count + ' post objects, no other text. Shape: {"name","angle","head","sub","caption","hashtags","visual":"free","composition","style","look","accent","decor","background","tint"(optional),"kicker"(optional),"elements":[3-7 elements with their placement]}. Two complete examples:',
       EXAMPLE,
-      'Module names must be keys from the ODOO APPS or APP RECORD FLOWS lists.',
+      EXAMPLE2,
       '',
       'SOURCE',
       sourceFor(o.cat, o.industry)
@@ -203,7 +253,7 @@
   }
 
   function tokens(text) { return Math.ceil(String(text || '').length / 4); }
-  var OUT_PER_POST = 470;
+  var OUT_PER_POST = 620;
   function estimate(o) { var p = buildPrompt(o); return { prompt: p, input: tokens(p), output: o.count * OUT_PER_POST }; }
 
   var SAMPLE = null;
@@ -225,5 +275,5 @@
     });
   }
 
-  window.TNAI = { VSPEC: VSPEC, detectIndustry: detectIndustry, ANGLES: ANGLES, TIERS: TIERS, buildPrompt: buildPrompt, estimate: estimate, tokens: tokens, generate: generate, available: available, OUT_PER_POST: OUT_PER_POST };
+  window.TNAI = { VSPEC: VSPEC, detectIndustry: detectIndustry, creativeBrief: creativeBrief, ANGLES: ANGLES, TIERS: TIERS, buildPrompt: buildPrompt, estimate: estimate, tokens: tokens, generate: generate, available: available, OUT_PER_POST: OUT_PER_POST };
 })();

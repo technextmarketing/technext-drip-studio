@@ -32,9 +32,9 @@
   function idx(v, n) { v = parseInt(v, 10); return v >= 0 && v < n ? v : undefined; }
   function obj(v) { return v && typeof v === 'object' && !Array.isArray(v) ? v : typeof v === 'string' && v ? { text: v } : {}; }
   function chipL(c, dIcon) {
-    c = obj(c); var tx = t(c.text, 26); if (!tx) return null;
+    c = obj(c); var tx = t(c.text, 34); if (!tx) return null;
     var ic = pick(ICONS, c.icon, dIcon || 'check');
-    return { type: 'chip', text: tx, small: t(c.small, 30) || undefined, icon: ic, tone: ic === 'check' || ic === 'cloudOk' ? 'ok' : undefined, z: 18 };
+    return { type: 'chip', text: tx, small: t(c.small, 34) || undefined, icon: ic, tone: ic === 'check' || ic === 'cloudOk' ? 'ok' : undefined, z: 18 };
   }
   function recordL(r, dApp) {
     r = r || {};
@@ -117,14 +117,16 @@
     var b = vbox(L), m = L._m, cx = px + (b.cx - px) * f, cy = py + (b.cy - py) * f;
     L.s = +((L.s || 1) * f).toFixed(3); L.x = Math.round(cx - m.w / 2); L.y = Math.round(cy - m.h / 2);
   }
-  function settle(d, T, center) {
+  function settle(d, T, center, keep) {
     var Ls = d.layers.filter(function (L) { return L._r; }), top = Infinity, bot = -Infinity;
     Ls.forEach(function (L) { if (L._r === 'fx') return; var b = vbox(L); top = Math.min(top, b.y); if (L._r === 'main' || L._r === 'accent') bot = Math.max(bot, b.y1); });
     if (!isFinite(top)) return;
     if (!isFinite(bot)) bot = top + 320;
-    var avail = BOTTOM - T, gh = bot - top, f = gh > avail ? Math.max(.7, avail / gh) : 1;
+    var avail = BOTTOM - T, gh = bot - top, f = 1;
+    if (keep) { var top2 = Math.max(top, T); f = bot > BOTTOM ? Math.max(.7, (BOTTOM - top2) / Math.max(1, bot - top2)) : 1; }
+    else f = gh > avail ? Math.max(.7, avail / gh) : 1;
     if (f < 1) Ls.forEach(function (L) { scaleAbout(L, W / 2, top, f); });
-    var dy = Math.round(T + Math.max(0, avail - gh * f) * (center == null ? .2 : center) - top);
+    var dy = keep ? Math.round(Math.max(0, T - top)) : Math.round(T + Math.max(0, avail - gh * f) * (center == null ? .2 : center) - top);
     Ls.forEach(function (L) { L.y += dy; });
     /* nothing solid past the sides */
     Ls.forEach(function (L) { if (L._r !== 'main' && L._r !== 'accent') return; var b = vbox(L); if (b.x < 14) L.x += Math.round(14 - b.x); else if (b.x1 > W - 14) L.x -= Math.round(b.x1 - W + 14); });
@@ -431,13 +433,14 @@
   /* ================= v5: Odoo documents and cards, poster layouts ================= */
   var PATTERNS = ['dots', 'grid', 'fine', 'diagonal', 'rings', 'plus', 'hex', 'waves', 'spots', 'floor'];
   /* looks: whole-post design directions under the fixed frame */
-  var LOOKS = ['clean', 'band', 'navy', 'corner', 'outline', 'paper', 'spotlight', 'stack'];
+  var LOOKS = ['clean', 'paper', 'spotlight', 'stack'];
   var LOOK_ABOUT = { clean: 'white cards on a light floor', band: 'a blue panel across the lower half, white cards and white pills on it', navy: 'a navy panel, white cards, yellow pills', corner: 'a big blue rounded shape in the lower-right corner behind the visual', outline: 'printed sticker look: navy outlines and hard offset shadows on every card and pill', paper: 'warm cream cards and coral handwriting on a sand background', spotlight: 'a warm glow and a huge faded industry illustration behind the visual', stack: 'cards on a desk: paper sheets behind each one, stronger tilts, a floor grid' };
   var ACCENTS = ['blue', 'navy', 'teal', 'coral', 'purple', 'yellow'];
   var DECORS = ['none', 'circle', 'underline', 'marker', 'strokes', 'box'];
-  var LOOK_ACC = { navy: 'yellow', outline: 'navy', paper: 'coral', band: 'blue', corner: 'blue' };
+  var LOOK_ACC = { paper: 'coral' };
   var HERO = ['normal', 'big', 'small'], TILTS = ['soft', 'flat', 'strong'], TILT_K = { flat: 0, soft: 1, strong: 1.9 };
-  var NEXI_OPT = { workorder: 1, chart: 1, board: 1, spotlight: 1, pyramid: 1, groups: 1, phases: 1, people: 1 };
+  var NEXI_OPT = { workorder: 1, chart: 1, board: 1, spotlight: 1, pyramid: 1, groups: 1, phases: 1, people: 1, free: 1 };
+  var STYLES = ['bold', 'editorial', 'doodle', 'spacious', 'geometric', 'storytelling', 'playful', 'perspective'];
   function shuffle(list, r) { var a = list.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)), t2 = a[i]; a[i] = a[j]; a[j] = t2; } return a; }
   var TINTS = ['sky', 'mint', 'lilac', 'sand'];
   var DOCKINDS = ['quote', 'order', 'invoice', 'bill', 'po', 'delivery', 'receipt'];
@@ -725,8 +728,137 @@
     return n;
   }
 
+  /* ================= v7: free composition — Claude places the elements itself ================= */
+  var FREE_AUTO = { pill: 1, chip: 1, note: 1, bubble: 1, stamp: 1, avatars: 1, toggle: 1, button: 1, timer: 1, pin: 1 };
+  var FREE_FX = { sparkles: 1, glow: 1, arrow: 1, scribble: 1 };
+  var FREE_SMALL = /^(prop|sticker|stamp|sticky|ring|scribble|sparkles|arrow|glow|pin|barcode|timer|avatars|toggle|button|pill|chip|note|bubble|search|qr|scanner)$/;
+  function fields2(v, n, a, b) { return arr(v).filter(Array.isArray).slice(0, n).map(function (f) { return [t(f[0], a), t(f[1], b)]; }); }
+  /* one element of Claude's layout → a layer (no position yet) */
+  function freeLayer(el, ctx, i) {
+    var ty = clean(el.type).toLowerCase(), L = null, items;
+    switch (ty) {
+      case 'doc': case 'document': L = docL(el, el.kind); if (el.compact) L.compact = true; break;
+      case 'record': L = recordL(el, el.app); break;
+      case 'product': L = productL(el); break;
+      case 'phone': {
+        var lines = arr(el.lines).filter(Array.isArray).slice(0, 4).map(function (l) { return [t(l[0], 24), t(l[1], 10), l[2] === true || l[2] === 1 || /^(true|done|yes|1)$/i.test(l[2])]; });
+        var fl = arr(el.field || el.fields); if (fl.length && !Array.isArray(fl[0])) fl = [fl];
+        fl = fl.filter(Array.isArray).slice(0, 1).map(function (f) { return [t(f[0], 18), t(f[1], 28)]; });
+        L = { type: 'phone', screen: el.offline ? 'offline-receipt' : 'odoo', app: mod(el.app, 'stock'), title: t(el.title, 26) || undefined, crumb: t(el.crumb, 30) || undefined, banner: t(el.banner, 64) || undefined, fields: fl.length ? fl : el.offline ? undefined : [], lines: lines.length ? lines : undefined, btn: t(el.btn, 18) || undefined };
+        break;
+      }
+      case 'board': {
+        var view = pick(['kanban', 'list', 'planning', 'kds', 'pos', 'dashboard'], el.view, 'kanban');
+        L = viewData(el, view); L.type = 'appcard'; L.app = mod(el.app, { kanban: 'crm', list: 'sale', planning: 'planning', kds: 'pos_restaurant', pos: 'point_of_sale', dashboard: 'spreadsheet_dashboard' }[view]);
+        L.title = t(el.title, 30) || undefined; L.crumb = t(el.crumb, 34) || undefined; L.tag = t(el.tag, 18) || undefined;
+        break;
+      }
+      case 'checklist': items = strs(el.items, 4, 70); if (!items.length && ctx.industry) items = ((C.industries[ctx.industry] || {}).new20 || []).slice(0, 4);
+        L = { type: 'checklist', title: t(el.title, 34) || undefined, tag: t(el.tag, 20) || undefined, items: items, apps: mods(el.apps, 5), big: items.length <= 3 || undefined, variant: el.old ? 'old' : undefined }; break;
+      case 'chart': L = graphL(el.chart || el, 560); break;
+      case 'kpis': L = { type: 'kpis', items: arr(el.items).filter(Array.isArray).slice(0, 4).map(function (x) { return [t(x[0], 24), t(x[1], 12), t(x[2], 10), x[3] ? mod(x[3], '') : '']; }) }; if (!L.items.length) L = null; break;
+      case 'stat': L = { type: 'stat', variant: el.big === false ? undefined : 'big', value: t(el.value, 10) || '0', label: t(el.label, 34) || undefined }; break;
+      case 'timeline': items = arr(el.items).filter(Array.isArray).slice(0, 5).map(function (x) { return [t(x[0], 8), t(x[1], 28), mod(x[2], ''), t(x[3], 34) || undefined]; });
+        L = items.length ? { type: 'timeline', title: t(el.title, 30) || undefined, items: items, hot: idx(el.hot, items.length) } : null; break;
+      case 'steps': items = arr(el.items).map(function (x) { x = arr(x); return [mod(x[0], ''), t(x[1], 22), t(x[2], 40)]; }).filter(function (x) { return x[1]; }).slice(0, 6);
+        L = items.length ? { type: 'steps', dir: el.dir === 'v' ? 'v' : 'h', items: items, hot: idx(el.hot, items.length) } : null; break;
+      case 'flow': {
+        var st = arr(el.steps).map(function (x) { if (Array.isArray(x)) x = { app: x[0], t: x[1], h: x[2] }; x = x || {}; return { app: mod(x.app, ''), t: t(x.t || x.title, 12), h: t(x.h || x.detail, 44) }; }).filter(function (x) { return x.t; }).slice(0, 6);
+        if (st.length < 3 && ctx.industry) st = R.flowSteps({ from: 'industry:' + ctx.industry });
+        if (st.length < 3) return null;
+        var n = st.length, cf = n >= 5 ? { cols: 3, nodeW: 270, nodeH: 200, gapX: 65, gapY: 50 } : n === 4 ? { cols: 4, nodeW: 222, nodeH: 236, gapX: 30, gapY: 40 } : { cols: 3, nodeW: 288, nodeH: 236, gapX: 58, gapY: 40 };
+        L = { type: 'flow', steps: st, cols: cf.cols, nodeW: cf.nodeW, nodeH: cf.nodeH, gapX: cf.gapX, gapY: cf.gapY, layout: 'snake', hot: idx(el.hot, n), _fixedW: cf.cols * cf.nodeW + (cf.cols - 1) * cf.gapX };
+        break;
+      }
+      case 'chat': { var msgs = msgsL(el); if (!msgs.length) return null; L = { type: 'chat', channel: pick(['whatsapp', 'web', 'odoo'], el.channel, 'whatsapp'), title: t(el.title, 24) || undefined, status: t(el.status, 28) || undefined, msgs: msgs }; break; }
+      case 'receipt': L = { type: 'receipt', vendor: t(el.vendor, 26) || 'Sample Supplier Pte Ltd', doc: t(el.doc, 18) || 'TAX INVOICE', lines: fields2(el.lines, 4, 22, 12), total: t(el.total, 14) || undefined, stamp: t(el.stamp, 10) || undefined }; if (!L.lines.length) L.lines = [['Item', '100.00']]; break;
+      case 'notif': L = notifL(el, el.app, 400); break;
+      case 'workorder': L = { type: 'workorder', app: mod(el.app, 'mrp'), title: t(el.title, 30) || 'WO/00042', sub: t(el.crumb || el.sub, 34) || undefined, status: t(el.status, 14) || undefined, timer: t(el.timer, 9) || undefined, timerLabel: t(el.timerLabel, 18) || undefined,
+        steps: arr(el.steps).filter(Array.isArray).slice(0, 4).map(function (s) { return [t(s[0], 20), t(s[1], 8) || 'todo', t(s[2], 14)]; }), progress: el.progress == null ? undefined : clampN(el.progress, 0, 100), progressLabel: t(el.progressLabel, 22) || undefined, btn: t(el.btn, 16) || undefined }; break;
+      case 'ticket': L = { type: 'ticket', app: mod(el.app, 'helpdesk'), title: t(el.title, 36) || '#1042', sub: t(el.crumb || el.sub, 34) || undefined, stage: t(el.stage, 14) || undefined, priority: el.priority == null ? undefined : clampN(el.priority, 0, 3), sla: t(el.sla, 12) || undefined, channel: t(el.channel, 12) || undefined, text: t(el.text, 90) || undefined, assignee: t(el.assignee, 18) || undefined, tags: strs(el.tags, 3, 12) }; break;
+      case 'calendar': L = { type: 'calendar', app: mod(el.app, 'appointment'), title: t(el.title, 26) || undefined, sub: t(el.crumb || el.sub, 34) || undefined, tag: t(el.tag, 14) || undefined, days: strs(el.days, 6, 8), from: el.from == null ? 9 : clampN(el.from, 6, 20), to: el.to == null ? undefined : clampN(el.to, 8, 23), today: idx(el.today, 6),
+        events: arr(el.events).filter(Array.isArray).slice(0, 10).map(function (e) { return [clampN(e[0], 0, 5), num(e[1], 9), num(e[2], 1), t(e[3], 16), undefined, e[4] ? 1 : undefined]; }) }; if (!L.days.length) delete L.days; break;
+      case 'employee': L = { type: 'employee', app: mod(el.app, 'hr'), name: t(el.person || el.name, 20) || 'Mei Ling T.', job: t(el.job, 26) || undefined, dept: t(el.dept, 24) || undefined, rows: arr(el.rows).filter(Array.isArray).slice(0, 4).map(function (r) { return [t(r[0], 12), t(r[1], 20), t(r[2], 12) || undefined]; }) }; break;
+      case 'email': case 'campaign': L = { type: 'email', app: mod(el.app, 'mass_mailing'), from: t(el.from, 30) || undefined, subject: t(el.subject, 44) || undefined, headline: t(el.headline, 40) || undefined, cta: t(el.cta, 16) || undefined, stats: fields2(el.stats, 3, 6, 12) }; break;
+      case 'shop': case 'store': L = { type: 'shop', brand: t(el.brand, 18) || undefined, url: t(el.url, 32) || undefined, product: t(el.product, 22) || undefined, category: t(el.category, 16) || undefined, icon: pick(PICOS, el.icon, 'shirt'), price: t(el.price, 12) || undefined, rating: el.rating == null ? undefined : clampN(el.rating, 1, 5), reviews: t(el.reviews, 14) || undefined, stock: t(el.stock, 24) || undefined, options: strs(el.options, 4, 6), cart: t(el.cart, 3) || undefined, btn: t(el.btn, 16) || undefined, badge: t(el.badge, 14) || undefined }; break;
+      case 'reconcile': L = { type: 'reconcile', app: mod(el.app, 'accountant'), title: t(el.title, 30) || undefined, sub: t(el.crumb || el.sub, 30) || undefined, status: t(el.status, 14) || undefined, bank: three(el.bank), match: three(el.match), label: t(el.label, 34) || undefined, btn: t(el.btn, 14) || undefined, note: t(el.note, 30) || undefined }; break;
+      case 'approval': L = { type: 'approval', app: mod(el.app, 'approvals'), title: t(el.title, 28) || undefined, sub: t(el.crumb || el.sub, 30) || undefined, status: t(el.status, 14) || undefined, fields: fields2(el.fields, 3, 14, 24), approvers: arr(el.approvers).filter(Array.isArray).slice(0, 3).map(function (x) { return [t(x[0], 16), t(x[1], 12) || 'Waiting']; }), btns: strs(el.btns, 2, 12) }; break;
+      case 'sheet': case 'spreadsheet': L = { type: 'sheet', app: mod(el.app, 'spreadsheet_dashboard'), title: t(el.title, 28) || undefined, tag: t(el.tag, 12) || undefined, formula: t(el.formula, 40) || undefined, cols: strs(el.cols, 4, 12), rows: arr(el.rows).filter(Array.isArray).slice(0, 6).map(function (r) { return r.slice(0, 4).map(function (c) { return t(c, 12); }); }), highlight: arr(el.highlight).slice(0, 2).map(function (v) { return parseInt(v, 10) || 0; }), totalRow: !!el.totalRow || undefined }; break;
+      case 'docs': case 'documents': L = { type: 'docs', app: mod(el.app, 'documents'), title: t(el.title, 26) || undefined, sub: t(el.crumb || el.sub, 30) || undefined, tag: t(el.tag, 12) || undefined, files: arr(el.files).filter(Array.isArray).slice(0, 6).map(function (f) { return [t(f[0], 22), pick(['pdf', 'xls', 'doc', 'img', 'zip'], f[1], 'pdf'), t(f[2], 12) || undefined, f[3] ? 1 : undefined]; }) }; break;
+      case 'rating': L = { type: 'rating', stars: clampN(el.stars == null ? 5 : el.stars, 1, 5), text: t(el.text, 80) || '', who: t(el.who, 18) || 'Customer', meta: t(el.meta, 30) || undefined }; break;
+      case 'kcard': case 'lead': L = { type: 'kcard', app: mod(el.app, 'crm'), title: t(el.title, 24) || 'Opportunity', sub: t(el.crumb || el.sub, 24) || undefined, tags: strs(el.tags, 3, 12), priority: el.priority == null ? 2 : clampN(el.priority, 0, 3), amount: t(el.amount, 12) || undefined, owner: t(el.owner, 18) || undefined, activity: t(el.activity, 30) || undefined }; break;
+      case 'pyramid': { var lv = arr(el.levels).map(function (x) { if (!Array.isArray(x)) x = [x && typeof x === 'object' ? x.title : x, x && typeof x === 'object' ? x.sub : '']; return [t(x[0], 16), t(x[1], 26) || undefined]; }).filter(function (x) { return x[0]; }).slice(0, 5); if (lv.length < 3) return null; L = { type: 'pyramid', levels: lv, hot: idx(el.hot, lv.length), note: t(el.note, 80) || undefined }; break; }
+      case 'groups': { var gs = arr(el.groups).slice(0, 3).map(function (g) { g = obj(g); return { title: t(g.title, 20), apps: arr(g.apps).slice(0, 6).map(function (x) { x = arr(x); return [mod(x[0], 'sale'), t(x[1], 16) || undefined]; }), note: t(g.note, 60) || undefined }; }).filter(function (g) { return g.apps.length; }); if (!gs.length) return null; L = { type: 'groups', groups: gs, base: t(el.base, 30) || undefined }; break; }
+      case 'nexi': L = { type: 'nexi', pose: pick(POSES, el.pose, 'point'), glow: false }; break;
+      case 'prop': { var nm = propName(el.name, ctx, (ctx.index || 0) + i); if (!nm) return null; L = { type: 'prop', name: nm, tile: el.tile ? true : undefined, label: t(el.label, 18) || undefined }; break; }
+      case 'scanner': L = { type: 'scanner', title: t(el.title, 14) || 'Scanned', text: t(el.text, 22) || undefined }; break;
+      case 'qr': L = { type: 'qr', title: t(el.title, 20) || undefined, text: t(el.text, 30) || undefined, app: mod(el.app, 'point_of_sale') }; break;
+      case 'sparkles': L = { type: 'sparkles' }; break;
+      case 'glow': L = { type: 'glow', op: .8 }; break;
+      case 'arrow': L = { type: 'arrow', kind: pick(['right', 'left', 'down', 'up', 'loop'], el.kind, 'right') }; break;
+      case 'text': { var tx = t(el.text, 70); if (!tx) return null; L = { type: 'text', text: tx, font: pick(['hand', 'display', 'body'], el.font, 'hand'), size: Math.round(clampN(el.size == null ? 64 : el.size, 28, 130)), weight: el.font === 'body' ? 600 : 700, color: /^#[0-9a-f]{6}$/i.test(el.color) ? el.color : (el.font === 'hand' ? 'var(--acc)' : undefined), align: pick(['left', 'center', 'right'], el.align, 'left') }; break; }
+      case 'devices': { var sk = (C.sites || {})[el.site] ? el.site : 'technext'; L = { type: 'devices', site: sk, label: t(el.label, 40) || (C.sites[sk].name + ' · built by TechNext') }; break; }
+      case 'site': L = { type: 'site', brand: t(el.brand, 18) || 'Your Brand', head: t(el.head || el.sitehead, 44) || undefined, sub: t(el.sub, 80) || undefined, cta: t(el.cta, 16) || undefined, url: t(el.url, 32) || undefined }; break;
+      case 'serp': case 'google': L = { type: 'serp', query: t(el.query, 44) || undefined, title: t(el.title, 64) || undefined, desc: t(el.desc, 160) || undefined }; break;
+      case 'code': L = { type: 'code', file: t(el.file, 20) || undefined, lines: strs(el.lines, 6, 40) }; if (!L.lines.length) delete L.lines; break;
+      case 'orbit': { var ap = mods(el.apps, 10); L = { type: 'orbit', apps: ap.length >= 5 ? ap : undefined, label: t(el.label, 16) || 'One database', core: el.core === 'odoo' ? 'odoo' : undefined }; break; }
+      case 'appflow': { var fa = C.appFlows && C.appFlows[mod(el.app, '')] ? mod(el.app, '') : 'sale'; L = { type: 'appflow', app: fa, hot: idx(el.hot, 5), title: t(el.title, 40) || undefined }; break; }
+      case 'phases': if (!ctx.industry) return null; L = { type: 'phases', from: 'industry:' + ctx.industry }; break;
+      case 'gauge': L = { type: 'gauge', value: el.value == null ? undefined : t(el.value, 6), label: t(el.label, 14) || 'Mobile-first' }; break;
+      default: if (FREE_AUTO[ty] || /^(sticker|sticky|ring|search|barcode|scribble)$/.test(ty)) { L = accentLayer(Object.assign({}, el, { type: ty }), ctx, i); if (L) { delete L._on; delete L._bleed; } } else return null;
+    }
+    return L;
+  }
+  var FREE_DEFW = { doc: 48, record: 48, product: 37, phone: 31, board: 70, checklist: 56, chart: 52, kpis: 56, stat: 34, timeline: 52, steps: 84, flow: 84, chat: 41, receipt: 34, notif: 37, workorder: 50, ticket: 48, calendar: 63, employee: 39, email: 44, shop: 58, reconcile: 54, approval: 48, sheet: 56, docs: 56, rating: 39, kcard: 39, pyramid: 56, groups: 85, nexi: 30, prop: 17, sticker: 18, ring: 20, sticky: 26, search: 52, barcode: 30, scribble: 20, scanner: 22, qr: 23, sparkles: 9, arrow: 11, glow: 56, text: 56, devices: 67, site: 60, serp: 78, code: 39, orbit: 46, appflow: 85, phases: 85, gauge: 18 };
+  VIS.free = { label: 'Free composition', keep: true, mirror: true, about: 'Claude places every element itself', build: function (p, a, ctx, d) {
+    var T = a.T, AH = BOTTOM - T, items = [], placed = [];
+    arr(p.elements).slice(0, 9).map(obj).forEach(function (el, i) {
+      var L = freeLayer(el, ctx, i); if (!L) return;
+      var ty = L.type, wp = clampN(el.w == null ? FREE_DEFW[ty] || FREE_DEFW[clean(el.type).toLowerCase()] || 40 : el.w, 5, 112), w = Math.round(wp / 100 * W);
+      if (L._fixedW) { var fw = L._fixedW; delete L._fixedW; L.s = +Math.min(1.1, Math.max(.55, w / fw)).toFixed(3); if (L.s === 1) delete L.s; }
+      else if (FREE_AUTO[ty]) { if (el.w != null) a.fitW(L, w); }
+      else L.w = w;
+      if (el.rot != null) L.rot = +clampN(el.rot, -15, 15).toFixed(1) || undefined;
+      L.z = el.z != null ? 10 + Math.round(clampN(el.z, 0, 9)) : ty === 'glow' ? 1 : ty === 'sparkles' ? 21 : ty === 'arrow' || ty === 'scribble' ? 22 : ty === 'stamp' ? 24 : ty === 'nexi' ? 16 : FREE_SMALL.test(ty) ? 18 + i : 12 + i;
+      if (el.stack) L.stack = Math.round(clampN(el.stack, 1, 2));
+      if (el.flip) L.flip = true;
+      var m = size(L), s = L.s || 1, mw = m.w * s, mh = m.h * s;
+      var role = pick(['hero', 'support', 'accent'], el.role, FREE_FX[ty] ? 'fx' : items.length === 0 && !FREE_SMALL.test(ty) ? 'hero' : FREE_SMALL.test(ty) ? 'accent' : 'support');
+      if (FREE_FX[ty]) role = 'fx';
+      var cx = el.cx != null ? clampN(el.cx, -30, 130) / 100 * W : clampN(el.x, -40, 140) / 100 * W + mw / 2;
+      var cy = el.cy != null ? T + clampN(el.cy, -20, 130) / 100 * AH : T + clampN(el.y, -10, 140) / 100 * AH + mh / 2;
+      var bleed = !!el.bleed && (role === 'hero' || role === 'support') && ty !== 'text';
+      var minX = bleed ? -mw * .42 : 14, maxX = bleed ? W - mw * .58 : W - 14 - mw, minY = T - 6, maxY = bleed ? 1080 - mh * .55 : BOTTOM - mh;
+      var x = cx - mw / 2, y = cy - mh / 2;
+      x = maxX < minX ? (W - mw) / 2 : Math.max(minX, Math.min(maxX, x)); y = maxY < minY ? minY : Math.max(minY, Math.min(maxY, y));
+      items.push({ L: L, x: x, y: y, w: mw, h: mh, role: role, bleed: bleed, over: !!el.over, i: i, ty: ty });
+    });
+    var rank = { hero: 0, support: 1, accent: 2, fx: 3 };
+    items.slice().sort(function (p1, p2) { return rank[p1.role] - rank[p2.role] || p1.i - p2.i; }).forEach(function (it) {
+      var B = box(it.x, it.y, it.w, it.h), worst = 0;
+      var ovr = function (b2) { var o = 0; placed.forEach(function (pb) { if (pb.role === 'fx' || (pb.role === 'accent' && it.role !== 'accent')) return; o = Math.max(o, area(b2, pb.b) / Math.min(b2.w * b2.h, pb.b.w * pb.b.h)); }); return o; };
+      if (it.role !== 'fx') worst = ovr(B);
+      var lim = it.over ? 1 : it.role === 'hero' ? .5 : it.role === 'support' ? .3 : .38;
+      if (worst > lim && !it.bleed) {
+        var best = null;
+        for (var y = T - 6; y <= BOTTOM - it.h; y += 20) for (var x = 14; x <= W - 14 - it.w; x += 20) {
+          var b2 = box(x, y, it.w, it.h), o2 = ovr(b2), sc = o2 * 1000 + Math.hypot(b2.cx - B.cx, b2.cy - B.cy) * .5;
+          if (!best || sc < best.sc) best = { x: x, y: y, sc: sc, o: o2 };
+        }
+        if (best && best.o < worst) { it.x = best.x; it.y = best.y; B = box(it.x, it.y, it.w, it.h); }
+      }
+      a.add(it.L, Math.round(it.x), Math.round(it.y), it.role === 'fx' ? 'fx' : it.bleed ? 'bleed' : it.role === 'accent' ? 'accent' : 'main');
+      if (it.L.type === 'flow') {
+        /* a workflow occupies its cards, not the gaps between them */
+        var F = it.L, fs = F.s || 1;
+        F.steps.forEach(function (x, k) { var r = Math.floor(k / F.cols), c = k % F.cols; if (r % 2) c = F.cols - 1 - c; placed.push({ b: box(it.x + c * (F.nodeW + F.gapX) * fs, it.y + r * (F.nodeH + F.gapY) * fs, F.nodeW * fs, F.nodeH * fs), role: it.role }); });
+      } else placed.push({ b: B, role: it.role });
+    });
+    if (!items.some(function (it) { return it.ty === 'sparkles'; })) { var hb = (placed[0] || {}).b || box(300, T, 480, 400); a.free({ type: 'sparkles', w: 100, z: 21 }, { near: box(hb.x1 - 70, hb.y - 50, 1, 1), maxOverlap: .6, role: 'fx' }); }
+  } };
+
   /* which visuals suit which category (the prompt only offers these) */
-  var CORE = ['phone', 'record', 'document', 'checklist', 'versus', 'flow', 'chart', 'bignumber', 'board', 'chat', 'alerts', 'timeline', 'fan', 'spotlight', 'groups', 'reaction'];
+  var CORE = ['free', 'phone', 'record', 'document', 'checklist', 'versus', 'flow', 'chart', 'bignumber', 'board', 'chat', 'alerts', 'timeline', 'fan', 'spotlight', 'groups', 'reaction'];
   var IND_VIS = {
     fnb: ['paper', 'product', 'calendar', 'spreadsheet', 'scan', 'phases', 'appflow'],
     retail: ['product', 'store', 'scan', 'campaign', 'spreadsheet', 'phases'],
@@ -743,8 +875,8 @@
   var FOR_CAT = {
     odoo20: CORE.concat(['paper', 'reconcile', 'spreadsheet', 'scan', 'workorder', 'orbit']),
     apps: CORE.concat(['paper', 'product', 'workorder', 'ticket', 'calendar', 'people', 'campaign', 'store', 'reconcile', 'approval', 'spreadsheet', 'documents', 'appflow', 'scan', 'orbit']),
-    ai: ['record', 'paper', 'document', 'reconcile', 'documents', 'chat', 'alerts', 'checklist', 'versus', 'timeline', 'board', 'phone', 'bignumber', 'fan', 'spotlight', 'reaction'],
-    services: ['website', 'webdesign', 'google', 'checklist', 'versus', 'chat', 'timeline', 'reaction', 'proof', 'spotlight', 'bignumber', 'pyramid', 'groups']
+    ai: ['free', 'record', 'paper', 'document', 'reconcile', 'documents', 'chat', 'alerts', 'checklist', 'versus', 'timeline', 'board', 'phone', 'bignumber', 'fan', 'spotlight', 'reaction'],
+    services: ['free', 'website', 'webdesign', 'google', 'checklist', 'versus', 'chat', 'timeline', 'reaction', 'proof', 'spotlight', 'bignumber', 'pyramid', 'groups']
   };
   function forCat(cat, industry) {
     var l = FOR_CAT[cat];
@@ -754,6 +886,7 @@
   }
 
   function guess(p) {
+    if (Array.isArray(p.elements) && p.elements.length) return 'free';
     if (p.site) return 'website'; if (p.query) return 'google'; if (p.sitehead) return 'webdesign';
     if (p.levels) return 'pyramid'; if (p.groups) return 'groups'; if (p.docs) return 'fan'; if (p.events) return 'calendar'; if (p.files) return 'documents';
     if (p.bank || p.match) return 'reconcile'; if (p.approvers) return 'approval'; if (p.formula || p.cols && p.rows && !p.view) return 'spreadsheet'; if (p.subject) return 'campaign';
@@ -779,6 +912,7 @@
       mirror: !!p.mirror && !!VIS[vis].mirror, ground: p.ground != null ? p.ground : GROUND,
       pattern: PATTERNS.indexOf(p.background) > -1 ? p.background : undefined, tint: TINTS.indexOf(p.tint) > -1 ? p.tint : undefined,
       look: pick(LOOKS, p.look, 'clean'), heroSize: pick(HERO, p.heroSize, 'normal'), tilt: pick(TILTS, p.tilt, 'soft'),
+      style: pick(STYLES, p.style, undefined), composition: t(p.composition, 90) || undefined,
       badge: ctx.cat === 'services' ? '' : ctx.cat === 'odoo20' || p.badge === 'o20' ? 'o20' : 'ready',
       copy: ctx.copy ? JSON.parse(JSON.stringify(ctx.copy)) : { head: head, sub: sub || undefined, kicker: t(p.kicker, 28) || undefined, decor: pick(DECORS, p.decor, 'none') }, layers: [],
       caption: t(p.caption, 900) || undefined, hashtags: strs(p.hashtags, 6, 30).map(function (h) { h = h.replace(/\s+/g, ''); return h.charAt(0) === '#' ? h : '#' + h; }),
@@ -788,11 +922,11 @@
     if (d.look === 'paper' && !d.tint) d.tint = 'sand';
     if (d.look === 'stack') { if (p.tilt == null) d.tilt = 'strong'; if (!d.pattern && p.background !== 'none') d.pattern = 'floor'; }
     if (d.look === 'spotlight') d.watermark = propName(p.prop, ctx) || propName('', ctx, (ctx.index || 0) + 2) || 'rocket';
-    d._tiltK = TILT_K[d.tilt];
+    d._tiltK = vis === 'free' ? 1 : TILT_K[d.tilt];
     var a = stage(d);
     VIS[vis].build(p, a, ctx, d);
     if (d.look === 'stack') d.layers.forEach(function (L) { if (L._r === 'main' && CARDISH[L.type] && !L.stack) L.stack = 2; });
-    var hk = { big: 1.1, small: .9 }[d.heroSize] || 1;
+    var hk = vis === 'free' ? 1 : ({ big: 1.1, small: .9 }[d.heroSize] || 1);
     if (hk !== 1) {
       var grp = d.layers.filter(function (L) { return L._r && L.type !== 'sparkles' && L.type !== 'sphere'; }), gtop = Infinity;
       grp.forEach(function (L) { gtop = Math.min(gtop, vbox(L).y); });
@@ -802,16 +936,17 @@
     strs(p.props, 2, 20).forEach(function (n) { acc.push({ type: 'prop', name: n }); });
     if (p.sticker) acc.push(Object.assign({ type: 'sticker' }, obj(p.sticker)));
     if (p.stamp) acc.push(Object.assign({ type: 'stamp' }, obj(p.stamp)));
-    var hasProp = acc.some(function (x) { x = obj(x); return x.type === 'prop' || (!x.type && x.name); }) || vis === 'spotlight' || d.layers.some(function (L) { return L.type === 'prop'; });
-    if (!hasProp && ctx.industry && p.autoProp !== false) acc.push({ type: 'prop', name: '', w: 150 });
+    var hasProp = acc.some(function (x) { x = obj(x); return x.type === 'prop' || (!x.type && x.name); }) || vis === 'spotlight' || d.layers.some(function (L) { return L.type === 'prop' || L.type === 'nexi'; });
+    if (!hasProp && ctx.industry && p.autoProp !== false && (vis !== 'free' || d.layers.length < 6)) acc.push({ type: 'prop', name: '', w: 150 });
     if (/^(band|navy|corner)$/.test(d.look)) acc.forEach(function (x) { if (x && typeof x === 'object' && (x.type === 'prop' || (!x.type && x.name))) x.tile = true; });
     placeAccents(a, d, acc.slice(0, 4), ctx);
     if (d.mirror) mirror(d);
     var T2 = copyBottom(d.copy) + 34;
-    settle(d, T2, VIS[vis].center);
+    settle(d, T2, VIS[vis].center, !!VIS[vis].keep);
     if (/^(band|navy|spotlight)$/.test(d.look)) d.panelY = T2 - 30;
     delete d._tiltK;
     if (d.look === 'clean') delete d.look; if (d.accent === 'blue') delete d.accent; if (d.heroSize === 'normal') delete d.heroSize; if (d.tilt === 'soft') delete d.tilt;
+    if (vis === 'free') { delete d.heroSize; delete d.tilt; }
     if (d.copy && d.copy.decor === 'none') delete d.copy.decor;
     d.layers.forEach(function (L) { delete L._m; delete L._r; Object.keys(L).forEach(function (k) { if (L[k] === undefined) delete L[k]; }); });
     if (!d.hashtags.length) delete d.hashtags;
@@ -823,7 +958,7 @@
      from the visual+look pairs already in the library (usedLib), so a second generation never repeats the first */
   function diversify(posts, seed, usedLib) {
     var seen = {}, last = {}, used = {}, r = R.rng((seed || Date.now()) % 1e9), pool = shuffle(PATTERNS, r), pi = 0;
-    var looksPool = shuffle(LOOKS, r), accPool = shuffle(ACCENTS, r), decPool = shuffle(DECORS.slice(1), r).concat(['none']), li = 0, ai = 0, di = 0;
+    var looksPool = shuffle(LOOKS, r), accPool = shuffle(ACCENTS, r), decPool = shuffle(DECORS.slice(1), r).concat(['none']), styPool = shuffle(STYLES, r), setSty = {}, sigs = {}, li = 0, ai = 0, di = 0, si = 0;
     var libPairs = {}, setLooks = {}, setAcc = {}, setDec = {}, list = arr(posts), n = list.length, nexiN = 0, quota = Math.ceil(n / 3);
     arr(usedLib).forEach(function (u) { if (u) libPairs[(u.visual || '') + '|' + (u.look || 'clean')] = 1; });
     return list.map(function (p, i) {
@@ -832,11 +967,15 @@
       if (p.mirror == null) p.mirror = !!VIS[v].mirror && (k ? !last[v] : i % 2 === 1);
       last[v] = !!p.mirror;
       if (p.variant == null && p.arrangement == null) p.variant = k;
-      var lk = LOOKS.indexOf(p.look) > -1 && !setLooks[p.look] && !libPairs[v + '|' + p.look] ? p.look : null, g;
-      if (!lk) { for (g = 0; g < LOOKS.length && !lk; g++) { var c1 = looksPool[(li + g) % LOOKS.length]; if (!setLooks[c1] && !libPairs[v + '|' + c1]) lk = c1; } }
-      if (!lk) { for (g = 0; g < LOOKS.length && !lk; g++) { var c1b = looksPool[(li + g) % LOOKS.length]; if (!setLooks[c1b]) lk = c1b; } }
-      if (!lk) lk = looksPool[li % LOOKS.length];
+      var lk = LOOKS.indexOf(p.look) > -1 && !setLooks[p.look] ? p.look : null, g;
+      if (!lk) { for (g = 0; g < LOOKS.length && !lk; g++) { var c1 = looksPool[(li + g) % LOOKS.length]; if (!setLooks[c1]) lk = c1; } }
+      if (!lk) { lk = looksPool[li % LOOKS.length]; setLooks = {}; }
       li++; setLooks[lk] = 1; p.look = lk;
+      var sty = STYLES.indexOf(p.style) > -1 && !setSty[p.style] ? p.style : null;
+      if (!sty) { for (g = 0; g < STYLES.length && !sty; g++) { var c4 = styPool[(si + g) % STYLES.length]; if (!setSty[c4]) sty = c4; } si++; }
+      if (!sty) sty = styPool[si++ % STYLES.length];
+      setSty[sty] = 1; p.style = sty;
+      if (v === 'free') { var sig = arr(p.elements).map(function (e) { return clean(obj(e).type).toLowerCase(); }).sort().join(','); if (sigs[sig]) p.mirror = !p.mirror; sigs[sig] = 1; }
       var ac = LOOK_ACC[lk] || (ACCENTS.indexOf(p.accent) > -1 && !setAcc[p.accent] ? p.accent : null);
       if (!ac) { for (g = 0; g < ACCENTS.length && !ac; g++) { var c2 = accPool[(ai + g) % ACCENTS.length]; if (!setAcc[c2]) ac = c2; } ai++; }
       if (!ac) ac = accPool[ai++ % ACCENTS.length];
@@ -845,9 +984,9 @@
       if (!dc) { for (g = 0; g < DECORS.length && !dc; g++) { var c3 = decPool[(di + g) % DECORS.length]; if (!setDec[c3]) dc = c3; } di++; }
       if (!dc) dc = decPool[di++ % DECORS.length];
       setDec[dc] = 1; p.decor = dc;
-      if (HERO.indexOf(p.heroSize) < 0) p.heroSize = HERO[i % 3];
-      if (TILTS.indexOf(p.tilt) < 0) p.tilt = TILTS[(i + 1) % 3];
+      if (v !== 'free') { if (HERO.indexOf(p.heroSize) < 0) p.heroSize = HERO[i % 3]; if (TILTS.indexOf(p.tilt) < 0) p.tilt = TILTS[(i + 1) % 3]; }
       if (p.nexi) { if (nexiN >= quota && NEXI_OPT[v]) delete p.nexi; else nexiN++; }
+      if (v === 'free' && Array.isArray(p.elements)) { var hasN = p.elements.some(function (e) { return e && e.type === 'nexi'; }); if (hasN) { if (nexiN >= quota) p.elements = p.elements.map(function (e) { return e && e.type === 'nexi' ? { type: 'prop', name: '', x: e.x, y: e.y, cx: e.cx, cy: e.cy, w: Math.min(22, e.w || 18), rot: 6 } : e; }); else nexiN++; } }
       var bg = p.background;
       if (bg !== 'none' && (PATTERNS.indexOf(bg) < 0 || used[bg])) { var guard = 0; while (used[pool[pi % pool.length]] && guard++ < pool.length) pi++; bg = pool[pi % pool.length]; pi++; }
       if (bg !== 'none') used[bg] = 1;
@@ -881,6 +1020,6 @@
   }
 
   window.TNSimple = { compose: compose, diversify: diversify, relayout: relayout, fresh: fresh, forCat: forCat, VIS: VIS, POSES: POSES, GROUND: GROUND, PATTERNS: PATTERNS, TINTS: TINTS, IND_VIS: IND_VIS,
-    LOOKS: LOOKS, LOOK_ABOUT: LOOK_ABOUT, LOOK_ACC: LOOK_ACC, ACCENTS: ACCENTS, DECORS: DECORS, HERO: HERO, TILTS: TILTS,
+    LOOKS: LOOKS, LOOK_ABOUT: LOOK_ABOUT, LOOK_ACC: LOOK_ACC, ACCENTS: ACCENTS, DECORS: DECORS, HERO: HERO, TILTS: TILTS, STYLES: STYLES, FREE_DEFW: FREE_DEFW,
     canMirror: function (v) { return !!(VIS[v] && VIS[v].mirror); }, hasVariants: function (v) { return !!(VIS[v] && (VIS[v].variants || 1) > 1); } };
 })();
