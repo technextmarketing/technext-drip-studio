@@ -11,9 +11,13 @@
   function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
 
   var S = { mode: 'local', db: null, assets: null, downloads: null, user: null, canWrite: true, listeners: {} };
+  /* inside the claude.ai viewer a page cannot start a download itself; files go through the viewer's
+     save prompt (the downloads capability). Resolve it once, up front, so a save never has to guess. */
+  S.inViewer = !!(window.claude && window.claude.use);
   S.on = function (ev, fn) { (S.listeners[ev] = S.listeners[ev] || []).push(fn); };
   function emit(ev, a) { (S.listeners[ev] || []).forEach(function (fn) { try { fn(a); } catch (e) { console.error(e); } }); }
   function use(name) { return window.claude && window.claude.use ? window.claude.use(name).catch(function () { return null; }) : Promise.resolve(null); }
+  S.downloadsReady = S.inViewer ? use('downloads').then(function (d) { S.downloads = d; return d; }) : Promise.resolve(null);
 
   /* resolves {lib, cats, usage, empty} once the first data is in */
   S.init = function (fileLib, fileCats) {
@@ -21,7 +25,7 @@
       if (!db) return initLocal(fileLib, fileCats);
       S.db = db; S.mode = 'hub';
       use('assets').then(function (a) { S.assets = a; emit('caps'); });
-      use('downloads').then(function (d) { S.downloads = d; emit('caps'); });
+      S.downloadsReady.then(function () { emit('caps'); });
       use('user').then(function (u) { S.user = u; if (u && u.can) Promise.resolve(u.can('data.write')).then(function (v) { if (v === false) { S.canWrite = false; emit('caps'); } }).catch(function () {}); });
       return new Promise(function (resolve) {
         var got = { drips: null, cats: null, usage: null }, done = false;
@@ -103,15 +107,35 @@
     return S.embed(file);
   };
 
-  /* hand a file to the viewer */
-  S.download = function (filename, blob) {
-    if (S.downloads) return S.downloads.save({ filename: filename, data: blob }).then(function () { return true; }, function (e) {
-      var c = e && e.code;
-      if (c === 'declined') return false;
-      if (c === 'rate_limited') throw new Error('one save at a time; answer the open prompt, then try again');
-      if (c === 'too_large') throw new Error('the file is too large for this device; pick a smaller size');
-      if (c === 'rejected_extension' || c === 'extension_not_enabled') throw new Error('this file type cannot be saved here');
-      throw new Error(c || (e && e.message) || 'save failed');
+  /* hand a file to the viewer.
+     In the viewer every save shows a confirmation (name + size) and the viewer accepts or declines; there
+     is no size limit for an ordinary save. Only one prompt can be open, and the platform pauses when many
+     prompts arrive in a row ("rate_limited"): the save then waits and tries again by itself, so callers can
+     queue any number of saves. opts.onWait(seconds) reports that waiting. Resolves true (saved) or false
+     (declined); rejects with an Error carrying .code. */
+  function fail(code, msg) { var e = new Error(msg); e.code = code; return e; }
+  function pause(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  S.download = function (filename, blob, opts) {
+    opts = opts || {};
+    if (S.inViewer) return S.downloadsReady.then(function (dl) {
+      if (!dl) throw fail('unavailable', 'saving is not available in this view');
+      var waited = 0;
+      function attempt() {
+        return dl.save({ filename: filename, data: blob }).then(function () { return true; }, function (e) {
+          var c = e && e.code;
+          if (c === 'declined') return false;
+          if (c === 'rate_limited' && waited < 240000) {
+            var ms = Math.min(8000, 1000 + waited / 4); waited += ms;
+            if (opts.onWait) opts.onWait(Math.round(waited / 1000));
+            return pause(ms).then(attempt);
+          }
+          if (c === 'rate_limited') throw fail(c, 'the save prompt did not open; try again in a moment');
+          if (c === 'too_large') throw fail(c, 'this file is too large for this device');
+          if (c === 'rejected_extension' || c === 'extension_not_enabled') throw fail(c, 'this file type cannot be saved here');
+          throw fail(c || 'error', (e && e.message) || 'save failed');
+        });
+      }
+      return attempt();
     });
     var url = URL.createObjectURL(blob), a = document.createElement('a');
     a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();

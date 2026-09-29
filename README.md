@@ -185,9 +185,15 @@ Claude plan, not an API bill. **Claude usage** logs every run.
 - Image size: Standard (1080 px), **HD (2160 px, the default)** or Ultra (3240 px), chosen next to the
   button and remembered on this browser. The PNG is rendered fresh at that size (vector cards and text,
   not an upscaled screenshot).
-- **Save all** saves every drip shown in the gallery as one zip.
-- There is no size limit on saving; the hub shows one save prompt at a time, so answer it before saving
-  the next one. Locally, the server also writes the file into `exports/`.
+- **Save all** saves every drip shown in the gallery as one zip. **Select** lets you tick posts and save
+  just those, as one zip or as separate PNGs.
+- **No limit.** Click Save on as many posts as you like: the saves queue up and go through one after
+  another, and a pill in the top bar shows progress (Stop removes the ones still waiting). In the hub
+  every file is confirmed by the viewer's save prompt, so a zip is the quickest way to take many images
+  at once: one prompt. If the platform pauses prompts for a moment, the studio waits and continues by
+  itself. There is no size limit on a save; the one device that caps file size (the Claude Android app,
+  200 MB) gets the zip split into smaller zips automatically. Locally, the server also writes each file
+  into `exports/`.
 
 ## Elements
 

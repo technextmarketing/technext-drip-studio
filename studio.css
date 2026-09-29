@@ -318,3 +318,15 @@ textarea.bad{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(179,39,
 .hdls .hdl-rot{background:#3167CA;cursor:grab}
 .hdls .hdl-rot::after{content:"";position:absolute;left:50%;top:100%;width:2px;height:26px;background:#3167CA;transform:translateX(-50%)}
 .canvas-box.dragging ~ .hdls{opacity:.9}
+
+/* v8: save queue pill and gallery selection */
+.genpill.save{background:#E6F5EC;color:#1B6B3A}
+.genpill.save i{background:rgba(27,107,58,.16)}
+.genpill.save button{color:#1B6B3A}
+.card{position:relative}
+.card .pick{position:absolute;left:10px;top:10px;z-index:3;display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:#fff;box-shadow:0 2px 8px rgba(31,31,61,.28);cursor:pointer}
+.card .pick input{width:17px;height:17px;margin:0;cursor:pointer;accent-color:var(--blue-700)}
+.card.picked .thumb{outline:3px solid var(--blue-700)}
+.pickbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-6px 0 16px;padding:10px 12px;border-radius:12px;background:var(--blue-050);font:600 13px var(--font-body);color:var(--ink)}
+.pickbar .sp{flex:1}
+.pickbar .btn.ghost{color:var(--blue-700)}

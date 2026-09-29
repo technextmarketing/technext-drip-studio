@@ -21,7 +21,7 @@
   var VIEWS = ['form', 'list', 'kanban', 'dashboard', 'planning', 'pos', 'kds', 'apps', 'discuss'], CARD_VIEWS = ['kanban', 'list', 'planning', 'kds', 'pos', 'dashboard'];
 
   var lib = [], cats = [], usage = [], fileLib = clone(window.DRIPS || []);
-  var st = { cat: 'all', id: null, sel: -1, multi: [], zoom: 1 };
+  var st = { cat: 'all', id: null, sel: -1, multi: [], zoom: 1, pick: null };
   var hist = [], future = [], SERVER = false, clip = null;
   var cur = function () { return lib.filter(function (d) { return d.id === st.id; })[0]; };
 
@@ -243,8 +243,9 @@
     var head = st.cat === 'drafts' ? 'Drafts to review' : c ? c.name : 'All drips';
     var h = '<div class="gallery"><div class="gal-head"><div><h2>' + esc(head) + '</h2><p>' +
       (ind ? 'Workflow on technext.asia: ' + esc(ind.flow_title) : st.cat === 'drafts' ? 'Posts Claude designed. Keep the ones you like; everything is already saved.' : c ? esc(c.group) + ' · ' + list.length + ' drip' + (list.length === 1 ? '' : 's') : lib.length + ' drips across ' + cats.length + ' categories.') +
-      '</p></div><span class="sp"></span>' + (list.length ? qualitySel('pngq2') + '<button class="btn" data-saveall="1" title="Save every drip shown here as PNG, in one zip">' + dlIcon() + 'Save all</button>' : '') +
+      '</p></div><span class="sp"></span>' + (list.length ? qualitySel('pngq2') + '<button class="btn" data-saveall="1" title="Save every drip shown here as PNG, in one zip">' + dlIcon() + 'Save all</button>' + (st.pick ? '' : '<button class="btn" data-pickmode="1" title="Tick posts, then save them together">Select</button>') : '') +
       (S.canWrite ? '<button class="btn" data-gen="1">' + sparkIcon() + 'Generate with Claude</button><button class="btn primary" data-new="1">New drip</button>' : '') + '</div>';
+    if (st.pick && list.length) h += '<div class="pickbar" id="pickbar"><b>0 selected</b><button class="btn sm" data-pickall="1" type="button">All</button><span class="sp"></span><button class="btn sm primary" data-picksave="zip" type="button" disabled>' + dlIcon() + 'Save as one zip</button><button class="btn sm" data-picksave="png" type="button" disabled>' + dlIcon() + 'Save as separate PNGs</button><button class="btn sm ghost" data-pickdone="1" type="button">Done</button></div>';
     if (lib.length === 0 && S.mode === 'hub') h += '<div class="empty" style="margin-bottom:18px"><b>This hub is empty.</b> Import the starter drips, or generate new ones with Claude.' + (S.canWrite ? ' <button class="btn sm" id="import-starters">Import the starter drips</button>' : '') + '</div>';
     if (drafts.length && st.cat !== 'drafts') h += '<div class="sec-h"><h3>New from Claude <span class="tag">' + drafts.length + '</span></h3><span class="sp"></span>' + (S.canWrite ? '<button class="btn sm" data-keepall="1">Keep all</button>' : '') + '</div>' + cards(drafts, true);
     if (st.cat === 'drafts') h += cards(drafts, true);
@@ -253,11 +254,28 @@
     $('#main').innerHTML = h;
     list.forEach(function (d) { var box = $('[data-thumb="' + d.id + '"]'); if (!box) return; box.appendChild(R.render(d)); R.fit(box); fitThumb(box); });
     document.fonts.ready.then(function () { $$('[data-thumb]').forEach(function (b) { R.fit(b); }); });
+    pickBar();
+  }
+  /* selection: tick posts in the gallery, then save them together (one zip = one save prompt) */
+  function togglePick(id, on) {
+    if (!st.pick) return;
+    if (on == null) on = !st.pick[id];
+    if (on) st.pick[id] = true; else delete st.pick[id];
+    var box = $('[data-thumb="' + id + '"]'), card = box && box.closest('.card');
+    if (card) { card.classList.toggle('picked', on); var cb = $('[data-tick]', card); if (cb) cb.checked = on; }
+    pickBar();
+  }
+  function picked() { return lib.filter(inCatFn).filter(function (d) { return st.pick && st.pick[d.id]; }); }
+  function pickBar() {
+    var bar = $('#pickbar'); if (!bar || !st.pick) return;
+    var n = picked().length, all = lib.filter(inCatFn).length;
+    $('b', bar).textContent = n + ' selected'; $('[data-pickall]', bar).textContent = n === all ? 'None' : 'All';
+    $$('[data-picksave]', bar).forEach(function (b) { b.disabled = !n; });
   }
   function cards(list, drafts, withNew) {
     var h = '<div class="grid">';
     list.forEach(function (d) {
-      h += '<div class="card"><button class="thumb' + (d.format === '4:5' ? ' r45' : '') + '" data-open="' + esc(d.id) + '" data-thumb="' + esc(d.id) + '" aria-label="Edit ' + esc(d.name || d.id) + '"></button>' +
+      h += '<div class="card' + (st.pick && st.pick[d.id] ? ' picked' : '') + '">' + (st.pick ? '<label class="pick" title="Select"><input type="checkbox" data-tick="' + esc(d.id) + '"' + (st.pick[d.id] ? ' checked' : '') + ' aria-label="Select ' + esc(d.name || d.id) + '"></label>' : '') + '<button class="thumb' + (d.format === '4:5' ? ' r45' : '') + '" data-open="' + esc(d.id) + '" data-thumb="' + esc(d.id) + '" aria-label="' + (st.pick ? 'Select ' : 'Edit ') + esc(d.name || d.id) + '"></button>' +
         '<span class="meta"><b>' + esc(d.name || d.id) + '</b>' + (st.cat === 'all' || st.cat === 'drafts' ? '<span class="tag">' + esc(catName(d.cat)) + '</span>' : '') + '<button class="btn sm save" data-save="' + esc(d.id) + '" title="Save as PNG (' + PNGQ[pngScale() - 1][1] + ')" aria-label="Save ' + esc(d.name || d.id) + ' as PNG">' + dlIcon() + 'Save</button></span>' +
         (drafts && S.canWrite ? '<span class="draft-act"><button class="btn sm primary" data-keep="' + esc(d.id) + '">Keep</button><button class="btn sm" data-open="' + esc(d.id) + '">Edit</button><button class="btn sm danger" data-discard="' + esc(d.id) + '">Discard</button></span>' : '') + '</div>';
     });
@@ -934,8 +952,13 @@
     var t = e.target.closest('button,[data-li],select[data-tool]'); if (!t || t.tagName === 'SELECT') return;
     var ds = t.dataset;
     if (ds.ctx) { ctxAct(ds.ctx); return; }
-    if (ds.cat) { st.cat = ds.cat; showGallery(); return; }
-    if (ds.open) { openDrip(ds.open); return; }
+    if (ds.cat) { st.cat = ds.cat; st.pick = null; showGallery(); return; }
+    if (ds.open) { if (st.pick && t.classList.contains('thumb')) togglePick(ds.open); else openDrip(ds.open); return; }
+    if (ds.pickmode) { st.pick = {}; showGallery(); return; }
+    if (ds.pickdone) { st.pick = null; showGallery(); return; }
+    if (ds.pickall) { var pl = lib.filter(inCatFn), allOn = pl.every(function (d) { return st.pick[d.id]; }); pl.forEach(function (d) { togglePick(d.id, !allOn); }); return; }
+    if (ds.picksave) { var pk = picked(); if (!pk.length) return; if (ds.picksave === 'zip') exportZip(pk, (st.cat === 'all' ? '' : st.cat + '-') + 'selected'); else pk.forEach(function (d) { exportPng(d, pngScale()); }); st.pick = null; showGallery(); return; }
+    if (ds.savestop) { stopSaves(); return; }
     if (ds.new) { openStarters(); return; }
     if (ds.gen) { openGenerate(); return; }
     if (ds.genstop) { if (genCtl) genCtl.abort(); return; }
@@ -963,7 +986,7 @@
     if (ds.tilt) { simpleRelayout({ tilt: ds.tilt }); return; }
     if (ds.fresh) { var fr = SP.fresh(cur()); simpleRelayout(fr); toast('Fresh design: ' + LOOKLAB[fr.look] + ' · ' + fr.accent + ' · ' + DECLAB[fr.decor] + ' · ' + PATLAB[fr.pattern]); return; }
     if (ds.save) { var sd = lib.filter(function (x) { return x.id === ds.save; })[0]; if (sd) exportPng(sd, pngScale()); return; }
-    if (ds.saveall) { exportAll(lib.filter(inCatFn)); return; }
+    if (ds.saveall) { exportZip(lib.filter(inCatFn), st.cat === 'all' ? 'all' : st.cat); return; }
     if (ds.mirror) { simpleRelayout({ mirror: !cur().mirror }); return; }
     if (ds.variant) { simpleRelayout({ variant: (cur().variant || 0) + 1 }); return; }
     if (ds.relayout) { simpleRelayout({}); toast('Layout reset'); return; }
@@ -1001,6 +1024,7 @@
   });
   document.addEventListener('change', function (e) {
     var t = e.target;
+    if (t.dataset && t.dataset.tick) { togglePick(t.dataset.tick, t.checked); return; }
     if (t.dataset && t.dataset.pngq) { try { localStorage.setItem('tn-drip-pngq', t.value); } catch (err) {} $$('[data-pngq]').forEach(function (x) { x.value = t.value; }); $$('[data-save]').forEach(function (b) { b.title = 'Save as PNG (' + PNGQ[+t.value - 1][1] + ')'; }); return; }
     if (t.dataset && t.dataset.tool === 'pose') change(function (d) { d.layers[st.sel].pose = t.value; }, { insp: true, now: true });
     if (t.dataset && t.dataset.tool === 'view') change(function (d) { d.layers[st.sel].view = t.value; }, { insp: true, now: true });
@@ -1191,7 +1215,11 @@
     }).then(function (b) { host.remove(); return b; }, function (e) { host.remove(); throw e; });
   }
   window.TNStudioRender = clientRender;
-  var exporting = false;
+  /* ---------- saving PNGs: a queue, so any number of saves go through, one after another ----------
+     In the hub every file is confirmed by the viewer's save prompt (name + size). The queue renders the
+     next file while a prompt is open, waits when the platform pauses prompts, and never refuses a click.
+     A zip is one prompt for many images; if a device caps the file size the zip is split by itself. */
+  var saveQ = [], saveBusy = false, saveDone = 0, saveTotal = 0;
   function pngName(d, scale) { return d.id + (scale > 1 ? '@' + scale + 'x' : '') + (d.format === '4:5' ? '-4x5' : '') + '.png'; }
   function renderBlob(d, scale) {
     if (SERVER) return fetch('api/render', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ drip: d, scale: scale }) }).then(function (r) { if (!r.ok) throw new Error('render ' + r.status); return r.blob(); });
@@ -1202,32 +1230,83 @@
     openDlg('<h2>Export needs a server</h2><p>Browsers block image export for pages opened straight from a folder. Double-click <code>Open Drip Studio.bat</code>, use the live link, or run <code>python tools/render.py</code>.</p><div class="dlg-foot"><button class="btn primary" id="dlg-close">OK</button></div>');
     return true;
   }
+  function sizeTxt(n) { return n >= 1048576 ? Math.round(n / 1048576 * 10) / 10 + ' MB' : Math.round(n / 1024) + ' KB'; }
+  function savePill(text) {
+    var p = $('#savepill'); if (!text) { if (p) p.remove(); return; }
+    if (!p) { p = document.createElement('span'); p.id = 'savepill'; p.className = 'genpill save'; p.innerHTML = '<i></i><span></span><button type="button" data-savestop="1">Stop</button>'; $('#topacts').insertBefore(p, $('#topacts').firstChild); }
+    $('span', p).textContent = (saveTotal > 1 ? (saveDone + 1) + ' of ' + saveTotal + ' · ' : '') + text;
+    $('i', p).style.width = Math.round(saveDone / Math.max(1, saveTotal) * 100) + '%';
+    $('button', p).hidden = saveQ.length === 0;
+  }
+  function queueSave(job) {
+    if (needsServer()) return;
+    saveQ.push(job); saveTotal++;
+    if (saveBusy) { savePill($('#savepill span') ? $('#savepill span').textContent.replace(/^\d+ of \d+ · /, '') : 'Saving…'); toast('Queued ' + job.label + ' (' + saveQ.length + ' waiting)', 2500); return; }
+    nextSave();
+  }
+  function nextSave() {
+    var job = saveQ.shift();
+    if (!job) { saveBusy = false; saveDone = saveTotal = 0; savePill(); return; }
+    saveBusy = true;
+    var progress = function (msg) { savePill(msg); };
+    job.run(progress)
+      .then(function (msg) { toast(msg, 4000); }, function (err) { toast('Could not save ' + job.label + ': ' + (err && (err.message || err.code) || err), 6000); })
+      .then(function () { saveDone++; nextSave(); });
+  }
+  function stopSaves() { var n = saveQ.length; saveQ = []; saveTotal = saveDone + 1; savePill('Finishing this file…'); toast(n ? n + ' queued save' + (n === 1 ? '' : 's') + ' removed' : 'Nothing queued'); }
+  function waiting(progress, name) { return { onWait: function (sec) { progress('Waiting for the save prompt for ' + name + ' (' + sec + ' s)…'); } }; }
   function exportPng(d, scale) {
-    if (!d || needsServer()) return;
-    if (exporting) { toast('Still saving the previous image: answer its prompt first'); return; }
-    scale = scale || 2; exporting = true;
-    var fname = pngName(d, scale), px = 1080 * scale;
-    toast('Rendering ' + (d.name || d.id) + ' at ' + px + ' px…', 10000);
-    renderBlob(d, scale).then(function (b) { return S.download(fname, b).then(function (ok) { toast(ok ? 'Saved ' + fname + ' (' + Math.round(b.size / 1024) + ' KB' + (SERVER ? ', also in exports/' : '') + ')' : 'Save cancelled'); }); })
-      .catch(function (err) { toast('Could not save: ' + (err && (err.message || err.code) || err), 6000); })
-      .then(function () { exporting = false; });
+    if (!d) return;
+    scale = scale || 2;
+    var fname = pngName(d, scale), px = 1080 * scale, label = d.name || d.id;
+    queueSave({ label: label, run: function (progress) {
+      progress('Rendering ' + label + ' at ' + px + ' px…');
+      return renderBlob(d, scale).then(function (b) {
+        progress('Save ' + fname + (S.inViewer ? ' · answer the prompt' : ''));
+        return S.download(fname, b, waiting(progress, fname)).then(function (ok) { return ok ? 'Saved ' + fname + ' (' + sizeTxt(b.size) + (SERVER ? ', also in exports/' : '') + ')' : 'Save cancelled: ' + fname; });
+      });
+    } });
   }
   function loadZip() {
     if (window.JSZip) return Promise.resolve(window.JSZip);
     return new Promise(function (res, rej) { var sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'; sc.onload = function () { res(window.JSZip); }; sc.onerror = function () { rej(new Error('The zip library could not load; save the posts one by one')); }; document.head.appendChild(sc); });
   }
-  function exportAll(list) {
-    if (!list.length || needsServer()) return;
-    if (exporting) { toast('Still saving the previous image: answer its prompt first'); return; }
-    var scale = pngScale(), n = list.length, zipName = 'technext-drips-' + (st.cat === 'all' ? 'all' : st.cat) + (scale > 1 ? '@' + scale + 'x' : '') + '.zip';
-    exporting = true; toast('Rendering 1 of ' + n + '…', 20000);
-    loadZip().then(function (JSZip) {
-      var zip = new JSZip();
-      return list.reduce(function (p, d, i) { return p.then(function () { toast('Rendering ' + (i + 1) + ' of ' + n + ': ' + (d.name || d.id), 20000); return renderBlob(d, scale).then(function (b) { zip.file(pngName(d, scale), b); }); }); }, Promise.resolve())
-        .then(function () { toast('Packing ' + n + ' images…', 20000); return zip.generateAsync({ type: 'blob', compression: 'STORE' }); });
-    }).then(function (b) { return S.download(zipName, b).then(function (ok) { toast(ok ? 'Saved ' + zipName + ' (' + n + ' images, ' + Math.round(b.size / 1048576 * 10) / 10 + ' MB)' : 'Save cancelled'); }); })
-      .catch(function (err) { toast('Could not save: ' + (err && (err.message || err.code) || err), 6000); })
-      .then(function () { exporting = false; });
+  function exportZip(list, tag) {
+    if (!list.length) return;
+    var scale = pngScale(), n = list.length, zipName = 'technext-drips-' + tag + (scale > 1 ? '@' + scale + 'x' : '') + '.zip';
+    queueSave({ label: zipName, run: function (progress) {
+      return loadZip().then(function (JSZip) {
+        var files = [];
+        return list.reduce(function (p, d, i) { return p.then(function () { progress('Rendering ' + (i + 1) + ' of ' + n + ': ' + (d.name || d.id)); return renderBlob(d, scale).then(function (b) { files.push({ name: pngName(d, scale), blob: b }); }); }); }, Promise.resolve())
+          .then(function () { return saveZip(JSZip, files, zipName, progress); }).then(function (r) { return zipMsg(r, zipName); });
+      });
+    } });
+  }
+  /* pack and save. If this device caps the file size (too_large: the Claude Android app, 200 MB), the
+     images are saved as two smaller zips instead, and so on; every part is attempted. Resolves a tally. */
+  function saveZip(JSZip, files, name, progress) {
+    progress('Packing ' + files.length + ' image' + (files.length === 1 ? '' : 's') + '…');
+    var zip = new JSZip(); files.forEach(function (f) { zip.file(f.name, f.blob); });
+    return zip.generateAsync({ type: 'blob', compression: 'STORE' }).then(function (b) {
+      progress('Save ' + name + (S.inViewer ? ' · answer the prompt' : ''));
+      return S.download(name, b, waiting(progress, name)).then(function (ok) {
+        return ok ? { saved: files.length, zips: 1, bytes: b.size, failed: [], cancelled: [] } : { saved: 0, zips: 0, bytes: 0, failed: [], cancelled: [name] };
+      }, function (e) {
+        if (!(e && e.code === 'too_large') || files.length < 2) throw e;
+        var h = Math.ceil(files.length / 2), base = name.replace(/\.zip$/, '');
+        var part = function (fs, sfx) { return saveZip(JSZip, fs, base + sfx + '.zip', progress).catch(function (e2) { return { saved: 0, zips: 0, bytes: 0, failed: [base + sfx + '.zip (' + (e2 && (e2.message || e2.code) || e2) + ')'], cancelled: [] }; }); };
+        return part(files.slice(0, h), '-a').then(function (r1) { return part(files.slice(h), '-b').then(function (r2) {
+          return { saved: r1.saved + r2.saved, zips: r1.zips + r2.zips, bytes: r1.bytes + r2.bytes, failed: r1.failed.concat(r2.failed), cancelled: r1.cancelled.concat(r2.cancelled) };
+        }); });
+      });
+    });
+  }
+  function zipMsg(r, name) {
+    if (!r.zips && !r.failed.length) return 'Save cancelled: ' + name;
+    var m = r.zips ? 'Saved ' + r.saved + ' image' + (r.saved === 1 ? '' : 's') + ' (' + sizeTxt(r.bytes) + ')' + (r.zips > 1 ? ' as ' + r.zips + ' zips, because this device caps the file size' : ' as ' + name) : '';
+    if (r.failed.length) m += (m ? ' · ' : '') + 'Could not save ' + r.failed.join('; ');
+    if (r.cancelled.length) m += (m ? ' · ' : '') + 'Cancelled: ' + r.cancelled.join(', ');
+    return m;
   }
   function saveLibraryFile() {
     var js = '/* TechNext Drip Studio — the drip library, saved from the studio on ' + new Date().toISOString().slice(0, 10) + '. See README.md. */\n\nwindow.CATEGORIES = ' + JSON.stringify(cats, null, 2) + ';\n\nwindow.DRIPS = ' + JSON.stringify(lib.map(stripMeta), null, 2) + ';\n';
