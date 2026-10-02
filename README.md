@@ -158,8 +158,8 @@ Claude plan, not an API bill. **Claude usage** logs every run.
 - **Text:** double-click text on the canvas to type in place (Enter saves, Esc cancels). Double-click a
   card, chart or list to edit its data in a small panel. The headline toolbar changes its size (A− A+)
   and colour. The headline stays in the standard position; if you drag it, "Reset position" puts it back.
-- **Toolbar over the selection:** Edit, Replace image or Swap Nexi for a photo, Nexi pose, Odoo view,
-  Lock, Forward, Backward, Duplicate, Delete. With several selected: align and distribute.
+- **No floating toolbar:** selecting shows only the frame. Every action is in the right-click menu and the panel on
+  the right (multi-select: right-click > Align / Distribute).
 - **Right-click** for every option. On an element: edit text, replace image, Nexi pose, Odoo view, prop, text font,
   size, alignment and colour, size (bigger, smaller, a share of the width), rotate and flip, position on the page,
   arrange, opacity, paper sheets, lock, hide, cut, copy, paste, duplicate, delete. On the headline: size, colour,
