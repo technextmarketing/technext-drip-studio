@@ -244,9 +244,9 @@
     var head = st.cat === 'drafts' ? 'Drafts to review' : c ? c.name : 'All drips';
     var h = '<div class="gallery"><div class="gal-head"><div><h2>' + esc(head) + '</h2><p>' +
       (ind ? 'Workflow on technext.asia: ' + esc(ind.flow_title) : st.cat === 'drafts' ? 'Posts Claude designed. Keep the ones you like; everything is already saved.' : c ? esc(c.group) + ' · ' + list.length + ' drip' + (list.length === 1 ? '' : 's') : lib.length + ' drips across ' + cats.length + ' categories.') +
-      '</p></div><span class="sp"></span>' + (list.length ? qualitySel('pngq2') + '<button class="btn" data-saveall="1" title="Save every drip shown here as PNG, in one zip">' + dlIcon() + 'Save all</button>' + (st.pick ? '' : '<button class="btn" data-pickmode="1" title="Tick posts, then save them together">Select</button>') : '') +
+      '</p></div><span class="sp"></span>' + (list.length ? qualitySel('pngq2') + destSel(st.cat) + '<button class="btn" data-saveall="1" title="' + (toDrive(st.cat) ? 'Upload every drip shown here to Google Drive' : 'Save every drip shown here as PNG, in one zip') + '">' + dlIcon() + 'Save all</button>' + (st.pick ? '' : '<button class="btn" data-pickmode="1" title="Tick posts, then save them together">Select</button>') : '') +
       (S.canWrite ? '<button class="btn" data-gen="1">' + sparkIcon() + 'Generate with Claude</button><button class="btn primary" data-new="1">New drip</button>' : '') + '</div>';
-    if (st.pick && list.length) h += '<div class="pickbar" id="pickbar"><b>0 selected</b><button class="btn sm" data-pickall="1" type="button">All</button><span class="sp"></span><button class="btn sm primary" data-picksave="zip" type="button" disabled>' + dlIcon() + 'Save as one zip</button><button class="btn sm" data-picksave="png" type="button" disabled>' + dlIcon() + 'Save as separate PNGs</button><button class="btn sm ghost" data-pickdone="1" type="button">Done</button></div>';
+    if (st.pick && list.length) h += '<div class="pickbar" id="pickbar"><b>0 selected</b><button class="btn sm" data-pickall="1" type="button">All</button><span class="sp"></span>' + (toDrive(st.cat) ? '<button class="btn sm primary" data-picksave="zip" type="button" disabled>' + dlIcon() + 'Upload to Google Drive</button>' : '<button class="btn sm primary" data-picksave="zip" type="button" disabled>' + dlIcon() + 'Save as one zip</button><button class="btn sm" data-picksave="png" type="button" disabled>' + dlIcon() + 'Save as separate PNGs</button>') + '<button class="btn sm ghost" data-pickdone="1" type="button">Done</button></div>';
     if (lib.length === 0 && S.mode === 'hub') h += '<div class="empty" style="margin-bottom:18px"><b>This hub is empty.</b> Import the starter drips, or generate new ones with Claude.' + (S.canWrite ? ' <button class="btn sm" id="import-starters">Import the starter drips</button>' : '') + '</div>';
     if (drafts.length && st.cat !== 'drafts') h += '<div class="sec-h"><h3>New from Claude <span class="tag">' + drafts.length + '</span></h3><span class="sp"></span>' + (S.canWrite ? '<button class="btn sm" data-keepall="1">Keep all</button>' : '') + '</div>' + cards(drafts, true);
     if (st.cat === 'drafts') h += cards(drafts, true);
@@ -277,7 +277,7 @@
     var h = '<div class="grid">';
     list.forEach(function (d) {
       h += '<div class="card' + (st.pick && st.pick[d.id] ? ' picked' : '') + '">' + (st.pick ? '<label class="pick" title="Select"><input type="checkbox" data-tick="' + esc(d.id) + '"' + (st.pick[d.id] ? ' checked' : '') + ' aria-label="Select ' + esc(d.name || d.id) + '"></label>' : '') + '<button class="thumb' + (d.format === '4:5' ? ' r45' : '') + '" data-open="' + esc(d.id) + '" data-thumb="' + esc(d.id) + '" aria-label="' + (st.pick ? 'Select ' : 'Edit ') + esc(d.name || d.id) + '"></button>' +
-        '<span class="meta"><b>' + esc(d.name || d.id) + '</b>' + (st.cat === 'all' || st.cat === 'drafts' ? '<span class="tag">' + esc(catName(d.cat)) + '</span>' : '') + '<button class="btn sm save" data-save="' + esc(d.id) + '" title="Save as PNG (' + PNGQ[pngScale() - 1][1] + ')" aria-label="Save ' + esc(d.name || d.id) + ' as PNG">' + dlIcon() + 'Save</button></span>' +
+        '<span class="meta"><b>' + esc(d.name || d.id) + '</b>' + (st.cat === 'all' || st.cat === 'drafts' ? '<span class="tag">' + esc(catName(d.cat)) + '</span>' : '') + (d.drive && d.drive.url ? '<a class="indrive" href="' + esc(d.drive.url) + '" target="_blank" rel="noopener" title="In Google Drive › ' + esc(d.drive.folder || '') + ' (' + esc(String(d.drive.at || '').slice(0, 10)) + ')">In Drive</a>' : '') + '<button class="btn sm save" data-save="' + esc(d.id) + '" title="' + (toDrive(st.cat) ? 'Upload to Google Drive' : 'Save as PNG') + ' (' + PNGQ[pngScale() - 1][1] + ')" aria-label="Save ' + esc(d.name || d.id) + '">' + dlIcon() + 'Save</button></span>' +
         (drafts && S.canWrite ? '<span class="draft-act"><button class="btn sm primary" data-keep="' + esc(d.id) + '">Keep</button><button class="btn sm" data-open="' + esc(d.id) + '">Edit</button><button class="btn sm danger" data-discard="' + esc(d.id) + '">Discard</button></span>' : '') + '</div>';
     });
     if (withNew && S.canWrite) h += '<div class="card new"><button class="thumb" data-new="1"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New drip</span></button><span class="meta"><b>Start from a starter</b></span></div>';
@@ -296,7 +296,7 @@
       '<span class="seg" role="group" aria-label="Zoom"><button id="zoom-out" title="Zoom out" aria-label="Zoom out">−</button><button id="zoom-fit" title="Fit">Fit</button><button id="zoom-in" title="Zoom in" aria-label="Zoom in">+</button></span>' +
       '<span class="seg" role="group" aria-label="Format"><button data-fmt="1:1">1:1</button><button data-fmt="4:5">4:5</button></span>' +
       '<button class="btn sm icon" id="undo" title="Undo (Ctrl+Z)" aria-label="Undo">↶</button><button class="btn sm icon" id="redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo">↷</button>' +
-      qualitySel('pngq') + '<button class="btn sm primary" id="png">' + dlIcon() + 'Save PNG</button></div>' +
+      qualitySel('pngq') + destSel(cur() && cur().cat) + '<button class="btn sm primary" id="png">' + dlIcon() + saveLabel(cur() && cur().cat) + '</button></div>' +
       '<div class="canvas-wrap" id="wrap"><div class="canvas-box" id="box"></div><div class="guides" id="guides"></div><div class="marq" id="marq" hidden></div><div class="tools" id="tools" hidden></div>' +
       '<span class="hint">Click to select · drag to move · corners resize, sides change the width, the round handle rotates · double-click text to type · right-click for every option</span></div></div>';
     drawCanvas(); renderInspector();
@@ -1205,6 +1205,7 @@
   });
   function burst() { var now = Date.now(), b = now - (burst.t || 0) < 1200; burst.t = now; return b; }
 
+  document.addEventListener('focusin', function (e) { if (e.target && e.target.matches && e.target.matches('select[data-dest]') && !driveFolders && driveAvail()) loadFolders().catch(function () {}); });
   /* clicks */
   document.addEventListener('click', function (e) {
     var t = e.target.closest('button,[data-li],select[data-tool]'); if (!t || t.tagName === 'SELECT') return;
@@ -1283,6 +1284,7 @@
   document.addEventListener('change', function (e) {
     var t = e.target;
     if (t.dataset && t.dataset.tick) { togglePick(t.dataset.tick, t.checked); return; }
+    if (t.dataset && t.dataset.dest) { setDest(t.dataset.dest, t.value); refreshDest(); if (t.value !== 'local') loadFolders().catch(function (err) { toast(err.message || 'Google Drive is not available', 6000); }); return; }
     if (t.dataset && t.dataset.pngq) { try { localStorage.setItem('tn-drip-pngq', t.value); } catch (err) {} $$('[data-pngq]').forEach(function (x) { x.value = t.value; }); $$('[data-save]').forEach(function (b) { b.title = 'Save as PNG (' + PNGQ[+t.value - 1][1] + ')'; }); return; }
     if (t.dataset && t.dataset.tool === 'pose') change(function (d) { d.layers[st.sel].pose = t.value; }, { insp: true, now: true });
     if (t.dataset && t.dataset.tool === 'view') change(function (d) { d.layers[st.sel].view = t.value; }, { insp: true, now: true });
@@ -1511,26 +1513,112 @@
       .then(function (msg) { toast(msg, 4000); }, function (err) { toast('Could not save ' + job.label + ': ' + (err && (err.message || err.code) || err), 6000); })
       .then(function () { saveDone++; nextSave(); });
   }
-  function stopSaves() { var n = saveQ.length; saveQ = []; saveTotal = saveDone + 1; savePill('Finishing this file…'); toast(n ? n + ' queued save' + (n === 1 ? '' : 's') + ' removed' : 'Nothing queued'); }
+  function stopSaves() { saveStopped = saveBusy; var n = saveQ.length; saveQ = []; saveTotal = saveDone + 1; savePill('Finishing this file…'); toast(n ? n + ' queued save' + (n === 1 ? '' : 's') + ' removed' : 'Nothing queued'); }
   function waiting(progress, name) { return { onWait: function (sec) { progress('Waiting for the save prompt for ' + name + ' (' + sec + ' s)…'); } }; }
+
+  /* ---------- where saved PNGs go: the team's Google Drive Drips folder (hub) or this computer ----------
+     The choice is per category and per viewer. "By category" picks the Drips subfolder that matches the
+     drip's category (DRIVE_AUTO, then the category name); without a match the file goes to the Drips folder. */
+  var DRIVE_AUTO = { odoo20: 'Meet Odoo 20', fnb: 'FnB', ecommerce: 'Ecommerce', manufacturing: 'Manufacturing', 'health-wellness': 'Health and Wellness', kitchen: 'Kitchen', 'field-service': 'Field Service', it: 'Information Technology' };
+  var driveFolders = null, driveLoad = null;
+  function driveAvail() { return !!(S.inViewer && S.drive); }
+  function destKey(scope) { return 'tn-drip-dest:' + (scope || 'all'); }
+  function getDest(scope) { var v = null; try { v = localStorage.getItem(destKey(scope)); } catch (e) {} if (!driveAvail()) return 'local'; return v || 'auto'; }
+  function setDest(scope, v) { try { localStorage.setItem(destKey(scope), v); } catch (e) {} }
+  function toDrive(scope) { return getDest(scope) !== 'local'; }
+  function scopeOf(d) { return st.id ? (d ? d.cat : (cur() || {}).cat) : st.cat; }
+  function loadFolders() {
+    if (!driveAvail()) return Promise.reject(new Error('Google Drive is not available in this view'));
+    if (driveFolders) return Promise.resolve(driveFolders);
+    if (!driveLoad) driveLoad = S.driveFolders().then(function (f) { driveFolders = f; driveLoad = null; refreshDest(); return f; }, function (e) { driveLoad = null; throw e; });
+    return driveLoad;
+  }
+  function folderFor(d, scope) {
+    var v = getDest(scope), fs = driveFolders || [], root = { id: S.DRIVE_ROOT, title: S.DRIVE_ROOT_NAME };
+    if (v === 'root') return root;
+    if (v !== 'auto') { var hit = fs.filter(function (f) { return f.id === v; })[0]; return hit || root; }
+    var names = [DRIVE_AUTO[d.cat], catName(d.cat)].filter(Boolean).map(function (x) { return x.toLowerCase(); });
+    for (var i = 0; i < names.length; i++) { var m = fs.filter(function (f) { return f.title.toLowerCase() === names[i]; })[0]; if (m) return m; }
+    return root;
+  }
+  function destSel(scope) {
+    if (!driveAvail()) return '';
+    var v = getDest(scope), fs = driveFolders || [];
+    var o = [['auto', 'Drive · folder by category'], ['root', 'Drive · ' + S.DRIVE_ROOT_NAME]].concat(fs.map(function (f) { return [f.id, 'Drive · ' + S.DRIVE_ROOT_NAME + ' / ' + f.title]; }));
+    if (v !== 'auto' && v !== 'root' && v !== 'local' && !fs.some(function (f) { return f.id === v; })) o.push([v, 'Drive · saved folder']);
+    o.push(['local', 'This computer (download)']);
+    return '<select class="sel dest" data-dest="' + esc(scope || 'all') + '" title="Where saved PNGs go" aria-label="Where saved PNGs go">' + o.map(function (x) { return '<option value="' + esc(x[0]) + '"' + (x[0] === v ? ' selected' : '') + '>' + esc(x[1]) + '</option>'; }).join('') + '</select>';
+  }
+  function saveLabel(scope) { return toDrive(scope) ? 'Save to Drive' : 'Save PNG'; }
+  function refreshDest() {
+    $$('select[data-dest]').forEach(function (s) { var tmp = document.createElement('div'); tmp.innerHTML = destSel(s.dataset.dest); if (tmp.firstChild) s.innerHTML = tmp.firstChild.innerHTML; s.value = getDest(s.dataset.dest); });
+    var png = $('#png'); if (png) png.innerHTML = dlIcon() + saveLabel(scopeOf());
+    var sa = $('[data-saveall]'); if (sa) sa.title = toDrive(st.cat) ? 'Upload every drip shown here to Google Drive' : 'Save every drip shown here as PNG, in one zip';
+  }
+  function freeTitle(folderId, title) {
+    var base = title.replace(/\.png$/, ''), k = 1;
+    function next(t) { return S.driveTaken(folderId, t).then(function (taken) { if (!taken || k > 6) return t; k++; return next(base + '-' + k + '.png'); }); }
+    return next(title);
+  }
+  function recordDrive(d, r, f) {
+    if (!S.canWrite || !r || !r.id) return;
+    d.drive = { id: r.id, url: r.url, folder: f.title, folderId: f.id, file: r.title, at: new Date().toISOString() };
+    queueSave(d); if (!st.id) showGallery();
+  }
+  /* render-independent: upload one rendered PNG to the right folder */
+  function uploadOne(d, blob, fname, scope, progress) {
+    return loadFolders().catch(function (e) { if (e && e.mine && !e.fallback && getDest(scope) !== 'root') throw e; return null; }).then(function () {
+      var f = folderFor(d, scope);
+      progress('Uploading ' + fname + ' to Drive › ' + f.title + '…');
+      return freeTitle(f.id, fname).then(function (title) { return S.driveUpload(f.id, title, blob); }).then(function (r) { recordDrive(d, r, f); return { r: r, f: f }; });
+    });
+  }
   function exportPng(d, scale) {
     if (!d) return;
     scale = scale || 2;
-    var fname = pngName(d, scale), px = 1080 * scale, label = d.name || d.id;
+    var fname = pngName(d, scale), px = 1080 * scale, label = d.name || d.id, scope = scopeOf(d);
     queueExport({ label: label, run: function (progress) {
       progress('Rendering ' + label + ' at ' + px + ' px…');
       return renderBlob(d, scale).then(function (b) {
-        progress('Save ' + fname + (S.inViewer ? ' · answer the prompt' : ''));
-        return S.download(fname, b, waiting(progress, fname)).then(function (ok) { return ok ? 'Saved ' + fname + ' (' + sizeTxt(b.size) + (SERVER ? ', also in exports/' : '') + ')' : 'Save cancelled: ' + fname; });
+        var local = function () {
+          progress('Save ' + fname + (S.inViewer ? ' · answer the prompt' : ''));
+          return S.download(fname, b, waiting(progress, fname)).then(function (ok) { return ok ? 'Saved ' + fname + ' (' + sizeTxt(b.size) + (SERVER ? ', also in exports/' : '') + ')' : 'Save cancelled: ' + fname; });
+        };
+        if (!toDrive(scope)) return local();
+        return uploadOne(d, b, fname, scope, progress).then(function (x) { return 'Uploaded ' + x.r.title + ' (' + sizeTxt(b.size) + ') to Google Drive › ' + x.f.title; },
+          function (e) { if (e && e.fallback) { toast(e.message + ' Saving to this computer instead.', 5000); return local(); } throw e; });
       });
     } });
   }
+  function uploadMany(list) {
+    var scale = pngScale(), n = list.length, scope = st.cat, label = n + ' drip' + (n === 1 ? '' : 's') + ' → Google Drive';
+    queueExport({ label: label, run: function (progress) {
+      var ok = [], bad = [], where = {};
+      return list.reduce(function (p, d, i) {
+        return p.then(function () {
+          if (saveStopped) return;
+          progress('Rendering ' + (i + 1) + ' of ' + n + ': ' + (d.name || d.id));
+          return renderBlob(d, scale).then(function (b) {
+            return uploadOne(d, b, pngName(d, scale), scope, function (m) { progress((i + 1) + ' of ' + n + ' · ' + m); }).then(function (x) { ok.push(x.r.title); where[x.f.title] = 1; });
+          }).catch(function (e) { bad.push((d.name || d.id) + ': ' + (e && (e.message || e.code) || e)); if (e && /needs_reauth|server_not_connected|server_not_found|not_in_manifest|blocked_by_policy|approval_required|unavailable|not_granted|capability_disabled/.test(e.code || '')) saveStopped = true; });
+        });
+      }, Promise.resolve()).then(function () {
+        var stopped = saveStopped; saveStopped = false;
+        var m = ok.length ? 'Uploaded ' + ok.length + ' of ' + n + ' to Google Drive › ' + Object.keys(where).join(', ') : 'Nothing uploaded';
+        if (bad.length) m += ' · ' + bad.length + ' failed: ' + bad.slice(0, 2).join(' · ') + (bad.length > 2 ? '…' : '');
+        if (stopped && ok.length + bad.length < n) m += ' · stopped';
+        return m;
+      });
+    } });
+  }
+  var saveStopped = false;
   function loadZip() {
     if (window.JSZip) return Promise.resolve(window.JSZip);
     return new Promise(function (res, rej) { var sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'; sc.onload = function () { res(window.JSZip); }; sc.onerror = function () { rej(new Error('The zip library could not load; save the posts one by one')); }; document.head.appendChild(sc); });
   }
   function exportZip(list, tag) {
     if (!list.length) return;
+    if (toDrive(st.cat)) return uploadMany(list);
     var scale = pngScale(), n = list.length, zipName = 'technext-drips-' + tag + (scale > 1 ? '@' + scale + 'x' : '') + '.zip';
     queueExport({ label: zipName, run: function (progress) {
       return loadZip().then(function (JSZip) {
@@ -1573,6 +1661,7 @@
   }
 
   /* ---------- boot ---------- */
+  function drawEditorBarDest() { var b = $('#png'); if (b && !$('select[data-dest]')) { var tmp = document.createElement('div'); tmp.innerHTML = destSel(cur() && cur().cat); if (tmp.firstChild) b.parentNode.insertBefore(tmp.firstChild, b); } refreshDest(); }
   function topbar() {
     var local = S.mode !== 'hub';
     $('#topacts').innerHTML = '<span class="savestate" id="savestate"></span><span class="sp"></span>' +
@@ -1593,6 +1682,7 @@
     });
     if (addedCat && S.canWrite) S.saveCats(cats);
     topbar(); S.on('caps', topbar);
+    S.driveReady.then(function () { if (!driveAvail()) return; if (S.drivePerm === 'granted') loadFolders().catch(function () {}); if (st.id) { var bar = $('.ed-bar'); if (bar && !$('select[data-dest]', bar)) drawEditorBarDest(); } else showGallery(); refreshDest(); });
     if (location.protocol !== 'file:' && S.mode !== 'hub') fetch('api/ping', { cache: 'no-store' }).then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; }).then(function (j) { SERVER = !!(j && j.ok); if (SERVER) topbar(); });
     var hash = location.hash.slice(1);
     if (hash && lib.some(function (d) { return d.id === hash; })) openDrip(hash); else showGallery();

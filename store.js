@@ -143,5 +143,75 @@
     return Promise.resolve(true);
   };
 
+  /* ---------- Google Drive: saved PNGs go straight into the team's Drips folder ----------
+     Through the viewer's own Google Drive connector (the mcp capability, declared on the hub). The PNG travels
+     as a staged file argument, so full-size images are fine. Outside the claude.ai hub this is unavailable and
+     the studio saves to this computer instead. Uploads are writes: never retried automatically. */
+  S.DRIVE = 'Google Drive';
+  S.DRIVE_ROOT = '14NUVtiu5_Zp36k2rjZcyg-ptkOPfayK_';
+  S.DRIVE_ROOT_NAME = '01_Drips';
+  S.drive = null; S.driveFileArgs = false; S.drivePerm = 'unavailable';
+  S.driveReady = S.inViewer ? use('mcp').then(function (m) {
+    if (!m) return null;
+    S.drive = m;
+    var perm = use('permissions').then(function (p) { return p ? p.state('mcp:' + S.DRIVE).catch(function () { return 'unavailable'; }) : 'unavailable'; }).then(function (v) { S.drivePerm = v || 'unavailable'; });
+    var tools = m.listTools().then(function (r) { S.driveFileArgs = !!(r && r.fileArgs); }, function () {});
+    return Promise.all([perm, tools]).then(function () { emit('drive'); return m; });
+  }) : Promise.resolve(null);
+  function dq(s) { return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+  var DRIVE_MSG = {
+    needs_reauth: 'Google Drive needs reconnecting: claude.ai Settings > Connectors > Google Drive, then save again.',
+    server_not_connected: 'Add the Google Drive connector in claude.ai Settings > Connectors, then save again.',
+    server_not_found: 'Add the Google Drive connector in claude.ai Settings > Connectors, then save again.',
+    selection_required: 'You have more than one Google Drive connector. Choose one when the page asks, then save again.',
+    not_in_manifest: 'Google Drive is not allowed for this page. Allow it when the page asks (or from the page\'s permissions menu), then save again.',
+    consent_required: 'Google Drive is not allowed for this page yet. Save again and allow it when asked.',
+    blocked_by_policy: 'Your organisation\'s policy blocks Google Drive uploads from this page.',
+    approval_required: 'Your organisation requires approval for Google Drive uploads, which pages cannot ask for yet.',
+    server_unavailable: 'Google Drive did not confirm the upload. Check the folder before saving again: the file may have arrived.',
+    upstream_error: 'Google Drive did not confirm the upload. Check the folder before saving again: the file may have arrived.',
+    cancelled: 'The upload was cancelled. Check the folder before saving again.',
+    bad_request: 'Google Drive rejected the request (the file may be too large).'
+  };
+  /* lifecycle codes where nothing reached Drive: the caller may save to this computer instead */
+  var DRIVE_FALLBACK = { unavailable: 1, not_granted: 1, capability_disabled: 1, capability_removed: 1 };
+  function driveErr(e) {
+    if (e && e.mine) return e;
+    var c = (e && e.code) || 'upstream_error', m = c === 'tool_error' ? 'Google Drive refused the upload: ' + ((e && e.message) || 'unknown error') : DRIVE_MSG[c] || ('Google Drive upload failed (' + c + ').');
+    var x = fail(c, m); x.mine = true; x.fallback = !!DRIVE_FALLBACK[c]; return x;
+  }
+  function driveCall(tool, input, opts) {
+    return S.driveReady.then(function (m) {
+      if (!m) { var x = fail('unavailable', 'Google Drive is not available in this view.'); x.mine = true; x.fallback = true; throw x; }
+      return m.callTool(S.DRIVE, tool, input, opts || { cache: false }).then(function (r) { return r && r.payload !== undefined ? r.payload : r; }, function (e) { throw driveErr(e); });
+    });
+  }
+  /* the subfolders of the Drips folder: [{id, title}] */
+  S.driveFolders = function () {
+    return driveCall('search_files', { query: "parentId = '" + S.DRIVE_ROOT + "' and mimeType = 'application/vnd.google-apps.folder' and trashed = false", pageSize: 100, excludeContentSnippets: true }, { cache: { staleTime: 30000 } })
+      .catch(function (e) { if (e && e.code === 'tool_error') return driveCall('search_files', { query: "parentId = '" + S.DRIVE_ROOT + "' and mimeType = 'application/vnd.google-apps.folder'", pageSize: 100, excludeContentSnippets: true }, { cache: { staleTime: 30000 } }); throw e; })
+      .then(function (p) {
+        return ((p && p.files) || []).filter(function (f) { return f && f.id; }).map(function (f) { return { id: f.id, title: f.title || f.name || 'Folder' }; })
+          .sort(function (a, b) { return a.title.localeCompare(b.title); });
+      });
+  };
+  /* is this file name already used in the folder? */
+  S.driveTaken = function (folderId, title) {
+    return driveCall('search_files', { query: "parentId = '" + dq(folderId) + "' and title = '" + dq(title) + "'", pageSize: 5, excludeContentSnippets: true })
+      .then(function (p) { return !!((p && p.files) || []).length; }, function () { return false; });
+  };
+  function toB64(blob) { return new Promise(function (res, rej) { var r = new FileReader(); r.onload = function () { res(String(r.result).split(',')[1] || ''); }; r.onerror = function () { rej(fail('read_error', 'the image could not be read')); }; r.readAsDataURL(blob); }); }
+  /* upload a PNG into a Drive folder; resolves {id, url, title} */
+  S.driveUpload = function (folderId, title, blob) {
+    var input = { title: title, parentId: folderId, contentMimeType: 'image/png', disableConversionToGoogleType: true };
+    var body = S.driveFileArgs ? Promise.resolve({ $file: { data: blob, name: title, type: 'image/png' } })
+      : blob.size <= 700 * 1024 ? toB64(blob)
+      : Promise.reject((function () { var x = fail('too_big', 'This view can only send images up to 700 KB to Google Drive. Pick Standard · 1080 px, or save to this computer.'); x.mine = true; return x; })());
+    return body.then(function (content) { input.base64Content = content; return driveCall('create_file', input); }).then(function (f) {
+      f = f || {};
+      return { id: f.id, title: f.title || title, url: f.viewUrl || f.alternateLink || f.webViewLink || (f.id ? 'https://drive.google.com/file/d/' + f.id + '/view' : '') };
+    });
+  };
+
   window.TNStore = S;
 })();

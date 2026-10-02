@@ -185,6 +185,13 @@ Claude plan, not an API bill. **Claude usage** logs every run.
 
 ## Saving images
 
+- **Saved straight to Google Drive (the hub).** Save, Save all and Select upload the PNGs into the team's Drips folder
+  (Drive > SALES > 01_Drips) through the viewer's own Google Drive connector. The menu next to the button picks the
+  folder: "folder by category" (Kitchen, FnB, Meet Odoo 20, Information Technology…; the Drips folder when no
+  subfolder matches), the Drips folder itself, any of its subfolders (JR Tech, CRM, Accounting, HVAC…), or "This
+  computer" to download instead. The choice is remembered per category. A name already in the folder gets -2, -3.
+  Each uploaded card shows an "In Drive" link. The first upload asks once to allow Google Drive for the page.
+  The GitHub mirror and the local copy have no Drive access and download as before.
 - **Save PNG** in the editor bar, and a **Save** button on every card in the gallery, so a post can be
   saved without opening it.
 - Image size: Standard (1080 px), **HD (2160 px, the default)** or Ultra (3240 px), chosen next to the

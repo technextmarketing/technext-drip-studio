@@ -383,3 +383,10 @@ textarea.bad{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(179,39,
 .canvas-box img,.canvas-box svg{-webkit-user-drag:none;user-select:none}
 .canvas-box [contenteditable]{-webkit-user-select:text;user-select:text}
 .canvas-box .L.ed-sel:hover,.canvas-box .d-copy.ed-sel:hover,.canvas-box.dragging .L:hover{outline:none!important}
+
+/* v11: save destination (Google Drive / this computer) and the In Drive link */
+.sel.dest:not(.drip *){max-width:250px}
+.gal-head .sel.dest:not(.drip *){height:36px;border-radius:10px}
+.card .meta .indrive{margin-left:auto;font:600 12px/1 var(--font-body);color:var(--ok);text-decoration:none;padding:6px 8px;border-radius:7px;background:var(--ok-050);white-space:nowrap}
+.card .meta .indrive:hover{text-decoration:underline}
+.card .meta .indrive + .save{margin-left:6px}
