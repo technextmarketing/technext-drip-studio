@@ -150,16 +150,21 @@ Claude plan, not an API bill. **Claude usage** logs every run.
 
 - **Select:** click; **Shift-click** or **drag a box** on empty canvas to select several; Ctrl+A selects all.
 - **Move:** drag. Smart guides snap to the canvas centre, the margins and other elements' edges and centres (Alt = free).
-- **Resize:** the corner handle scales the element as a whole and keeps its top-left corner in place;
-  the side handle on cards changes the width (the text reflows). **Rotate:** top dot (Shift = 15° steps).
-  Smart guides snap only to the canvas guides and the three nearest elements, and never while you move
-  fast (Alt = no snapping). The element you drag is lifted above the others.
+- **Resize, like Canva:** a selection frame hugs what the element draws and turns with it. The four corners scale
+  the element and keep the opposite corner in place (Alt scales about the centre); the side pills change the width
+  and the text reflows; the round handle below rotates (it snaps to 0/90/180°, Shift = 15° steps). A badge shows the
+  size or angle while you drag. A click no longer nudges an element: it moves only after 4 px. Smart guides snap to
+  the canvas guides and the three nearest elements, never while you move fast (Alt = no snapping).
 - **Text:** double-click text on the canvas to type in place (Enter saves, Esc cancels). Double-click a
   card, chart or list to edit its data in a small panel. The headline toolbar changes its size (A− A+)
   and colour. The headline stays in the standard position; if you drag it, "Reset position" puts it back.
 - **Toolbar over the selection:** Edit, Replace image or Swap Nexi for a photo, Nexi pose, Odoo view,
   Lock, Forward, Backward, Duplicate, Delete. With several selected: align and distribute.
-- **Right-click** for Copy, Paste, Bring to front, Send to back, Lock, Delete.
+- **Right-click** for every option. On an element: edit text, replace image, Nexi pose, Odoo view, prop, text font,
+  size, alignment and colour, size (bigger, smaller, a share of the width), rotate and flip, position on the page,
+  arrange, opacity, paper sheets, lock, hide, cut, copy, paste, duplicate, delete. On the headline: size, colour,
+  alignment and headline accent. On empty canvas: add an element and the whole design (look, accent colour, headline
+  accent, pattern, tint, floor, Odoo badge, layout, format), undo, redo, Save PNG.
 - **Keyboard:** arrows nudge (Shift = 10 px), Delete, Ctrl+D duplicate, Ctrl+C / Ctrl+V (also between drips),
   `]` / `[` forward / backward, Ctrl+Z / Ctrl+Shift+Z undo / redo, Esc deselects. Zoom with − Fit + in the bar.
 - **Design panel:**

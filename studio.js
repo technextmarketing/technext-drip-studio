@@ -297,7 +297,7 @@
       '<button class="btn sm icon" id="undo" title="Undo (Ctrl+Z)" aria-label="Undo">↶</button><button class="btn sm icon" id="redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo">↷</button>' +
       qualitySel('pngq') + '<button class="btn sm primary" id="png">' + dlIcon() + 'Save PNG</button></div>' +
       '<div class="canvas-wrap" id="wrap"><div class="canvas-box" id="box"></div><div class="guides" id="guides"></div><div class="marq" id="marq" hidden></div><div class="tools" id="tools" hidden></div>' +
-      '<span class="hint">Click to select · Shift-click or drag a box to select several · double-click text to type · right-click for more</span></div></div>';
+      '<span class="hint">Click to select · drag to move · corners resize, sides change the width, the round handle rotates · double-click text to type · right-click for every option</span></div></div>';
     drawCanvas(); renderInspector();
   }
   function drawCanvas() {
@@ -320,21 +320,76 @@
   function markSel() {
     $$('#box .sel').forEach(function (n) { n.classList.remove('sel'); });
     $$('#box .hdl').forEach(function (n) { n.remove(); });
-    var els = selEls(); if (!els.length) { $('#tools').hidden = true; return; }
+    var els = selEls(); $('#box').classList.toggle('multi', st.multi.length > 1); if (!els.length) { $('#tools').hidden = true; var hh = $('#hdls'); if (hh) hh.innerHTML = ''; return; }
     els.forEach(function (n) { n.classList.add('sel'); });
     placeTools();
   }
+  /* ---------- v9: Canva-style selection frame ----------
+     One frame per selection, drawn in the overlay (#hdls) so it is never clipped. It is sized from the element's
+     untransformed box and rotated with the element, so the handles sit on the real corners. Corners scale the element
+     (the opposite corner stays put; Alt scales about the centre), the side pills change the width (text reflows) and
+     the round handle below rotates. A badge shows the size or angle while dragging. */
+  var ROT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg>';
+  var FRAME_HTML = '<span class="hdl h-nw" data-h="nw"></span><span class="hdl h-ne" data-h="ne"></span><span class="hdl h-se" data-h="se"></span><span class="hdl h-sw" data-h="sw"></span>' +
+    '<span class="hdl h-w" data-h="w" title="Width (the text reflows)"></span><span class="hdl h-e" data-h="e" title="Width (the text reflows)"></span>' +
+    '<span class="hdl h-rot" data-h="rot" title="Rotate (Shift snaps to 15°)">' + ROT_SVG + '</span><i class="rot-badge" hidden></i>';
+  /* the layer's geometry in canvas px: its own box (ex,ey,ew,eh; transforms pivot on its centre), the box of what it
+     actually draws in its own unrotated, unscaled coordinates (ox,oy = content centre minus box centre; cw,ch), its scale
+     and rotation, and the content centre on the canvas (cx,cy). Content can be bigger or offset from the layer box. */
+  function geomOf(n, L) {
+    var S0 = +$('#box').dataset.s || 1, ew = n.offsetWidth, eh = n.offsetHeight, ex = n.offsetLeft, ey = n.offsetTop, s = (L && L.s) || 1, rot = (L && L.rot) || 0;
+    var keep = n.style.transform; n.style.transform = 'none';
+    var r = n.getBoundingClientRect(), u = { l: r.left, t: r.top, r: r.right, b: r.bottom }, kids = n.querySelectorAll('*');
+    if (r.width < 2 || r.height < 2) u = { l: 1e9, t: 1e9, r: -1e9, b: -1e9 };
+    for (var k = 0; k < kids.length && k < 400; k++) { var q = kids[k].getBoundingClientRect(); if (q.width < 1 || q.height < 1) continue; if (q.left < u.l) u.l = q.left; if (q.top < u.t) u.t = q.top; if (q.right > u.r) u.r = q.right; if (q.bottom > u.b) u.b = q.bottom; }
+    n.style.transform = keep;
+    if (u.r < u.l) u = { l: r.left, t: r.top, r: r.left + ew * S0, b: r.top + eh * S0 };
+    var cw = (u.r - u.l) / S0, ch = (u.b - u.t) / S0, ox = ((u.l + u.r) / 2 - r.left) / S0 - ew / 2, oy = ((u.t + u.b) / 2 - r.top) / S0 - eh / 2;
+    var rad = rot * Math.PI / 180, c = Math.cos(rad), sn = Math.sin(rad), ecx = ex + ew / 2, ecy = ey + eh / 2;
+    return { ex: ex, ey: ey, ew: ew, eh: eh, ecx: ecx, ecy: ecy, ox: ox, oy: oy, cw: cw, ch: ch, s: s, rot: rot,
+      cx: ecx + s * (ox * c - oy * sn), cy: ecy + s * (ox * sn + oy * c), w: cw, h: ch };
+  }
+  /* rotate a local vector by the layer rotation and scale it */
+  function rv(g, x, y, s, rot) { var rad = (rot == null ? g.rot : rot) * Math.PI / 180, c = Math.cos(rad), sn = Math.sin(rad); s = s == null ? g.s : s; return [s * (x * c - y * sn), s * (x * sn + y * c)]; }
+  /* place a layer so its content centre lands on (fx,fy) with scale s and rotation rot */
+  function placeContent(L, n, g, fx, fy, s, rot) { var o = rv(g, g.ox, g.oy, s, rot); putAt(L, n, fx - o[0] - g.ew / 2, fy - o[1] - g.eh / 2, g.eh); }
   function placeHandles() {
     var wrap = $('#wrap'); if (!wrap) return;
     var h = $('#hdls'); if (!h) { h = document.createElement('div'); h.id = 'hdls'; h.className = 'hdls'; wrap.appendChild(h); }
-    h.innerHTML = '';
-    var d = cur(); if (!d || !S.canWrite || editing || st.multi.length > 1 || st.sel === -1) return;
-    var n = selEls()[0], L = st.sel === 'copy' ? null : d.layers[st.sel]; if (!n || (L && (L.type === 'link' || L.lock))) return;
-    var r = n.getBoundingClientRect(), w = wrap.getBoundingClientRect(), x = r.left - w.left, y = r.top - w.top;
-    if (st.sel === 'copy') { h.innerHTML = '<span class="hdl hdl-cw" data-h="cw" style="left:' + (x + r.width - 10) + 'px;top:' + (y + r.height / 2 - 10) + 'px" title="Width"></span>'; return; }
-    h.innerHTML = '<span class="hdl hdl-rot" data-h="rot" style="left:' + (x + r.width / 2 - 10) + 'px;top:' + (y - 46) + 'px" title="Rotate (Shift snaps to 15°)"></span>' +
-      '<span class="hdl hdl-se" data-h="se" style="left:' + (x + r.width - 10) + 'px;top:' + (y + r.height - 10) + 'px" title="Resize (keeps the proportions)"></span>' +
-      (L.w != null && !AUTO[L.type] ? '<span class="hdl hdl-e" data-h="e" style="left:' + (x + r.width - 7) + 'px;top:' + (y + r.height / 2 - 17) + 'px" title="Width (the text reflows)"></span>' : '');
+    var d = cur(), els = selEls();
+    if (!d || !S.canWrite || editing || !els.length) { h.innerHTML = ''; return; }
+    var box = $('#box'), S0 = +box.dataset.s, dr = $('#box .drip').getBoundingClientRect(), wr = wrap.getBoundingClientRect(), ox = dr.left - wr.left, oy = dr.top - wr.top;
+    var f = h.querySelector('.selframe');
+    if (!f) { f = document.createElement('div'); f.className = 'selframe'; h.appendChild(f); }
+    if (st.multi.length > 1) {
+      var U = unionBox(st.multi); f.className = 'selframe multi'; f.innerHTML = '';
+      f.style.cssText = 'left:' + (ox + U.x * S0) + 'px;top:' + (oy + U.y * S0) + 'px;width:' + (U.w * S0) + 'px;height:' + (U.h * S0) + 'px;transform:none';
+      return;
+    }
+    var n = els[0], L = st.sel === 'copy' ? null : d.layers[st.sel];
+    if (L && (L.type === 'link' || L.lock)) { h.innerHTML = ''; return; }
+    var g = geomOf(n, L), cam = L && L.cam && d.cam && d.cam !== 'front';
+    if (st.sel === 'copy') { var cr = n.getBoundingClientRect(); g = { cx: (cr.left + cr.width / 2 - dr.left) / S0, cy: (cr.top + cr.height / 2 - dr.top) / S0, w: cr.width / S0, h: cr.height / S0, s: 1, rot: 0 }; }
+    if (cam) { var r = n.getBoundingClientRect(); g = { cx: (r.left + r.width / 2 - dr.left) / S0, cy: (r.top + r.height / 2 - dr.top) / S0, w: r.width / S0, h: r.height / S0, s: 1, rot: 0 }; }
+    var cls = 'selframe' + (st.sel === 'copy' ? ' copy' : '') + (L && (L.w == null || AUTO[L.type]) ? ' nowidth' : '') + (cam ? ' cam' : '');
+    if (f.className !== cls || !f.firstChild) { f.className = cls; f.innerHTML = FRAME_HTML; }
+    f.style.cssText = 'left:' + (ox + g.cx * S0) + 'px;top:' + (oy + g.cy * S0) + 'px;width:' + (g.w * g.s * S0) + 'px;height:' + (g.h * g.s * S0) + 'px;transform:translate(-50%,-50%) rotate(' + g.rot + 'deg);--rot:' + g.rot + 'deg';
+    setCursors(f, g.rot);
+  }
+  document.addEventListener('load', function (e) { if (st.id && !drag && e.target.closest && e.target.closest('#box')) { clearTimeout(placeHandles.t); placeHandles.t = setTimeout(function () { if (!drag) placeTools(); }, 60); } }, true);
+  if (document.fonts) document.fonts.addEventListener('loadingdone', function () { if (st.id && !drag) placeTools(); });
+  var CUR8 = ['ns-resize', 'nesw-resize', 'ew-resize', 'nwse-resize'];
+  function setCursors(f, rot) {
+    /* a handle's cursor follows the rotated edge it sits on */
+    var base = { n: 0, ne: 45, e: 90, se: 135, s: 180, sw: 225, w: 270, nw: 315 };
+    $$('.hdl', f).forEach(function (hd) { var k = hd.dataset.h; if (!(k in base)) return; var a = ((base[k] + rot) % 180 + 180) % 180; hd.style.cursor = CUR8[Math.round(a / 45) % 4]; });
+  }
+  function sizeBadge(t) { var b = $('#hdls .rot-badge'); if (!b) return; if (t == null) { b.hidden = true; return; } b.hidden = false; b.textContent = t; }
+  /* write a new top-left for a layer and its node (bottom-anchored and 4:5 layers keep their own fields) */
+  function putAt(L, n, x, y, h) {
+    L.x = Math.round(x); n.style.left = L.x + 'px';
+    if (L.b != null) { L.b = Math.round((drag ? drag.H : $('#box .drip').offsetHeight) - (y + h)); n.style.bottom = L.b + 'px'; }
+    else { var ny = Math.round(y); if (drag && drag.tall) L.y45 = ny; else L.y = ny; n.style.top = ny + 'px'; }
   }
   var TEXTY = { pill: 1, chip: 1, note: 1, bubble: 1, text: 1, record: 1, phone: 1, checklist: 1, code: 1, site: 1, serp: 1, gauge: 1, ba: 1, orbit: 1, apps: 1, palette: 1, devices: 1, appflow: 1,
     appcard: 1, qr: 1, doc: 1, product: 1, workorder: 1, ticket: 1, calendar: 1, employee: 1, email: 1, shop: 1, reconcile: 1, approval: 1, sheet: 1, docs: 1, rating: 1, kcard: 1, pyramid: 1, groups: 1, stamp: 1, sticker: 1, ring: 1, avatars: 1, sticky: 1, toggle: 1, button: 1, search: 1, barcode: 1, pin: 1, timer: 1, scanner: 1, prop: 1, window: 1, ophone: 1, graph: 1, kpis: 1, timeline: 1, steps: 1, chat: 1, receipt: 1, notif: 1, stat: 1, route: 1, link: 1 };
@@ -367,7 +422,7 @@
     var left = Math.max(6, Math.min(r.left - w.left + r.width / 2 - t.offsetWidth / 2, w.width - t.offsetWidth - 6));
     t.style.top = top + 'px'; t.style.left = left + 'px';
   }
-  function unionRect(els) { var a = { left: 1e9, top: 1e9, right: -1e9, bottom: -1e9 }; els.forEach(function (n) { var r = n.getBoundingClientRect(); a.left = Math.min(a.left, r.left); a.top = Math.min(a.top, r.top); a.right = Math.max(a.right, r.right); a.bottom = Math.max(a.bottom, r.bottom); }); a.width = a.right - a.left; a.height = a.bottom - a.top; return a; }
+  function unionRect(els) { var a = { left: 1e9, top: 1e9, right: -1e9, bottom: -1e9 }; els.forEach(function (n) { var r = visRect(n); a.left = Math.min(a.left, r.left); a.top = Math.min(a.top, r.top); a.right = Math.max(a.right, r.right); a.bottom = Math.max(a.bottom, r.bottom); }); a.width = a.right - a.left; a.height = a.bottom - a.top; return a; }
   function select(i, add) {
     closePop(); closeMenu();
     if (add && i !== 'copy' && i > -1) {
@@ -381,9 +436,11 @@
   /* ---------- pointer: move, resize, rotate, marquee, smart guides ---------- */
   var drag = null, editing = null;
   function tf(L) { var d = cur(), camT = L.cam && R.CAM[d.cam] ? R.CAM[d.cam] + ' ' : ''; return (L.rot || L.flip || L.s || camT) ? camT + 'rotate(' + (L.rot || 0) + 'deg)' + (L.flip ? ' scaleX(-1)' : '') + (L.s ? ' scale(' + L.s + ')' : '') : ''; }
-  function boxOf(n) { var s = +$('#box').dataset.s, dr = $('#box .drip').getBoundingClientRect(), r = n.getBoundingClientRect(); return { x: (r.left - dr.left) / s, y: (r.top - dr.top) / s, w: r.width / s, h: r.height / s }; }
+  function visRect(n) { var r = n.getBoundingClientRect(), u = { left: r.left, top: r.top, right: r.right, bottom: r.bottom }, kids = n.querySelectorAll('*'); if (r.width < 2 || r.height < 2) u = { left: 1e9, top: 1e9, right: -1e9, bottom: -1e9 }; for (var k = 0; k < kids.length && k < 400; k++) { var q = kids[k].getBoundingClientRect(); if (q.width < 1 || q.height < 1) continue; if (q.left < u.left) u.left = q.left; if (q.top < u.top) u.top = q.top; if (q.right > u.right) u.right = q.right; if (q.bottom > u.bottom) u.bottom = q.bottom; } if (u.right < u.left) u = { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; u.width = u.right - u.left; u.height = u.bottom - u.top; return u; }
+  function boxOf(n) { var s = +$('#box').dataset.s, dr = $('#box .drip').getBoundingClientRect(), r = visRect(n); return { x: (r.left - dr.left) / s, y: (r.top - dr.top) / s, w: r.width / s, h: r.height / s }; }
   function toCanvas(e) { var s = +$('#box').dataset.s, dr = $('#box .drip').getBoundingClientRect(); return [(e.clientX - dr.left) / s, (e.clientY - dr.top) / s]; }
   document.addEventListener('pointerdown', function (e) {
+    if (e.target.closest && e.target.closest('#ctx')) return;
     closeMenu();
     if (!st.id || !S.canWrite || e.button !== 0) return;
     if (editing && e.target.closest('[contenteditable]')) return;
@@ -406,16 +463,16 @@
     var inMulti = st.multi.indexOf(i) > -1;
     if (!inMulti && st.sel !== i) select(i);
     var ids = inMulti ? st.multi.slice() : [i];
-    drag = { mode: hdl ? hdl.dataset.h : 'move', i: i, ids: ids, s: s, H: H, x0: e.clientX, y0: e.clientY, moved: false, tall: d.format === '4:5', start: {} };
+    drag = { mode: hdl ? (i === 'copy' && /^(e|w)$/.test(hdl.dataset.h) ? 'cw' : hdl.dataset.h) : 'move', i: i, ids: ids, s: s, H: H, x0: e.clientX, y0: e.clientY, moved: false, tall: d.format === '4:5', start: {}, p0: toCanvas(e), cwLeft: !!(hdl && i === 'copy' && hdl.dataset.h === 'w') };
     if (i === 'copy') {
       var c = d.copy || {}, cn = $('#box .d-copy');
       drag.copy0 = { x: c.x != null ? c.x : cn.offsetLeft, y: c.x != null ? (c.y || 0) : cn.offsetTop - (drag.tall ? 40 : 0), w: c.w || cn.offsetWidth }; drag.n = cn; drag.box0 = boxOf(cn);
     } else {
       ids.forEach(function (k) { var L = d.layers[k], ln = $('#box .L[data-i="' + k + '"]'); drag.start[k] = { x: L.x || 0, y: drag.tall ? parseFloat(ln.style.top) || 0 : L.y || 0, b: L.b, x1: L.x1, y1: L.y1, x2: L.x2, y2: L.y2, n: ln }; });
       var L0 = d.layers[i]; drag.n = selEls().filter(function (x) { return +x.dataset.i === i; })[0] || n;
-      drag.w0 = L0.w || drag.n.offsetWidth; drag.h0 = drag.n.offsetHeight; drag.s0 = L0.s || 1; drag.box0 = unionBox(ids);
+      drag.w0 = L0.w || drag.n.offsetWidth; drag.h0 = drag.n.offsetHeight; drag.s0 = L0.s || 1; drag.box0 = unionBox(ids); drag.g0 = geomOf(drag.n, L0);
       ids.forEach(function (k) { if (drag.start[k].n) drag.start[k].n.classList.add('lift'); });
-      var r = drag.n.getBoundingClientRect(); drag.cx = r.left + r.width / 2; drag.cy = r.top + r.height / 2;
+      var r = drag.n.getBoundingClientRect(), dr0 = $('#box .drip').getBoundingClientRect(); drag.cx = r.left + r.width / 2; drag.cy = r.top + r.height / 2; if (drag.g0) { drag.cx = dr0.left + drag.g0.cx * s; drag.cy = dr0.top + drag.g0.cy * s; }
     }
     drag.others = $$('#box .L').filter(function (x) { return ids.indexOf(+x.dataset.i) < 0 && !x.classList.contains('L-glow') && !x.classList.contains('L-link') && !x.classList.contains('fx'); }).map(boxOf);
     if (i !== 'copy') drag.others.push(boxOf($('#box .d-copy')));
@@ -433,13 +490,13 @@
       drag.rect = { x: x, y: y, x1: x + w, y1: y + h }; return;
     }
     var dx = (e.clientX - drag.x0) / drag.s, dy = (e.clientY - drag.y0) / drag.s;
-    if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 2) return;
+    if (!drag.moved && Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 4) return;
     if (!drag.moved) { snapshot(); drag.moved = true; }
     var fast = drag.lx != null && Math.hypot(e.clientX - drag.lx, e.clientY - drag.ly) / drag.s > 16; drag.lx = e.clientX; drag.ly = e.clientY;
     var d = cur();
     if (drag.i === 'copy') {
       d.copy = d.copy || {};
-      if (drag.mode === 'cw') { d.copy.x = drag.copy0.x; d.copy.y = drag.copy0.y; d.copy.w = Math.max(160, Math.round(drag.copy0.w + dx)); if (!d.copy.align) d.copy.align = 'center'; drag.n.style.width = d.copy.w + 'px'; return; }
+      if (drag.mode === 'cw') { var cdir = drag.cwLeft ? -1 : 1, nw2 = Math.max(160, Math.round(drag.copy0.w + dx * cdir)); d.copy.x = drag.cwLeft ? Math.round(drag.copy0.x + drag.copy0.w - nw2) : drag.copy0.x; d.copy.y = drag.copy0.y; d.copy.w = nw2; if (!d.copy.align) d.copy.align = 'center'; drag.n.style.left = d.copy.x + 'px'; drag.n.style.right = 'auto'; drag.n.style.width = d.copy.w + 'px'; placeHandles(); sizeBadge(nw2 + ' px wide'); return; }
       var g = snap(drag.box0, dx, dy, drag.H, drag.others, e.altKey || fast); showGuides(g.lines);
       d.copy.x = Math.round(drag.copy0.x + g.dx); d.copy.y = Math.round(drag.copy0.y + g.dy); d.copy.w = drag.copy0.w; if (!d.copy.align) d.copy.align = 'center';
       drag.n.style.left = d.copy.x + 'px'; drag.n.style.right = 'auto'; drag.n.style.width = d.copy.w + 'px'; drag.n.style.top = (d.copy.y + (drag.tall ? 40 : 0)) + 'px'; return;
@@ -454,30 +511,40 @@
         if (s0.b != null) { M.b = Math.round(s0.b - dy); s0.n.style.bottom = M.b + 'px'; }
         else { var ny = Math.round(s0.y + dy); if (drag.tall) M.y45 = ny; else M.y = ny; s0.n.style.top = ny + 'px'; }
       });
-    } else if (drag.mode === 'se') {
-      /* the corner scales the element as a whole and keeps its top-left corner in place */
-      var a = (L.rot || 0) * Math.PI / 180, along = dx * Math.cos(a) + dy * Math.sin(a), st0 = drag.start[drag.i];
-      var s1 = Math.max(.2, Math.min(4, Math.round((drag.w0 * drag.s0 + along) / drag.w0 * 1000) / 1000));
-      L.s = s1 === 1 ? undefined : s1;
-      L.x = Math.round(st0.x + drag.w0 * (s1 - drag.s0) / 2); drag.n.style.left = L.x + 'px';
-      if (st0.b == null) { var ny2 = Math.round(st0.y + drag.h0 * (s1 - drag.s0) / 2); if (drag.tall) L.y45 = ny2; else L.y = ny2; drag.n.style.top = ny2 + 'px'; }
-      drag.n.style.transform = tf(L); drag.n.style.setProperty('--ls', s1);
-    } else if (drag.mode === 'e') {
-      /* the side handle changes the width; the text inside reflows */
-      var a2 = (L.rot || 0) * Math.PI / 180, along2 = dx * Math.cos(a2) + dy * Math.sin(a2), st1 = drag.start[drag.i], w1 = Math.max(40, Math.round(drag.w0 + along2 / drag.s0));
-      L.w = w1; L.x = Math.round(st1.x + (drag.w0 - w1) * (1 - drag.s0) / 2); drag.n.style.width = w1 + 'px'; drag.n.style.left = L.x + 'px';
+    } else if (/^(nw|ne|se|sw)$/.test(drag.mode)) {
+      /* a corner scales the element as a whole, like Canva: the opposite corner stays put (Alt: scale about the centre) */
+      var g = drag.g0, p = toCanvas(e), kx = drag.mode.indexOf('e') > -1 ? -1 : 1, ky = drag.mode.indexOf('s') > -1 ? -1 : 1;
+      var av = rv(g, kx * g.cw / 2, ky * g.ch / 2), ax = e.altKey ? g.cx : g.cx + av[0], ay = e.altKey ? g.cy : g.cy + av[1];
+      var d0 = Math.hypot(drag.p0[0] - ax, drag.p0[1] - ay) || 1, d1 = Math.hypot(p[0] - ax, p[1] - ay);
+      var s1 = Math.max(.15, Math.min(5, Math.round(g.s * d1 / d0 * 1000) / 1000));
+      L.s = s1 === 1 ? undefined : s1; drag.n.style.transform = tf(L);
+      placeContent(L, drag.n, g, ax + (g.cx - ax) * s1 / g.s, ay + (g.cy - ay) * s1 / g.s, s1);
+      sizeBadge(Math.round(g.cw * s1) + ' × ' + Math.round(g.ch * s1) + (s1 !== 1 ? ' · ' + Math.round(s1 * 100) + '%' : ''));
+    } else if (drag.mode === 'e' || drag.mode === 'w') {
+      /* a side changes the width and the text reflows; the opposite side and the top edge stay put */
+      var g2 = drag.g0, p2 = toCanvas(e), dir = drag.mode === 'e' ? 1 : -1, ux = rv(g2, 1, 0, 1);
+      var along = ((p2[0] - drag.p0[0]) * ux[0] + (p2[1] - drag.p0[1]) * ux[1]) * dir, w1 = Math.max(40, Math.round(g2.ew + along / g2.s));
+      L.w = w1; drag.n.style.width = w1 + 'px';
+      var g3 = geomOf(drag.n, L), fv = rv(g2, -dir * g2.cw / 2, -g2.ch / 2), F = [g2.cx + fv[0], g2.cy + fv[1]], nv = rv(g3, -dir * g3.cw / 2, -g3.ch / 2);
+      placeContent(L, drag.n, g3, F[0] - nv[0], F[1] - nv[1]);
+      sizeBadge(Math.round(g3.cw * g2.s) + ' px wide');
     } else if (drag.mode === 'rot') {
-      var ang = Math.atan2(e.clientY - drag.cy, e.clientX - drag.cx) * 180 / Math.PI + 90;
-      if (ang > 180) ang -= 360;
-      ang = e.shiftKey ? Math.round(ang / 15) * 15 : Math.abs(ang) < 3 ? 0 : Math.round(ang * 2) / 2;
+      /* the handle hangs below the element, so straight down is 0° */
+      var ang = Math.atan2(e.clientY - drag.cy, e.clientX - drag.cx) * 180 / Math.PI - 90;
+      if (ang > 180) ang -= 360; if (ang <= -180) ang += 360;
+      if (e.shiftKey) ang = Math.round(ang / 15) * 15;
+      else { var near = Math.round(ang / 90) * 90; ang = Math.abs(ang - near) < 4 ? near : Math.round(ang * 2) / 2; }
+      if (ang === 180) ang = -180;
       L.rot = ang || undefined; drag.n.style.transform = tf(L);
+      if (drag.g0 && (Math.abs(drag.g0.ox) > 1 || Math.abs(drag.g0.oy) > 1)) placeContent(L, drag.n, drag.g0, drag.g0.cx, drag.g0.cy, drag.g0.s, ang);
+      sizeBadge((ang > 0 ? '+' : '') + ang + '°');
     }
     syncXY(); placeHandles();
   }
   document.addEventListener('pointermove', function (e) { if (!drag) return; drag.ev = e; if (drag.raf) return; drag.raf = requestAnimationFrame(function () { var dr = drag; if (!dr) return; dr.raf = 0; onMove(dr.ev); }); });
   document.addEventListener('pointerup', function () {
     if (!drag) return;
-    $('#box').classList.remove('dragging'); showGuides([]);
+    $('#box').classList.remove('dragging'); showGuides([]); sizeBadge(null);
     var dd = drag; drag = null;
     if (dd.mode === 'marq') {
       $('#marq').hidden = true;
@@ -635,25 +702,184 @@
   }
   function closePop() { var p = $('#pop'); if (!p) return; p.remove(); editing = null; renderInspector(); placeTools(); }
 
-  /* ---------- context menu ---------- */
+  /* ---------- v9: context menu with everything for the element, the text and the design ----------
+     Right-click an element, the headline or the empty canvas. Items with a › open a submenu on hover (or on tap). */
+  function mi(label, act, v, o) { o = o || {}; return { label: label, act: act, v: v, on: o.on, danger: o.danger, k: o.k, sw: o.sw }; }
+  function sub(label, items) { items = (items || []).filter(Boolean); return items.length ? { label: label, sub: items } : null; }
+  var SEP = { sep: true };
+  function cap(x) { x = String(x || ''); return x.charAt(0).toUpperCase() + x.slice(1); }
+  var STACKY = { doc: 1, appcard: 1, record: 1, product: 1, workorder: 1, ticket: 1, calendar: 1, employee: 1, email: 1, shop: 1, reconcile: 1, approval: 1, sheet: 1, docs: 1, rating: 1, kcard: 1, pyramid: 1, groups: 1, checklist: 1, graph: 1, kpis: 1, timeline: 1, chat: 1, receipt: 1, notif: 1, stat: 1, phone: 1, window: 1, flow: 1 };
+  var PAGE_POS = [['l', 'Left edge'], ['c', 'Centre'], ['r', 'Right edge'], ['t', 'Under the subline'], ['m', 'Middle'], ['b', 'Bottom edge'], ['cc', 'Centre of the visual']];
+  var ARRANGE = [mi('Bring to front', 'top'), mi('Bring forward', 'front', null, { k: ']' }), mi('Send backward', 'back', null, { k: '[' }), mi('Send to back', 'bottom')];
+  function clipItems() { return [mi('Cut', 'cut', null, { k: 'Ctrl+X' }), mi('Copy', 'copy', null, { k: 'Ctrl+C' }), mi('Paste', 'paste', null, { k: 'Ctrl+V' }), mi('Duplicate', 'dup', null, { k: 'Ctrl+D' })]; }
+  function designItems(d) {
+    var c = d.copy || {};
+    return [
+      sub('Look', SP.LOOKS.map(function (x) { return mi(LOOKLAB[x], 'look', x, { on: (d.look || 'clean') === x }); })),
+      sub('Accent colour', SP.ACCENTS.map(function (x) { return mi(cap(x), 'acc', x, { on: (d.accent || 'blue') === x, sw: ACCC[x] }); })),
+      sub('Headline accent', SP.DECORS.map(function (x) { return mi(DECLAB[x], 'decor', x, { on: (c.decor || 'none') === x }); })),
+      sub('Background pattern', [mi('None', 'pattern', '', { on: !d.pattern })].concat(SP.PATTERNS.map(function (x) { return mi(PATLAB[x], 'pattern', x, { on: d.pattern === x }); }))),
+      sub('Tint', [mi('White', 'tint', '', { on: !d.tint })].concat(SP.TINTS.map(function (x) { return mi(cap(x), 'tint', x, { on: d.tint === x }); }))),
+      sub('Floor', [['', 'Clean'], ['haze', 'Soft blue floor'], ['blobs', 'Blue shapes']].map(function (x) { var g = d.ground == null ? 'blobs' : String(d.ground); return mi(x[1], 'ground', x[0], { on: g === x[0] || (x[0] === 'blobs' && g.indexOf('blobs') === 0) }); })),
+      sub('Odoo badge', [['ready', 'Odoo Ready Partner'], ['o20', 'Meet Odoo 20'], ['', 'None']].map(function (x) { var b = d.brand ? (d.brand.badge === 'none' ? '' : d.brand.badge || 'ready') : d.badge == null ? 'ready' : d.badge; return mi(x[1], 'badge', x[0], { on: b === x[0] }); })),
+      d.post ? sub('Layout', [SP.canMirror(d.visual) ? mi('Mirror', 'mirror', null, { on: !!d.mirror }) : null, SP.hasVariants(d.visual) ? mi('Other arrangement', 'variant') : null, mi('Reset layout', 'relayout'), mi('Fresh design', 'fresh')]) : null,
+      sub('Format', [mi('Square 1:1', 'fmt', '1:1', { on: (d.format || '1:1') === '1:1' }), mi('Portrait 4:5', 'fmt', '4:5', { on: d.format === '4:5' })])
+    ];
+  }
+  var ADD_QUICK = [['pill', 'Pill'], ['chip', 'Chip'], ['note', 'Note'], ['bubble', 'Bubble'], ['text', 'Text'], ['sticker', 'Sticker'], ['stamp', 'Stamp'], ['sticky', 'Sticky note'], ['arrow', 'Arrow'], ['scribble', 'Scribble'], ['prop', 'Prop'], ['nexi', 'Nexi'], ['person', 'Photo'], ['doc', 'Odoo document'], ['record', 'Record card'], ['appcard', 'Odoo card'], ['graph', 'Chart'], ['stat', 'Big number'], ['sparkles', 'Sparkles']];
+  function ctxItems(i, L, d) {
+    var it;
+    if (i === -1) {
+      it = [mi('Paste', 'paste', null, { k: 'Ctrl+V' }), mi('Select all', 'selall', null, { k: 'Ctrl+A' }),
+        sub('Add element', ADD_QUICK.map(function (x) { return mi(x[1], 'add', x[0]); })), SEP]
+        .concat(designItems(d))
+        .concat([SEP, mi('Undo', 'undo', null, { k: 'Ctrl+Z' }), mi('Redo', 'redo', null, { k: 'Ctrl+Shift+Z' }), mi('Save PNG', 'png')]);
+      return it.filter(Boolean);
+    }
+    if (i === 'copy') {
+      var c = d.copy || {};
+      it = [mi('Edit headline…', 'edit', null, { k: 'Enter' }), SEP,
+        sub('Text size', [mi('Bigger', 'fs', 4), mi('Smaller', 'fs', -4)]),
+        sub('Colour', [['#1F1F3D', 'Ink'], ['#3167CA', 'Blue'], ['#FFFFFF', 'White']].map(function (x) { return mi(x[1], 'color', x[0], { on: (c.color || '#1F1F3D').toUpperCase() === x[0], sw: x[0] }); })),
+        sub('Align', [mi('Left', 'calign', 'left', { on: c.align === 'left' }), mi('Centre', 'calign', 'center', { on: !c.align || c.align === 'center' })]),
+        sub('Headline accent', SP.DECORS.map(function (x) { return mi(DECLAB[x], 'decor', x, { on: (c.decor || 'none') === x }); })),
+        c.x != null || c.fs != null || c.color ? mi('Reset to the standard headline', 'stdframe') : null,
+        SEP, mi('Paste', 'paste', null, { k: 'Ctrl+V' })];
+      return it.filter(Boolean);
+    }
+    if (st.multi.length > 1) {
+      it = [mi(st.multi.length + ' elements selected'), SEP,
+        sub('Align', [['l', 'Left'], ['c', 'Centre'], ['r', 'Right'], ['t', 'Top'], ['m', 'Middle'], ['b', 'Bottom']].map(function (x) { return mi(x[1], 'align', x[0]); })),
+        sub('Distribute', [mi('Across', 'dist', 'h'), mi('Down', 'dist', 'v')]),
+        sub('Position on page', PAGE_POS.map(function (x) { return mi(x[1], 'page', x[0]); })),
+        sub('Arrange', ARRANGE),
+        sub('Size', [mi('Bigger', 'scale', 1.1), mi('Smaller', 'scale', 1 / 1.1), mi('Reset size', 'scale', 0)]),
+        sub('Rotate', [mi('Rotate left 15°', 'rot', -15), mi('Rotate right 15°', 'rot', 15), mi('Straighten', 'rot', 0)]),
+        mi('Lock', 'lock'), SEP].concat(clipItems()).concat([SEP, mi('Delete', 'del', null, { danger: true, k: 'Del' })]);
+      return it.filter(Boolean);
+    }
+    var canW = L.w != null && !AUTO[L.type], texty = L.type === 'text' || L.type === 'note';
+    it = [TEXTY[L.type] && popSpec(L) ? mi(L.type === 'text' ? 'Edit text…' : 'Edit text and data…', 'edit', null, { k: 'Enter' }) : null,
+      IMAGEY[L.type] ? mi(L.type === 'nexi' ? 'Swap Nexi for a photo…' : 'Replace image…', 'image') : null,
+      L.type === 'nexi' ? sub('Nexi pose', POSES.map(function (p) { return mi(cap(p), 'pose', p, { on: (L.pose || 'wave') === p }); })) : null,
+      L.type === 'window' || L.type === 'ophone' ? sub('Odoo view', VIEWS.map(function (v) { return mi(v, 'view', v, { on: L.view === v }); })) : L.type === 'appcard' ? sub('Odoo view', CARD_VIEWS.map(function (v) { return mi(v, 'view', v, { on: (L.view || 'kanban') === v }); })) : null,
+      L.type === 'prop' ? sub('Prop', ((window.TNProps || {}).names || []).map(function (p) { return mi(p, 'prop', p, { on: L.name === p }); })) : null,
+      L.type === 'prop' ? mi(L.tile ? 'Without the white tile' : 'On a white tile', 'tile', null, { on: !!L.tile }) : null,
+      texty ? sub('Text', [
+        L.type === 'text' ? sub('Font', [['hand', 'Handwriting'], ['display', 'Display'], ['body', 'Body']].map(function (x) { return mi(x[1], 'font', x[0], { on: (L.font || 'display') === x[0] }); })) : null,
+        sub('Text size', [mi('Bigger', 'tsize', 1.15), mi('Smaller', 'tsize', 1 / 1.15)]),
+        L.type === 'text' ? sub('Align', [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']].map(function (x) { return mi(x[1], 'talign', x[0], { on: (L.align || 'left') === x[0] }); })) : null,
+        sub('Colour', [['', 'Default'], ['#1F1F3D', 'Ink'], ['#3167CA', 'Blue'], ['#FFFFFF', 'White'], ['#E5534B', 'Coral'], ['#21B799', 'Teal'], ['#714B67', 'Purple'], ['#FFC83D', 'Yellow']].map(function (x) { return mi(x[1], 'tcolor', x[0], { on: (L.color || '') === x[0], sw: x[0] || null }); }))
+      ]) : null,
+      SEP,
+      sub('Size', [mi('Bigger', 'scale', 1.1), mi('Smaller', 'scale', 1 / 1.1), mi('Reset size', 'scale', 0, { on: !L.s })].concat(canW ? [SEP].concat([25, 33, 50, 66, 80, 92].map(function (p) { return mi(p + '% of the width', 'width', p); })) : [])),
+      sub('Rotate', [mi('Rotate left 15°', 'rot', -15), mi('Rotate right 15°', 'rot', 15), mi('Straighten', 'rot', 0, { on: !L.rot }), SEP, mi('Flip horizontally', 'flip', null, { on: !!L.flip })]),
+      sub('Position on page', PAGE_POS.map(function (x) { return mi(x[1], 'page', x[0]); })),
+      sub('Arrange', ARRANGE),
+      sub('Opacity', [100, 75, 50, 25].map(function (p) { return mi(p + '%', 'op', p / 100, { on: Math.round((L.op == null ? 1 : L.op) * 100) === p }); })),
+      STACKY[L.type] ? sub('Paper sheets behind', [0, 1, 2].map(function (k) { return mi(k === 0 ? 'None' : k === 1 ? 'One sheet' : 'Two sheets', 'stack', k, { on: (L.stack || 0) === k }); })) : null,
+      SEP, mi(L.lock ? 'Unlock' : 'Lock', 'lock', null, { on: !!L.lock }), mi(L.hide ? 'Show' : 'Hide', 'hide'),
+      d.cam && d.cam !== 'front' ? mi(L.cam ? 'Stop following the camera' : 'Follow the camera angle', 'cam') : null,
+      SEP].concat(clipItems()).concat([SEP, mi('Delete', 'del', null, { danger: true, k: 'Del' })]);
+    return it.filter(Boolean);
+  }
+  function renderMenu(items) {
+    return items.map(function (x) {
+      if (!x) return '';
+      if (x.sep) return '<hr>';
+      if (x.sub) return '<div class="it sub"><button type="button" class="lab">' + esc(x.label) + '<span class="arr">›</span></button><div class="ctx-sub">' + renderMenu(x.sub) + '</div></div>';
+      if (!x.act) return '<div class="it head">' + esc(x.label) + '</div>';
+      return '<button type="button" class="it' + (x.on ? ' on' : '') + (x.danger ? ' danger' : '') + '" data-ctx="' + x.act + '"' + (x.v != null ? ' data-v="' + esc(String(x.v)) + '"' : '') + '>' +
+        (x.sw ? '<i class="sw" style="--sw:' + esc(x.sw) + '"></i>' : '') + '<span>' + esc(x.label) + '</span>' + (x.k ? '<kbd>' + esc(x.k) + '</kbd>' : '') + '</button>';
+    }).join('');
+  }
   document.addEventListener('contextmenu', function (e) {
-    var n = e.target.closest && e.target.closest('#box .L, #box .d-copy, #box'); if (!n || !st.id || !S.canWrite) return;
+    var n = e.target.closest && e.target.closest('#box .L, #box .d-copy, #box, #hdls .hdl'); if (!n || !st.id || !S.canWrite) return;
     e.preventDefault();
-    var i = n.classList.contains('d-copy') ? 'copy' : n.classList.contains('L') ? +n.dataset.i : -1;
+    var i = n.classList.contains('hdl') ? st.sel : n.classList.contains('d-copy') ? 'copy' : n.classList.contains('L') ? +n.dataset.i : -1;
     if (i !== -1 && st.multi.indexOf(i) < 0 && st.sel !== i) select(i);
-    var L = typeof i === 'number' && i > -1 ? cur().layers[i] : null;
-    var items = i === -1 ? [['paste', 'Paste'], ['selall', 'Select all']] : i === 'copy' ? [['edit', 'Edit headline'], ['paste', 'Paste']] :
-      [['edit', 'Edit text'], ['dup', 'Duplicate'], ['copy', 'Copy'], ['paste', 'Paste'], ['top', 'Bring to front'], ['bottom', 'Send to back'], ['lock', L && L.lock ? 'Unlock' : 'Lock']].concat(cur().cam && cur().cam !== 'front' ? [['cam', L && L.cam ? 'Stop following the camera' : 'Follow the camera angle']] : []).concat([['del', 'Delete']]);
-    var m = $('#ctx'); m.innerHTML = items.map(function (x) { return '<button data-ctx="' + x[0] + '"' + (x[0] === 'del' ? ' class="danger"' : '') + '>' + esc(x[1]) + '</button>'; }).join('');
-    m.hidden = false; m.style.left = Math.min(e.clientX, innerWidth - 220) + 'px'; m.style.top = Math.min(e.clientY, innerHeight - m.offsetHeight - 8) + 'px';
+    var d = cur(), L = typeof i === 'number' && i > -1 ? d.layers[i] : null;
+    openMenu(ctxItems(i, L, d), e.clientX, e.clientY);
   });
-  function closeMenu() { var m = $('#ctx'); if (m) m.hidden = true; }
-  function ctxAct(a) {
+  function openMenu(items, x, y) {
+    var m = $('#ctx'); if (!m) { m = document.createElement('div'); m.id = 'ctx'; m.className = 'ctx'; document.body.appendChild(m); }
+    m.innerHTML = renderMenu(items); m.hidden = false; m.classList.remove('flip');
+    var W0 = m.offsetWidth, H0 = m.offsetHeight;
+    m.style.left = Math.max(4, Math.min(x, innerWidth - W0 - 8)) + 'px'; m.style.top = Math.max(4, Math.min(y, innerHeight - H0 - 8)) + 'px';
+    if (x + W0 + 240 > innerWidth) m.classList.add('flip');
+    $$('.it.sub', m).forEach(function (s) {
+      s.addEventListener('mouseenter', function () { var sm = $('.ctx-sub', s); sm.classList.remove('up'); var r = sm.getBoundingClientRect(); if (r.bottom > innerHeight - 8) sm.classList.add('up'); });
+    });
+  }
+  function closeMenu() { var m = $('#ctx'); if (m) { m.hidden = true; $$('.it.sub.open', m).forEach(function (s) { s.classList.remove('open'); }); } }
+  function scaleLayer(L, f) { var s1 = f === 0 ? 1 : Math.max(.15, Math.min(5, Math.round((L.s || 1) * f * 1000) / 1000)); L.s = s1 === 1 ? undefined : s1; }
+  function setWidthPct(L, dd, pct) {
+    var n = $('#box .L[data-i="' + dd.layers.indexOf(L) + '"]'); if (!n || L.w == null || AUTO[L.type]) return;
+    var g = geomOf(n, L), w1 = Math.max(40, Math.round(1080 * pct / 100 / g.s)); L.x = Math.round(g.cx - w1 / 2); L.w = w1;
+  }
+  function pagePos(k) {
+    var ids = st.multi.length ? st.multi.slice() : st.sel > -1 && st.sel !== 'copy' ? [st.sel] : []; if (!ids.length) return;
+    var H = $('#box .drip').offsetHeight, cb = $('#box .d-copy'), T = cb ? cb.offsetTop + cb.offsetHeight + 24 : 440, B = H - 36, U = unionBox(ids);
+    change(function (dd) {
+      var dx = 0, dy = 0;
+      if (k === 'l') dx = 64 - U.x; if (k === 'r') dx = 1016 - (U.x + U.w); if (k === 'c' || k === 'cc') dx = 540 - (U.x + U.w / 2);
+      if (k === 't') dy = T - U.y; if (k === 'b') dy = B - (U.y + U.h); if (k === 'm' || k === 'cc') dy = (T + B) / 2 - (U.y + U.h / 2);
+      ids.forEach(function (i) { moveBy(dd.layers[i], dx, dy, dd); });
+    }, { now: true, insp: true });
+  }
+  function ctxAct(a, v) {
     closeMenu();
-    if (a === 'edit') openPop(); else if (a === 'dup') layerAct('dup'); else if (a === 'del') layerAct('del'); else if (a === 'copy') copyLayers(); else if (a === 'paste') pasteLayers();
-    else if (a === 'top' || a === 'bottom') change(function (d) { var zs0 = zs(), L = d.layers[st.sel]; L.z = a === 'top' ? Math.max.apply(null, zs0) + 1 : Math.max(0, Math.min.apply(null, zs0) - 1); }, { now: true, insp: true });
-    else if (a === 'lock') layerAct('lock'); else if (a === 'cam') change(function (d) { var L = d.layers[st.sel]; L.cam = !L.cam || undefined; }, { now: true, insp: true });
-    else if (a === 'selall') { st.multi = cur().layers.map(function (L, i) { return L.lock || L.type === 'glow' ? -1 : i; }).filter(function (i) { return i > -1; }); st.sel = st.multi[st.multi.length - 1]; if (st.multi.length < 2) st.multi = []; markSel(); renderInspector(); }
+    var d = cur(); if (!d) return;
+    var ids = st.multi.length ? st.multi.slice() : st.sel > -1 && st.sel !== 'copy' ? [st.sel] : [];
+    var each = function (fn) { if (!ids.length) return; change(function (dd) { ids.forEach(function (k) { if (dd.layers[k]) fn(dd.layers[k], dd); }); }, { now: true, insp: true }); };
+    switch (a) {
+      case 'edit': openPop(); break;
+      case 'image': pickImage(); break;
+      case 'add': addLayer(v, v === 'nexi' ? { pose: 'wave' } : null); break;
+      case 'dup': case 'del': case 'lock': case 'hide': case 'front': case 'back': layerAct(a); break;
+      case 'copy': copyLayers(); break;
+      case 'cut': copyLayers(); layerAct('del'); break;
+      case 'paste': pasteLayers(); break;
+      case 'top': case 'bottom': change(function (dd) { var all = zs(); ids.forEach(function (k, n) { dd.layers[k].z = a === 'top' ? Math.max.apply(null, all) + 1 + n : Math.max(0, Math.min.apply(null, all) - 1 - n); }); }, { now: true, insp: true }); break;
+      case 'selall': st.multi = d.layers.map(function (L, i) { return L.lock || L.type === 'glow' ? -1 : i; }).filter(function (i) { return i > -1; }); st.sel = st.multi.length ? st.multi[st.multi.length - 1] : -1; if (st.multi.length < 2) st.multi = []; markSel(); renderInspector(); break;
+      case 'cam': each(function (L) { L.cam = !L.cam || undefined; }); break;
+      case 'pose': each(function (L) { L.pose = v; }); break;
+      case 'view': each(function (L) { L.view = v; }); break;
+      case 'prop': each(function (L) { L.name = v; }); break;
+      case 'tile': each(function (L) { L.tile = !L.tile || undefined; }); break;
+      case 'font': each(function (L) { L.font = v; }); break;
+      case 'talign': each(function (L) { L.align = v; }); break;
+      case 'tcolor': each(function (L) { if (v) L.color = v; else delete L.color; }); break;
+      case 'tsize': each(function (L) { var base = L.size || (L.type === 'note' ? 44 : 40); L.size = Math.max(10, Math.min(200, Math.round(base * +v))); }); break;
+      case 'scale': each(function (L) { scaleLayer(L, +v); }); break;
+      case 'width': each(function (L, dd) { setWidthPct(L, dd, +v); }); break;
+      case 'rot': each(function (L) { var r = +v === 0 ? 0 : (L.rot || 0) + +v; r = ((r + 180) % 360 + 360) % 360 - 180; L.rot = r || undefined; }); break;
+      case 'flip': each(function (L) { L.flip = !L.flip || undefined; }); break;
+      case 'op': each(function (L) { L.op = +v === 1 ? undefined : +v; }); break;
+      case 'stack': each(function (L) { L.stack = +v || undefined; }); break;
+      case 'page': pagePos(v); break;
+      case 'align': doAlign(v); break;
+      case 'dist': doDist(v); break;
+      case 'fs': change(function (dd) { dd.copy = dd.copy || {}; var hd = $('#box .d-head'), base = dd.copy.fs || (hd ? parseFloat(getComputedStyle(hd).fontSize) : 80); dd.copy.fs = Math.max(32, Math.min(140, Math.round(base + +v))); dd.copy.subFs = Math.max(18, Math.round((dd.copy.subFs || 29) + (+v) / 4)); }, { now: true, insp: true }); break;
+      case 'color': change(function (dd) { dd.copy = dd.copy || {}; dd.copy.color = v === '#1F1F3D' ? undefined : v; }, { now: true }); break;
+      case 'calign': change(function (dd) { var c = dd.copy = dd.copy || {}, cn = $('#box .d-copy'); if (c.x == null && cn) { c.x = cn.offsetLeft; c.y = cn.offsetTop - (dd.format === '4:5' ? 40 : 0); c.w = cn.offsetWidth; } c.align = v; }, { now: true }); break;
+      case 'stdframe': change(function (dd) { stdFrame(dd); }, { now: true, insp: true }); toast('Standard headline: centred, standard size and colour'); break;
+      case 'look': if (d.post) simpleRelayout({ look: v }); else change(function (dd) { if (v === 'clean') delete dd.look; else dd.look = v; }, { now: true, insp: true }); break;
+      case 'acc': change(function (dd) { if (v === 'blue') delete dd.accent; else dd.accent = v; if (dd.post) dd.post.accent = v; }, { now: true, insp: true }); break;
+      case 'decor': change(function (dd) { dd.copy = dd.copy || {}; if (v === 'none') delete dd.copy.decor; else dd.copy.decor = v; }, { now: true, insp: true }); break;
+      case 'pattern': change(function (dd) { if (v) dd.pattern = v; else delete dd.pattern; }, { now: true, insp: true }); break;
+      case 'tint': change(function (dd) { if (v) dd.tint = v; else delete dd.tint; }, { now: true, insp: true }); break;
+      case 'ground': change(function (dd) { dd.ground = v; }, { now: true, insp: true }); break;
+      case 'badge': change(function (dd) { if (dd.brand) dd.brand.badge = v || 'none'; else dd.badge = v; }, { now: true, insp: true }); break;
+      case 'mirror': simpleRelayout({ mirror: !d.mirror }); break;
+      case 'variant': simpleRelayout({ variant: (d.variant || 0) + 1 }); break;
+      case 'relayout': simpleRelayout({}); toast('Layout reset'); break;
+      case 'fresh': var fr = SP.fresh(d); simpleRelayout(fr); toast('Fresh design: ' + LOOKLAB[fr.look] + ' · ' + fr.accent + ' · ' + DECLAB[fr.decor] + ' · ' + PATLAB[fr.pattern]); break;
+      case 'fmt': change(function (dd) { if (v === '1:1') delete dd.format; else dd.format = v; }, { now: true, insp: true }); break;
+      case 'undo': undo(); break;
+      case 'redo': redo(); break;
+      case 'png': exportPng(d, pngScale()); break;
+    }
   }
   function copyLayers() { var ids = st.multi.length ? st.multi : st.sel > -1 && st.sel !== 'copy' ? [st.sel] : []; if (!ids.length) return; clip = ids.map(function (i) { return clone(cur().layers[i]); }); try { localStorage.setItem('tn-drip-clip', JSON.stringify(clip)); } catch (e) {} toast(ids.length + ' copied'); }
   function pasteLayers() {
@@ -670,6 +896,7 @@
     if (mod && k === 'y' && !typing) { e.preventDefault(); redo(); return; }
     if (typing || !S.canWrite) return;
     if (mod && k === 'c') { copyLayers(); return; }
+    if (mod && k === 'x') { if (st.sel > -1 && st.sel !== 'copy') { e.preventDefault(); copyLayers(); layerAct('del'); } return; }
     if (mod && k === 'v') { e.preventDefault(); pasteLayers(); return; }
     if (mod && k === 'a') { e.preventDefault(); ctxAct('selall'); return; }
     if (e.key === 'Escape') { select(-1); return; }
@@ -951,7 +1178,7 @@
   document.addEventListener('click', function (e) {
     var t = e.target.closest('button,[data-li],select[data-tool]'); if (!t || t.tagName === 'SELECT') return;
     var ds = t.dataset;
-    if (ds.ctx) { ctxAct(ds.ctx); return; }
+    if (t.closest('#ctx')) { if (t.classList.contains('lab')) { var par = t.parentNode; $$('#ctx .it.sub.open').forEach(function (s) { if (s !== par && !s.contains(par)) s.classList.remove('open'); }); par.classList.toggle('open'); return; } if (ds.ctx) ctxAct(ds.ctx, ds.v); return; }
     if (ds.cat) { st.cat = ds.cat; st.pick = null; showGallery(); return; }
     if (ds.open) { if (st.pick && t.classList.contains('thumb')) togglePick(ds.open); else openDrip(ds.open); return; }
     if (ds.pickmode) { st.pick = {}; showGallery(); return; }
@@ -1238,7 +1465,7 @@
     $('i', p).style.width = Math.round(saveDone / Math.max(1, saveTotal) * 100) + '%';
     $('button', p).hidden = saveQ.length === 0;
   }
-  function queueSave(job) {
+  function queueExport(job) {
     if (needsServer()) return;
     saveQ.push(job); saveTotal++;
     if (saveBusy) { savePill($('#savepill span') ? $('#savepill span').textContent.replace(/^\d+ of \d+ · /, '') : 'Saving…'); toast('Queued ' + job.label + ' (' + saveQ.length + ' waiting)', 2500); return; }
@@ -1259,7 +1486,7 @@
     if (!d) return;
     scale = scale || 2;
     var fname = pngName(d, scale), px = 1080 * scale, label = d.name || d.id;
-    queueSave({ label: label, run: function (progress) {
+    queueExport({ label: label, run: function (progress) {
       progress('Rendering ' + label + ' at ' + px + ' px…');
       return renderBlob(d, scale).then(function (b) {
         progress('Save ' + fname + (S.inViewer ? ' · answer the prompt' : ''));
@@ -1274,7 +1501,7 @@
   function exportZip(list, tag) {
     if (!list.length) return;
     var scale = pngScale(), n = list.length, zipName = 'technext-drips-' + tag + (scale > 1 ? '@' + scale + 'x' : '') + '.zip';
-    queueSave({ label: zipName, run: function (progress) {
+    queueExport({ label: zipName, run: function (progress) {
       return loadZip().then(function (JSZip) {
         var files = [];
         return list.reduce(function (p, d, i) { return p.then(function () { progress('Rendering ' + (i + 1) + ' of ' + n + ': ' + (d.name || d.id)); return renderBlob(d, scale).then(function (b) { files.push({ name: pngName(d, scale), blob: b }); }); }); }, Promise.resolve())
