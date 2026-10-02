@@ -188,8 +188,7 @@
   }
   /* the subfolders of the Drips folder: [{id, title}] */
   S.driveFolders = function () {
-    return driveCall('search_files', { query: "parentId = '" + S.DRIVE_ROOT + "' and mimeType = 'application/vnd.google-apps.folder' and trashed = false", pageSize: 100, excludeContentSnippets: true }, { cache: { staleTime: 30000 } })
-      .catch(function (e) { if (e && e.code === 'tool_error') return driveCall('search_files', { query: "parentId = '" + S.DRIVE_ROOT + "' and mimeType = 'application/vnd.google-apps.folder'", pageSize: 100, excludeContentSnippets: true }, { cache: { staleTime: 30000 } }); throw e; })
+    return driveCall('search_files', { query: "parentId = '" + S.DRIVE_ROOT + "' and mimeType = 'application/vnd.google-apps.folder'", pageSize: 100, excludeContentSnippets: true }, { cache: { staleTime: 30000 } })
       .then(function (p) {
         return ((p && p.files) || []).filter(function (f) { return f && f.id; }).map(function (f) { return { id: f.id, title: f.title || f.name || 'Folder' }; })
           .sort(function (a, b) { return a.title.localeCompare(b.title); });
