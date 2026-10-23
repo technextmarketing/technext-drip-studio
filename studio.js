@@ -156,7 +156,7 @@
     chat: ['chat', { channel: 'whatsapp', title: 'Sample Store', msgs: [['in', 'Is my order out for delivery?'], ['bot', 'Yes, it arrives today before 6pm.']] }],
     receipt: ['receipt', { vendor: 'Sample Supplier Pte Ltd', doc: 'TAX INVOICE', lines: [['Item one', '120.00'], ['GST 9%', '10.80']], total: 'S$ 130.80', stamp: 'PAID' }],
     notif: ['notif', { app: 'account', title: 'Invoice paid', text: 'S$ 3,313.60 received online', time: 'now' }],
-    stat: ['stat', { value: '10+', label: 'countries served' }],
+    stat: ['stat', { value: '25+', label: 'countries served' }],
     route: ['route', { stops: [['Tampines', '09:00'], ['Bedok', '10:30'], ['Katong', '13:00']], hot: 1 }],
     link: ['link', { x1: 300, y1: 600, x2: 700, y2: 760, label: 'Handed over', bend: .25 }]
   };

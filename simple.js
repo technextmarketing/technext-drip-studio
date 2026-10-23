@@ -424,7 +424,7 @@
   VIS.proof = { label: 'TechNext in numbers', about: 'the approved company figures', build: function (p, a) {
     var T = a.T;
     var top = 0;
-    [['10+', 'countries'], ['11+', 'enterprise clients'], ['4', 'AI disciplines']].forEach(function (f, i) { var B = a.add({ type: 'stat', variant: 'big', w: 292, rot: [-3, 0, 3][i], z: 12 + i, value: f[0], label: f[1] }, [60, 394, 728][i], T + [34, 0, 34][i]); top = Math.max(top, B.y1); });
+    [['25+', 'countries'], ['90+', 'enterprise clients'], ['4', 'AI disciplines']].forEach(function (f, i) { var B = a.add({ type: 'stat', variant: 'big', w: 292, rot: [-3, 0, 3][i], z: 12 + i, value: f[0], label: f[1] }, [60, 394, 728][i], T + [34, 0, 34][i]); top = Math.max(top, B.y1); });
     var nx = a.nexi(p.nexi || 'celebrate', 420); a.add(nx, Math.round((W - nx.w) / 2), top + 20, 'bleed');
     strs(p.pills, 2, 20).forEach(function (tx, i) { var L = { type: 'pill', text: tx, rot: i ? 4 : -4, z: 19 }; a.fitW(L, 330); a.add(L, i ? W - 54 - a.w(L) : 54, top + 90 + i * 70); });
     a.sparkles(860, T - 40, 96);

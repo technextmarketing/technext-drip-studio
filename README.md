@@ -247,7 +247,7 @@ then republish `hub.html` with the files in `hub-files.json` to the same Artifac
 
 ## Content rules (from technext.asia)
 
-- Say "Odoo Partner"; never "Certified". Only the approved figures: 10+ countries, 11+ enterprise clients, 4 AI disciplines.
+- Say "Odoo Partner"; never "Certified". Only the approved figures: 25+ countries, 90+ enterprise clients, 4 AI disciplines.
 - Marketing (websites, social) is its own TechNext service; never tie it to Odoo (those posts carry no Odoo badge).
 - Odoo 20 claims come from the site's Odoo 20 article; AI features in Odoo 20 use paid credits.
 - Screens use sample data ("Sample Trading Pte Ltd", first names), never a real client's; charts say "Demo data".

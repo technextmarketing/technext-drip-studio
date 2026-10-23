@@ -109,7 +109,7 @@
     pyramid: 'pyramid: 3-5 stages that build on each other, the foundation at the bottom. {"levels":[["title ≤14","sub ≤24"] top to bottom],"hot":index,"note":"≤80","pills":["0-2"]}',
     groups: 'groups: how the business runs on one system: 2-3 groups of Odoo apps on one base. {"groups":[{"title":"≤20","apps":[[module,"label ≤16"] x2-6]}],"base":"≤30","pills":["0-1"]}',
     scan: 'scan: a handheld scanner reading a barcode into Odoo. {"scan":{"title","text":"≤22"},"product":{"item" and the other product fields} OR "doc":{the document fields},"chip":{…},"pills":["0-1"]}',
-    proof: 'proof: the three approved company figures (10+ countries, 11+ enterprise clients, 4 AI disciplines) as big numbers. {"pills":["0-2 ≤20"],"nexi":' + POSE + '}'
+    proof: 'proof: the three approved company figures (25+ countries, 90+ enterprise clients, 4 AI disciplines) as big numbers. {"pills":["0-2 ≤20"],"nexi":' + POSE + '}'
   };
   function propsLine(o) {
     var P = window.TNProps; if (!P) return '';
@@ -235,7 +235,7 @@
       ((o.existingDesigns || []).length ? '- Compositions already in the library, not to repeat: ' + o.existingDesigns.slice(0, 40).join(' · ') : ''),
       '',
       'RULES',
-      '- Never invent client names, results, awards, prices or dates as claims. Company figures allowed: 10+ countries, 11+ enterprise clients, 4 AI disciplines.',
+      '- Never invent client names, results, awards, prices or dates as claims. Company figures allowed: 25+ countries, 90+ enterprise clients, 4 AI disciplines.',
       '- Inside elements use sample data only: generic names ("Sample Trading Pte Ltd", "Mei Ling T."), realistic S$ amounts, dates in Sep-Oct 2026. Chart numbers are demo data.',
       '- Say "Odoo Partner", never "Certified". Never say websites or social media are part of Odoo. Odoo 20 claims only from the Odoo 20 list; AI features use paid credits.',
       '- head: max 9 words, two parts split by | ; wrap 1-3 key words of the second part in *asterisks* (blue). sub: one sentence, max 22 words.',
