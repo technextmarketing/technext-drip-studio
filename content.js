@@ -6133,6 +6133,6 @@ window.TN_CONTENT = {
 "hubs": "Singapore HQ · Philippines · Vietnam",
 "odoo_listing": "https://www.odoo.com/partners/technext-pte-ltd-28073844",
 "careers_email": "career@technext.asia",
-"meeting_link": "https://technext.odoo.com/appointment/discovery-call-with-technext-2?invite_token=914012541b1242c1ae832faa66a6efdc&filter_appointment_type_ids=%5B2%5D&"
+"meeting_link": "https://technext.odoo.com/book/c82cf8a9"
 }
 };
